@@ -831,19 +831,23 @@ function renderMapView(el){
 
 function loadD3AndDraw(){
   if(d3Loaded&&topoLoaded&&worldData){drawWorldMap();return;}
-  if(!d3Loaded){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js';s.onload=()=>{d3Loaded=true;loadTopo();};document.head.appendChild(s);}
-  else loadTopo();
+  // Load D3 and TopoJSON in parallel, then fetch world data
+  const loadScript=(src)=>new Promise((res,rej)=>{
+    const s=document.createElement('script');s.src=src;
+    s.onload=res;s.onerror=rej;document.head.appendChild(s);
+  });
+  const scripts=[];
+  if(!d3Loaded)scripts.push(loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js').then(()=>{d3Loaded=true;}));
+  if(!topoLoaded)scripts.push(loadScript('https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js').then(()=>{topoLoaded=true;}));
+  Promise.all(scripts).then(()=>{
+    if(worldData){drawWorldMap();return;}
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+      .then(r=>r.json()).then(data=>{worldData=data;drawWorldMap();})
+      .catch(()=>{const l=document.getElementById('map-loading');if(l){l.innerHTML='<i class="ti ti-wifi-off" style="font-size:24px;opacity:.4;display:block;margin-bottom:8px"></i>Karte konnte nicht geladen werden.<br><small style="color:#9a9088">Internetverbindung prüfen</small>';}});
+  }).catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Fehler beim Laden der Kartenbibliothek.';});
 }
-function loadTopo(){
-  if(!topoLoaded){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js';s.onload=()=>{topoLoaded=true;fetchWorld();};document.head.appendChild(s);}
-  else fetchWorld();
-}
-function fetchWorld(){
-  if(worldData){drawWorldMap();return;}
-  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
-    .then(r=>r.json()).then(data=>{worldData=data;drawWorldMap();})
-    .catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Karte konnte nicht geladen werden.';});
-}
+function loadTopo(){}
+function fetchWorld(){}
 
 function getCountryWines(){const cw={};wines.forEach(w=>{const c=w.country||'Unbekannt';if(!cw[c])cw[c]=[];cw[c].push(w);});return cw;}
 
@@ -851,7 +855,9 @@ function drawWorldMap(){
   currentDrillCountry=null;
   const container=document.getElementById('map-svg-container');if(!container)return;
   const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
-  const W=container.offsetWidth||360;const H=280;
+  // Wait a frame for layout on iPhone
+  const W=container.getBoundingClientRect().width||container.offsetWidth||360;const H=280;
+  if(W<10){setTimeout(drawWorldMap,100);return;}
   const countryWines=getCountryWines();
   const wineIsos=new Set(Object.keys(countryWines).map(n=>NAME_ISO[n]).filter(Boolean));
   container.innerHTML='';
