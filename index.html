@@ -227,7 +227,13 @@ select.filter-chip{-webkit-appearance:none;appearance:none;padding-right:20px;ba
 <div id="screen-list" class="screen active">
   <div class="topbar">
     <div class="topbar-logo">Wein<span>buch</span></div>
-    <button class="btn btn-wine" onclick="goAdd()"><i class="ti ti-plus"></i> Eintragen</button>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="display:flex;align-items:center;gap:5px;cursor:pointer" onclick="gapi&&gapi.client&&gapi.client.getToken()?disconnectDrive():connectDrive()" title="Google Drive Sync">
+        <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#d0c8bc;flex-shrink:0;transition:background .3s"></span>
+        <span id="sync-btn" style="font-size:10px;color:var(--ink3);font-family:var(--font-body)">Drive</span>
+      </div>
+      <button class="btn btn-wine" onclick="goAdd()"><i class="ti ti-plus"></i> Eintragen</button>
+    </div>
   </div>
   <div id="stats-strip" class="stats-strip"></div>
   <div class="search-row">
@@ -756,6 +762,127 @@ async function importJson(e){
 }
 
 init();
+
+// ── Google Drive Sync ──────────────────────────────────────────────
+const GAPI_CLIENT_ID='399210738927-kr0dkpovdkrr8ugiqv7vcr43oggagjj2.apps.googleusercontent.com';
+const GAPI_SCOPE='https://www.googleapis.com/auth/drive.appdata';
+const DRIVE_FILE_NAME='weinbuch-data.json';
+let gapiReady=false;let gisReady=false;let tokenClient=null;let driveFileId=null;
+
+function loadGoogleLibs(){
+  const s1=document.createElement('script');s1.src='https://apis.google.com/js/api.js';
+  s1.onload=()=>{gapi.load('client',async()=>{await gapi.client.init({});gapiReady=true;checkSyncReady();});};
+  document.head.appendChild(s1);
+  const s2=document.createElement('script');s2.src='https://accounts.google.com/gsi/client';
+  s2.onload=()=>{tokenClient=google.accounts.oauth2.initTokenClient({client_id:GAPI_CLIENT_ID,scope:GAPI_SCOPE,callback:onTokenResponse});gisReady=true;checkSyncReady();};
+  document.head.appendChild(s2);
+}
+
+function checkSyncReady(){
+  if(gapiReady&&gisReady){
+    updateSyncUI('bereit');
+    const saved=localStorage.getItem('wt_gdrive_token');
+    if(saved){gapi.client.setToken(JSON.parse(saved));updateSyncUI('verbunden');syncFromDrive();}
+  }
+}
+
+function onTokenResponse(resp){
+  if(resp.error){updateSyncUI('fehler');return;}
+  localStorage.setItem('wt_gdrive_token',JSON.stringify(gapi.client.getToken()));
+  updateSyncUI('verbunden');
+  syncFromDrive();
+}
+
+function connectDrive(){
+  if(!gapiReady||!gisReady){alert('Google lädt noch, kurz warten.');return;}
+  tokenClient.requestAccessToken({prompt:'consent'});
+}
+
+function disconnectDrive(){
+  const token=gapi.client.getToken();
+  if(token){google.accounts.oauth2.revoke(token.access_token,()=>{});}
+  gapi.client.setToken(null);
+  localStorage.removeItem('wt_gdrive_token');
+  driveFileId=null;
+  updateSyncUI('bereit');
+}
+
+async function syncToDrive(){
+  if(!gapi.client.getToken()){return;}
+  updateSyncUI('sync');
+  try{
+    const data=JSON.stringify(wines);
+    const meta={name:DRIVE_FILE_NAME,parents:['appDataFolder']};
+    if(!driveFileId)await findDriveFile();
+    if(driveFileId){
+      await gapi.client.request({path:`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}`,method:'PATCH',params:{uploadType:'media'},body:data,headers:{'Content-Type':'application/json'}});
+    } else {
+      const boundary='weinbuch_boundary';
+      const body=`--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(meta)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${data}\r\n--${boundary}--`;
+      const resp=await gapi.client.request({path:'https://www.googleapis.com/upload/drive/v3/files',method:'POST',params:{uploadType:'multipart'},body,headers:{'Content-Type':`multipart/related; boundary=${boundary}`}});
+      driveFileId=resp.result.id;
+    }
+    updateSyncUI('ok');
+  }catch(e){
+    if(e.status===401){gapi.client.setToken(null);localStorage.removeItem('wt_gdrive_token');updateSyncUI('bereit');}
+    else updateSyncUI('fehler');
+  }
+}
+
+async function syncFromDrive(){
+  if(!gapi.client.getToken())return;
+  updateSyncUI('sync');
+  try{
+    await findDriveFile();
+    if(!driveFileId){updateSyncUI('verbunden');return;}
+    const resp=await gapi.client.request({path:`https://www.googleapis.com/drive/v3/files/${driveFileId}`,params:{alt:'media'}});
+    const driveWines=typeof resp.result==='string'?JSON.parse(resp.result):resp.result;
+    if(Array.isArray(driveWines)&&driveWines.length>0){
+      const localIds=new Set(wines.map(w=>w.id));
+      const toAdd=driveWines.filter(w=>!localIds.has(w.id));
+      for(const w of toAdd)await dbPut('wines',w);
+      if(toAdd.length>0){
+        wines=await dbGetAll('wines');wines.sort((a,b)=>b.id-a.id);
+        renderAll();
+      }
+    }
+    updateSyncUI('ok');
+  }catch(e){
+    if(e.status===401){gapi.client.setToken(null);localStorage.removeItem('wt_gdrive_token');updateSyncUI('bereit');}
+    else updateSyncUI('verbunden');
+  }
+}
+
+async function findDriveFile(){
+  const resp=await gapi.client.request({path:'https://www.googleapis.com/drive/v3/files',params:{spaces:'appDataFolder',q:`name='${DRIVE_FILE_NAME}'`,fields:'files(id,name)'}});
+  const files=resp.result.files||[];
+  driveFileId=files.length>0?files[0].id:null;
+}
+
+function updateSyncUI(state){
+  const btn=document.getElementById('sync-btn');
+  const dot=document.getElementById('sync-dot');
+  if(!btn||!dot)return;
+  const states={
+    bereit:{dot:'#b8860b',label:'Drive verbinden',disabled:false},
+    verbunden:{dot:'#2d5a27',label:'Drive verbunden',disabled:false},
+    sync:{dot:'#185fa5',label:'Synchronisiert…',disabled:true},
+    ok:{dot:'#2d5a27',label:'Gespeichert ✓',disabled:false},
+    fehler:{dot:'#a32d2d',label:'Fehler',disabled:false},
+  };
+  const s=states[state]||states.bereit;
+  dot.style.background=s.dot;
+  btn.textContent=s.label;
+  btn.disabled=s.disabled;
+  if(state==='ok')setTimeout(()=>updateSyncUI('verbunden'),2500);
+}
+
+const _origSaveWine=saveWine;
+saveWine=async function(){await _origSaveWine.apply(this,arguments);setTimeout(syncToDrive,500);};
+const _origDeleteWine=deleteWine;
+deleteWine=async function(){await _origDeleteWine.apply(this,arguments);setTimeout(syncToDrive,500);};
+
+loadGoogleLibs();
 </script>
 </body>
 </html>
