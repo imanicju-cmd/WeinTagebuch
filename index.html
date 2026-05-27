@@ -236,16 +236,18 @@ select.filter-chip{-webkit-appearance:none;appearance:none;padding-right:20px;ba
     </div>
   </div>
   <div id="stats-strip" class="stats-strip"></div>
-  <div class="search-row">
-    <div class="search-wrap">
-      <i class="ti ti-search"></i>
-      <input class="search-input" id="sinput" placeholder="Wein, Region, Notizen…" oninput="filterWines()">
+  <div id="liste-header">
+    <div class="search-row">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-input" id="sinput" placeholder="Wein, Region, Notizen…" oninput="filterWines()">
+      </div>
     </div>
+    <div class="filter-row" id="filter-row"></div>
   </div>
-  <div class="filter-row" id="filter-row"></div>
-  <div class="scroll-body">
-    <div id="wine-grid" class="wine-grid"></div>
-  </div>
+  <div id="tab-liste" class="scroll-body"><div id="wine-grid" class="wine-grid"></div></div>
+  <div id="tab-karte" class="scroll-body" style="display:none"><div id="karte-content" class="map-wrap"></div></div>
+  <div id="tab-export" class="scroll-body" style="display:none"><div id="export-content"></div></div>
   <div class="bottom-nav">
     <button class="bnav-btn active" id="bnav-liste" onclick="switchMainTab('liste')"><i class="ti ti-layout-grid"></i>Liste</button>
     <button class="bnav-btn" id="bnav-karte" onclick="switchMainTab('karte')"><i class="ti ti-map-2"></i>Karte</button>
@@ -516,111 +518,180 @@ function showScreen(s){document.querySelectorAll('.screen').forEach(x=>x.classLi
 
 function switchMainTab(t){
   activeMainTab=t;
-  ['liste','karte','export'].forEach(x=>document.getElementById('bnav-'+x).classList.toggle('active',x===t));
-  const listEl=document.getElementById('wine-grid').closest('.scroll-body');
-  const filterEl=document.getElementById('filter-row');
-  const searchEl=document.querySelector('.search-row');
-  const statsEl=document.getElementById('stats-strip');
-  if(t==='liste'){
-    listEl.style.display='';filterEl.parentElement.style.display='';searchEl.style.display='';statsEl.style.display='';
-    document.getElementById('map-view')?.remove();document.getElementById('export-view')?.remove();
-  } else {
-    listEl.style.display='none';filterEl.parentElement.style.display='none';searchEl.style.display='none';statsEl.style.display='none';
-    document.getElementById('map-view')?.remove();document.getElementById('export-view')?.remove();
-    const wrap=document.createElement('div');wrap.id=t+'-view';wrap.style.cssText='flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch';
-    document.getElementById('screen-list').insertBefore(wrap,document.querySelector('.bottom-nav'));
-    if(t==='karte')renderMapView(wrap);
-    if(t==='export')renderExportView(wrap);
-  }
+  ['liste','karte','export'].forEach(x=>{
+    document.getElementById('bnav-'+x).classList.toggle('active',x===t);
+    document.getElementById('tab-'+x).style.display=x===t?'block':'none';
+  });
+  document.getElementById('liste-header').style.display=t==='liste'?'block':'none';
+  if(t==='karte'){renderMapView(document.getElementById('karte-content'));}
+  if(t==='export'){renderExportView(document.getElementById('export-content'));}
 }
+
+const ISO_NAMES={'250':'Frankreich','276':'Deutschland','380':'Italien','724':'Spanien','620':'Portugal','40':'Österreich','300':'Griechenland','348':'Ungarn','840':'USA','152':'Chile','32':'Argentinien','710':'Südafrika','36':'Australien','554':'Neuseeland','756':'Schweiz','076':'Brasilien','858':'Uruguay','268':'Georgien','051':'Armenien','792':'Türkei','191':'Kroatien','705':'Slowenien','100':'Bulgarien','642':'Rumänien','376':'Israel','504':'Marokko','788':'Tunesien','124':'Kanada','484':'Mexiko','604':'Peru'};
+const NAME_ISO={};Object.entries(ISO_NAMES).forEach(([k,v])=>{NAME_ISO[v]=k;});
+let d3Loaded=false;let topoLoaded=false;let worldData=null;
 
 function renderMapView(el){
-  const countryWines={};
-  wines.forEach(w=>{if(!countryWines[w.country||'Unbekannt'])countryWines[w.country||'Unbekannt']=[];countryWines[w.country||'Unbekannt'].push(w);});
+  el.innerHTML=`
+    <div style="position:relative">
+      <div id="map-svg-container" style="width:100%;height:280px;background:#c8dce8;overflow:hidden;position:relative;touch-action:none">
+        <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8a95;flex-direction:column;gap:8px"><i class="ti ti-map-2" style="font-size:28px;opacity:.4"></i>Weltkarte lädt…</div>
+      </div>
+      <div id="map-back-btn" style="position:absolute;top:10px;left:10px;display:none">
+        <button class="btn" style="font-size:11px;padding:5px 10px;background:rgba(250,248,244,0.92)" onclick="mapZoomOut()"><i class="ti ti-arrow-left"></i> Zurück</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;padding:8px 14px;border-bottom:0.5px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)"><span style="width:10px;height:10px;border-radius:50%;background:var(--wine);display:inline-block"></span>Weine vorhanden</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3)"><span style="width:10px;height:10px;background:#d8cfc5;display:inline-block;border-radius:2px"></span>Noch keine</div>
+    </div>
+    <div id="map-country-list" style="padding:10px 14px 0"></div>`;
+  loadD3AndDraw();
+}
+
+function loadD3AndDraw(){
+  if(d3Loaded&&topoLoaded&&worldData){drawWorldMap();return;}
+  if(!d3Loaded){
+    const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js';
+    s.onload=()=>{d3Loaded=true;loadTopo();};document.head.appendChild(s);
+  } else loadTopo();
+}
+function loadTopo(){
+  if(!topoLoaded){
+    const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js';
+    s.onload=()=>{topoLoaded=true;fetchWorld();};document.head.appendChild(s);
+  } else fetchWorld();
+}
+function fetchWorld(){
+  if(worldData){drawWorldMap();return;}
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    .then(r=>r.json()).then(data=>{worldData=data;drawWorldMap();})
+    .catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Karte konnte nicht geladen werden.';});
+}
+
+function getCountryWines(){
+  const cw={};wines.forEach(w=>{const c=w.country||'Unbekannt';if(!cw[c])cw[c]=[];cw[c].push(w);});return cw;
+}
+
+let _mapSvg=null;let _mapZoom=null;let _mapG=null;let _mapProjection=null;let _mapPath=null;
+
+function drawWorldMap(){
+  const container=document.getElementById('map-svg-container');if(!container)return;
+  const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
+  const W=container.offsetWidth||360;const H=280;
+  const countryWines=getCountryWines();
+  const wineIsos=new Set(Object.keys(countryWines).map(n=>NAME_ISO[n]).filter(Boolean));
+
+  container.innerHTML='';
+  const svg=d3.select(container).append('svg').attr('width',W).attr('height',H).style('display','block');
+  _mapSvg=svg;
+  const projection=d3.geoNaturalEarth1().scale(W/6.3).translate([W/2,H/2]);
+  _mapProjection=projection;
+  const path=d3.geoPath().projection(projection);
+  _mapPath=path;
+  const zoom=d3.zoom().scaleExtent([1,10]).on('zoom',e=>{g.attr('transform',e.transform);});
+  _mapZoom=zoom;
+  svg.call(zoom);
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill','#c8dce8');
+  const g=svg.append('g');
+  _mapG=g;
+
+  const countries=topojson.feature(worldData,worldData.objects.countries);
+
+  g.selectAll('path.country')
+    .data(countries.features)
+    .join('path')
+    .attr('class','country')
+    .attr('d',path)
+    .attr('fill',d=>{
+      const iso=String(d.id);
+      return(wineIsos.has(iso)||wineIsos.has(iso.padStart(3,'0')))?'#7a1c2e':'#d8cfc5';
+    })
+    .attr('stroke','#fff')
+    .attr('stroke-width',0.4)
+    .style('cursor',d=>{
+      const iso=String(d.id);
+      return(wineIsos.has(iso)||wineIsos.has(iso.padStart(3,'0')))?'pointer':'default';
+    })
+    .on('click',(event,d)=>{
+      const iso=String(d.id);
+      const name=ISO_NAMES[iso]||ISO_NAMES[iso.padStart(3,'0')];
+      if(!name||!countryWines[name])return;
+      zoomToCountry(d,name,path,svg,g,zoom,W,H,countryWines);
+    });
+
+  // White dot markers on wine countries
+  g.selectAll('circle.wine-marker')
+    .data(countries.features.filter(d=>{const iso=String(d.id);return wineIsos.has(iso)||wineIsos.has(iso.padStart(3,'0'));}))
+    .join('circle')
+    .attr('class','wine-marker')
+    .attr('cx',d=>{try{const c=path.centroid(d);return isNaN(c[0])?0:c[0];}catch(e){return 0;}})
+    .attr('cy',d=>{try{const c=path.centroid(d);return isNaN(c[1])?0:c[1];}catch(e){return 0;}})
+    .attr('r',4).attr('fill','#fff').attr('stroke','#7a1c2e').attr('stroke-width',1.5)
+    .style('pointer-events','none');
+
+  renderCountryList(countryWines);
+}
+
+function zoomToCountry(feature,countryName,path,svg,g,zoom,W,H,countryWines){
+  try{
+    const [[x0,y0],[x1,y1]]=path.bounds(feature);
+    if(isNaN(x0))return;
+    const dx=x1-x0,dy=y1-y0;
+    const cx=(x0+x1)/2,cy=(y0+y1)/2;
+    const scale=Math.min(8,0.8/Math.max(dx/W,dy/H));
+    svg.transition().duration(650).call(zoom.transform,d3.zoomIdentity.translate(W/2-scale*cx,H/2-scale*cy).scale(scale));
+    const backBtn=document.getElementById('map-back-btn');if(backBtn)backBtn.style.display='block';
+    setTimeout(()=>{
+      document.querySelectorAll('.map-country-card').forEach(card=>{
+        if(card.dataset.country===countryName){
+          card.querySelector('.map-country-wines').classList.add('open');
+          card.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    },500);
+  }catch(e){}
+}
+
+function mapZoomOut(){
+  if(_mapSvg&&_mapZoom){
+    const container=document.getElementById('map-svg-container');
+    const W=container?.offsetWidth||360;const H=280;
+    _mapSvg.transition().duration(500).call(_mapZoom.transform,d3.zoomIdentity);
+  }
+  const backBtn=document.getElementById('map-back-btn');if(backBtn)backBtn.style.display='none';
+}
+
+function renderCountryList(countryWines){
+  const el=document.getElementById('map-country-list');if(!el)return;
   const countries=Object.keys(countryWines).sort();
-  el.innerHTML=`<div class="map-wrap">
-    <div class="world-map-container">
-      ${buildMapSVG(countryWines)}
-    </div>
-    <div style="font-size:11px;color:var(--ink3);margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:var(--wine);display:inline-block"></span>Einträge vorhanden</div>
-      <div style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:var(--bg3);display:inline-block;border:0.5px solid var(--border2)"></span>Noch keine</div>
-    </div>
-    ${countries.map(c=>{
-      const ws=countryWines[c];const flag=COUNTRY_FLAGS[c]||'🍷';
-      const avg=(ws.reduce((a,w)=>a+w.rating,0)/ws.length).toFixed(1);
-      const regionGroups={};ws.forEach(w=>{const r=w.region||'—';if(!regionGroups[r])regionGroups[r]=[];regionGroups[r].push(w);});
-      return`<div class="map-country-card">
-        <div class="map-country-header" onclick="this.nextElementSibling.classList.toggle('open')">
-          <span class="map-country-flag">${flag}</span>
-          <span class="map-country-name">${c}</span>
-          <span class="map-country-count">${ws.length} Weine · ★ ${avg}</span>
-          <i class="ti ti-chevron-down" style="font-size:14px;color:var(--ink3)"></i>
-        </div>
-        <div class="map-country-wines">
-          ${Object.entries(regionGroups).map(([r,rws])=>`
-            <div class="map-region-item">
-              <div class="map-region-name">${r}</div>
-              <div class="map-region-meta">${[...new Set(rws.map(w=>w.lage).filter(Boolean))].join(', ')||''} ${[...new Set(rws.map(w=>w.klass).filter(Boolean))].join(', ')||''}</div>
-              <div class="map-region-wines-list">
-                ${rws.map(w=>`<div class="map-wine-row" onclick="goDetail(${w.id})">
-                  <span style="color:var(--gold);font-size:10px">${'★'.repeat(w.rating)}</span>
-                  <span style="flex:1">${w.name}</span>
-                  <span style="color:var(--ink3);font-size:11px">${w.vintage||'NV'}</span>
-                </div>`).join('')}
-              </div>
-            </div>`).join('')}
-        </div>
-      </div>`;
-    }).join('')}
-    <div style="height:20px"></div>
-  </div>`;
-}
-
-function buildMapSVG(countryWines){
-  const wineCountries=Object.keys(countryWines);
-  const europePoints={
-    'Frankreich':'M 195 118 L 215 108 L 240 112 L 248 130 L 242 148 L 220 155 L 198 148 L 188 132 Z',
-    'Deutschland':'M 220 88 L 245 82 L 262 90 L 258 108 L 242 112 L 218 108 L 212 96 Z',
-    'Italien':'M 240 148 L 258 145 L 272 152 L 278 165 L 270 178 L 260 185 L 248 175 L 244 162 Z',
-    'Spanien':'M 170 128 L 195 118 L 198 148 L 182 158 L 162 152 L 155 138 Z',
-    'Portugal':'M 158 132 L 170 128 L 165 150 L 155 155 L 150 145 Z',
-    'Österreich':'M 248 100 L 268 96 L 278 104 L 270 112 L 250 114 L 242 108 Z',
-    'Griechenland':'M 272 148 L 290 145 L 295 155 L 285 165 L 272 162 Z',
-    'Ungarn':'M 268 104 L 285 102 L 292 112 L 282 120 L 266 118 Z',
-  };
-  const otherCountryCircles={
-    'USA':'248 75',
-    'Australien':'370 195',
-    'Neuseeland':'400 205',
-    'Chile':'220 210',
-    'Argentinien':'225 220',
-    'Südafrika':'295 200',
-  };
-  const svgPaths=Object.entries(europePoints).map(([country,path])=>{
-    const hasWine=wineCountries.includes(country);
-    return`<path d="${path}" fill="${hasWine?'#7a1c2e':'#d0c8bc'}" stroke="white" stroke-width="1.5" opacity="${hasWine?1:0.6}" style="cursor:${hasWine?'pointer':'default'}" onclick="${hasWine?`openCountryOnMap('${country}')`:''}"><title>${country}${hasWine?` (${countryWines[country].length} Weine)`:''}</title></path>`;
-  });
-  const svgCircles=Object.entries(otherCountryCircles).map(([country,pos])=>{
-    const [cx,cy]=pos.split(' ');const hasWine=wineCountries.includes(country);
-    return`<circle cx="${cx}" cy="${cy}" r="${hasWine?8:5}" fill="${hasWine?'#7a1c2e':'#d0c8bc'}" stroke="white" stroke-width="1.5" opacity="${hasWine?1:0.5}" style="cursor:${hasWine?'pointer':'default'}" onclick="${hasWine?`openCountryOnMap('${country}')`:''}"><title>${country}${hasWine?` (${countryWines[country].length} Weine)`:''}</title></circle>`;
-  });
-  return`<svg viewBox="100 60 360 180" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
-    <rect x="100" y="60" width="360" height="180" fill="#c8dce8"/>
-    ${svgPaths.join('')}${svgCircles.join('')}
-    <text x="110" y="72" font-size="8" fill="#7a8a95" font-family="sans-serif">Weltkarte</text>
-  </svg>`;
-}
-
-function openCountryOnMap(country){
-  const cards=document.querySelectorAll('.map-country-card');
-  cards.forEach(card=>{
-    const header=card.querySelector('.map-country-name');
-    if(header&&header.textContent===country){
-      card.querySelector('.map-country-wines').classList.add('open');
-      card.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-  });
+  el.innerHTML=countries.map(c=>{
+    const ws=countryWines[c];const flag=COUNTRY_FLAGS[c]||'🍷';
+    const avg=(ws.reduce((a,w)=>a+w.rating,0)/ws.length).toFixed(1);
+    const regionGroups={};ws.forEach(w=>{const r=w.region||'—';if(!regionGroups[r])regionGroups[r]=[];regionGroups[r].push(w);});
+    return`<div class="map-country-card" data-country="${c}">
+      <div class="map-country-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="map-country-flag">${flag}</span>
+        <span class="map-country-name">${c}</span>
+        <span class="map-country-count">${ws.length} Weine · ★${avg}</span>
+        <i class="ti ti-chevron-down" style="font-size:14px;color:var(--ink3)"></i>
+      </div>
+      <div class="map-country-wines">
+        ${Object.entries(regionGroups).map(([r,rws])=>`
+          <div class="map-region-item">
+            <div class="map-region-name">${r}</div>
+            <div class="map-region-meta">${[...new Set(rws.map(w=>w.lage).filter(Boolean))].join(' · ')} ${[...new Set(rws.map(w=>w.klass).filter(Boolean))].join(' · ')}</div>
+            <div class="map-region-wines-list">
+              ${rws.map(w=>`<div class="map-wine-row" onclick="goDetail(${w.id})">
+                <span style="color:var(--gold);font-size:10px">${'★'.repeat(w.rating)}</span>
+                <span style="flex:1">${w.name}</span>
+                <span style="color:var(--ink3);font-size:11px">${w.vintage||'NV'}</span>
+              </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('')+'<div style="height:20px"></div>';
 }
 
 function renderExportView(el){
