@@ -214,21 +214,37 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 .map-vintage-row:active{background:var(--wine-pale)}
 .map-vintage-chip{background:var(--ink);color:var(--bg);font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.3px}
 
-/* TYPE TILES */
-.type-tile{border-radius:var(--r2);padding:10px 8px;text-align:center;cursor:pointer;transition:all .12s;border:1.5px solid transparent;display:flex;flex-direction:column;align-items:center;gap:5px}
-.type-tile:active{transform:scale(0.95)}
-.type-tile.active{border-color:var(--ink)}
-.type-tile-icon{font-size:20px}
-.type-tile-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.2}
-.type-tile-count{font-size:8px;opacity:.7}
+/* HOME TAB NAV */
+.home-tab-btn{flex:1;padding:12px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink3);font-family:var(--font-body);border-bottom:2px solid transparent;transition:all .15s;letter-spacing:0.2px}
+.home-tab-btn.active{color:var(--ink);border-bottom-color:var(--ink)}
 
-/* HOME LISTS */
-.home-list-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);cursor:pointer;gap:6px}
-.home-list-item:last-child{border-bottom:none}
-.home-list-item:active{opacity:.6}
-.home-list-name{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:-0.2px;line-height:1.3}
-.home-list-sub{font-size:9px;color:var(--ink3);margin-top:1px}
-.home-list-count{font-size:10px;font-weight:700;color:var(--wine);flex-shrink:0}
+/* GRADIENT TILES */
+.type-tile{border-radius:20px;padding:0;cursor:pointer;transition:all .15s;border:none;overflow:hidden;aspect-ratio:1;position:relative;display:flex;align-items:flex-end}
+.type-tile:active{transform:scale(0.96)}
+.type-tile-gradient{position:absolute;inset:0;border-radius:20px}
+.type-tile-body{position:relative;padding:14px;z-index:1;width:100%}
+.type-tile-label{font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.3px;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.type-tile-count{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;font-weight:500}
+.type-tile.active::after{content:'';position:absolute;inset:0;border-radius:20px;border:3px solid rgba(255,255,255,0.8)}
+
+/* COUNTRY TILES */
+.country-tile{border-radius:16px;padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;background:var(--bg2);margin-bottom:8px;border:1.5px solid transparent}
+.country-tile:active{transform:scale(0.98)}
+.country-tile.active{border-color:var(--ink)}
+.country-flag{font-size:26px}
+.country-tile-name{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;flex:1}
+.country-tile-meta{font-size:10px;color:var(--ink3);font-weight:500}
+.country-tile-count{font-size:18px;font-weight:700;color:var(--wine);min-width:28px;text-align:right}
+
+/* WEINGUT ALPHA LIST */
+.alpha-section{margin-bottom:4px}
+.alpha-letter{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;padding:10px 2px 4px}
+.weingut-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;cursor:pointer;transition:all .12s;background:transparent}
+.weingut-row:active{background:var(--bg2)}
+.weingut-row-name{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-0.2px}
+.weingut-row-count{font-size:12px;font-weight:700;color:var(--wine)}
+
+/* TYPE TILE */
 
 /* AUTOCOMPLETE */
 .ac-wrap{position:relative}
@@ -269,30 +285,33 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
     </div>
   </div>
 
-  <!-- HOME TAB -->
-  <div id="tab-home" class="scroll-body">
+  <!-- HOME SUB-NAV -->
+  <div id="home-subnav" style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);flex-shrink:0">
+    <button class="home-tab-btn active" id="htab-weinart" onclick="if(typeof switchHomeTab==='function')switchHomeTab('weinart')">Weinart</button>
+    <button class="home-tab-btn" id="htab-laender" onclick="if(typeof switchHomeTab==='function')switchHomeTab('laender')">Länder</button>
+    <button class="home-tab-btn" id="htab-weingueter" onclick="if(typeof switchHomeTab==='function')switchHomeTab('weingueter')">Weingüter</button>
+  </div>
+
+  <!-- WEINART PANEL -->
+  <div id="panel-weinart" class="scroll-body">
     <div id="stats-strip" class="stats-strip"></div>
-
-    <!-- Weinart Kacheln -->
-    <div style="padding:14px 16px 4px">
-      <div style="font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Weinart</div>
-      <div id="type-tiles" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+    <div style="padding:16px 14px">
+      <div id="type-tiles" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
     </div>
+  </div>
 
-    <!-- Länder & Weingüter -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:14px;border-top:0.5px solid var(--border)">
-      <!-- Länder -->
-      <div style="border-right:0.5px solid var(--border);padding:14px 14px 6px">
-        <div style="font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Länder</div>
-        <div id="country-list-home"></div>
-      </div>
-      <!-- Weingüter -->
-      <div style="padding:14px 14px 6px">
-        <div style="font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Weingüter</div>
-        <div id="weingut-list-home"></div>
-      </div>
+  <!-- LÄNDER PANEL -->
+  <div id="panel-laender" class="scroll-body" style="display:none">
+    <div style="padding:16px 14px">
+      <div id="country-tiles"></div>
     </div>
-    <div style="height:20px"></div>
+  </div>
+
+  <!-- WEINGÜTER PANEL -->
+  <div id="panel-weingueter" class="scroll-body" style="display:none">
+    <div style="padding:16px 14px">
+      <div id="weingut-alpha-list"></div>
+    </div>
   </div>
 
   <!-- LISTE TAB (filtered results) -->
@@ -315,7 +334,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <div id="tab-export" class="scroll-body" style="display:none"><div id="export-content"></div></div>
 
   <div class="bottom-nav">
-    <button class="bnav-btn active" id="bnav-home" onclick="switchMainTab('home')"><i class="ti ti-home"></i>Start</button>
+    <button class="bnav-btn active" id="bnav-home" onclick="switchMainTab('home')"><i class="ti ti-layout-grid"></i>Start</button>
     <button class="bnav-btn" id="bnav-liste" onclick="switchMainTab('liste')"><i class="ti ti-list"></i>Alle</button>
     <button class="bnav-btn" id="bnav-karte" onclick="switchMainTab('karte')"><i class="ti ti-map-2"></i>Karte</button>
     <button class="bnav-btn" id="bnav-export" onclick="switchMainTab('export')"><i class="ti ti-download"></i>Export</button>
@@ -501,17 +520,28 @@ async function renderGrid(list){
   grid.innerHTML=items.join('');
 }
 
-const TYPE_CONFIG={
-  'Schaumwein':{icon:'🥂',bg:'#e8f4f0',color:'#1a5c48'},
-  'Weißwein':{icon:'🍋',bg:'#faf5e0',color:'#5c4a10'},
-  'Rosé':{icon:'🌸',bg:'#fce8f0',color:'#8b1a4a'},
-  'Orange':{icon:'🍊',bg:'#fdeede',color:'#7a3010'},
-  'Rotwein':{icon:'🍷',bg:'#fbecea',color:'#8b1a2e'},
-  'Portwein':{icon:'🫙',bg:'#f0e8f8',color:'#4a1a7a'},
-  'Süßwein':{icon:'🍯',bg:'#fdf4dc',color:'#7a5010'},
-  'Sonstiges':{icon:'🍾',bg:'#f0f0f0',color:'#4a4a4a'},
+const TYPE_GRADIENTS={
+  'Schaumwein':'linear-gradient(135deg,#c8d8f0 0%,#e0c8e8 60%,#f0d8c0 100%)',
+  'Weißwein':'linear-gradient(135deg,#f0e8a0 0%,#e8d070 60%,#c8b040 100%)',
+  'Rosé':'linear-gradient(135deg,#f8c0c8 0%,#e88898 60%,#d06070 100%)',
+  'Orange':'linear-gradient(135deg,#f8d090 0%,#e89858 60%,#c86830 100%)',
+  'Rotwein':'linear-gradient(135deg,#c05060 0%,#882838 60%,#581020 100%)',
+  'Portwein':'linear-gradient(135deg,#9868b0 0%,#683880 60%,#401858 100%)',
+  'Süßwein':'linear-gradient(135deg,#f8e090 0%,#e8b850 60%,#c88820 100%)',
+  'Sonstiges':'linear-gradient(135deg,#c8c8c8 0%,#989898 60%,#686868 100%)',
 };
 let activeTypeFilter=null;let activeCountryFilter=null;let activeWeingutFilter=null;
+let activeHomeTab='weinart';
+
+function switchHomeTab(tab){
+  activeHomeTab=tab;
+  ['weinart','laender','weingueter'].forEach(t=>{
+    document.getElementById('htab-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='laender')renderCountryTiles();
+  if(tab==='weingueter')renderWeingutAlpha();
+}
 
 function renderStats(){
   const el=document.getElementById('stats-strip');if(!el)return;
@@ -528,19 +558,21 @@ function renderTypeTiles(){
   const typeCounts={};wines.forEach(w=>{const t=w.type||'Sonstiges';typeCounts[t]=(typeCounts[t]||0)+1;});
   const types=['Schaumwein','Weißwein','Rosé','Orange','Rotwein','Portwein','Süßwein'];
   el.innerHTML=types.map(t=>{
-    const cfg=TYPE_CONFIG[t]||{icon:'🍾',bg:'#f0f0f0',color:'#333'};
+    const grad=TYPE_GRADIENTS[t]||TYPE_GRADIENTS['Sonstiges'];
     const count=typeCounts[t]||0;
     const isActive=activeTypeFilter===t;
-    return`<div class="type-tile" style="background:${cfg.bg};color:${cfg.color};border-color:${isActive?cfg.color:'transparent'}" onclick="filterByType('${t}')">
-      <div class="type-tile-icon">${cfg.icon}</div>
-      <div class="type-tile-label">${t}</div>
-      <div class="type-tile-count">${count} Weine</div>
+    return`<div class="type-tile${isActive?' active':''}" onclick="filterByType('${t}')">
+      <div class="type-tile-gradient" style="background:${grad}"></div>
+      <div class="type-tile-body">
+        <div class="type-tile-label">${t}</div>
+        <div class="type-tile-count">${count} ${count===1?'Wein':'Weine'}</div>
+      </div>
     </div>`;
   }).join('');
 }
 
-function renderCountryListHome(){
-  const el=document.getElementById('country-list-home');if(!el)return;
+function renderCountryTiles(){
+  const el=document.getElementById('country-tiles');if(!el)return;
   const countryGroups={};
   wines.forEach(w=>{
     const c=w.country||'—';
@@ -548,32 +580,46 @@ function renderCountryListHome(){
     countryGroups[c].wines.push(w);
     if(w.region)countryGroups[c].regions.add(w.region);
   });
-  if(!Object.keys(countryGroups).length){el.innerHTML=`<div style="font-size:11px;color:var(--ink3)">Noch keine Einträge</div>`;return;}
+  if(!Object.keys(countryGroups).length){el.innerHTML=`<div style="font-size:13px;color:var(--ink3);text-align:center;padding:32px">Noch keine Einträge</div>`;return;}
   el.innerHTML=Object.entries(countryGroups).sort(([a],[b])=>a.localeCompare(b)).map(([c,data])=>`
-    <div class="home-list-item" onclick="filterByCountry('${c.replace(/'/g,"\\'")}')">
-      <div><div class="home-list-name">${COUNTRY_FLAGS[c]||''} ${c}</div><div class="home-list-sub">${data.regions.size} Regionen</div></div>
-      <div class="home-list-count">${data.wines.length}</div>
+    <div class="country-tile" onclick="filterByCountry('${c.replace(/'/g,"\\'")}')">
+      <div class="country-flag">${COUNTRY_FLAGS[c]||'🍷'}</div>
+      <div style="flex:1">
+        <div class="country-tile-name">${c}</div>
+        <div class="country-tile-meta">${data.regions.size} ${data.regions.size===1?'Region':'Regionen'}</div>
+      </div>
+      <div class="country-tile-count">${data.wines.length}</div>
     </div>`).join('');
 }
 
-function renderWeingutListHome(){
-  const el=document.getElementById('weingut-list-home');if(!el)return;
+function renderWeingutAlpha(){
+  const el=document.getElementById('weingut-alpha-list');if(!el)return;
   const wgGroups={};
-  wines.forEach(w=>{const wg=w.weingut||w.name;if(!wgGroups[wg])wgGroups[wg]=[];wgGroups[wg].push(w);});
-  if(!Object.keys(wgGroups).length){el.innerHTML=`<div style="font-size:11px;color:var(--ink3)">Noch keine Einträge</div>`;return;}
-  el.innerHTML=Object.entries(wgGroups).sort(([a],[b])=>a.localeCompare(b)).map(([wg,ws])=>`
-    <div class="home-list-item" onclick="filterByWeingut('${wg.replace(/'/g,"\\'")}')">
-      <div class="home-list-name" style="font-size:11px">${wg}</div>
-      <div class="home-list-count">${ws.length}</div>
+  wines.forEach(w=>{const wg=w.weingut||w.name;if(!wgGroups[wg])wgGroups[wg]=0;wgGroups[wg]++;});
+  const sorted=Object.entries(wgGroups).sort(([a],[b])=>a.localeCompare(b,'de'));
+  const byLetter={};
+  sorted.forEach(([wg,count])=>{const letter=wg[0].toUpperCase();if(!byLetter[letter])byLetter[letter]=[];byLetter[letter].push([wg,count]);});
+  if(!Object.keys(byLetter).length){el.innerHTML=`<div style="font-size:13px;color:var(--ink3);text-align:center;padding:32px">Noch keine Einträge</div>`;return;}
+  el.innerHTML=Object.entries(byLetter).map(([letter,items])=>`
+    <div class="alpha-section">
+      <div class="alpha-letter">${letter}</div>
+      ${items.map(([wg,count])=>`
+        <div class="weingut-row" onclick="filterByWeingut('${wg.replace(/'/g,"\\'")}')">
+          <div class="weingut-row-name">${wg}</div>
+          <div class="weingut-row-count">${count}</div>
+        </div>`).join('')}
     </div>`).join('');
 }
+
+function renderCountryListHome(){renderCountryTiles();}
+function renderWeingutListHome(){renderWeingutAlpha();}
 
 function filterByType(type){
   activeTypeFilter=activeTypeFilter===type?null:type;
   activeCountryFilter=null;activeWeingutFilter=null;
   renderTypeTiles();
   if(activeTypeFilter){
-    document.getElementById('filter-label').textContent=(TYPE_CONFIG[type]?.icon||'')+' '+type;
+    document.getElementById('filter-label').textContent=type;
     showFilteredList(wines.filter(w=>w.type===type));
   }
 }
@@ -586,7 +632,7 @@ function filterByCountry(country){
 
 function filterByWeingut(wg){
   activeWeingutFilter=wg;activeTypeFilter=null;activeCountryFilter=null;
-  document.getElementById('filter-label').textContent='🏠 '+wg;
+  document.getElementById('filter-label').textContent=wg;
   showFilteredList(wines.filter(w=>(w.weingut||w.name)===wg));
 }
 
@@ -612,19 +658,33 @@ function switchMainTab(t){
   activeMainTab=t;
   ['home','liste','karte','export'].forEach(x=>{
     const btn=document.getElementById('bnav-'+x);if(btn)btn.classList.toggle('active',x===t);
-    const tab=document.getElementById('tab-'+x);if(tab)tab.style.display=x===t?'block':'none';
   });
-  if(t==='karte')renderMapView(document.getElementById('karte-content'));
-  if(t==='export')renderExportView(document.getElementById('export-content'));
-  if(t==='liste'&&!activeTypeFilter&&!activeCountryFilter&&!activeWeingutFilter){
-    document.getElementById('filter-label').textContent='Alle Weine';
-    renderGrid(wines);
+  // Hide all top-level panels
+  ['panel-weinart','panel-laender','panel-weingueter','tab-liste','tab-karte','tab-export'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  document.getElementById('home-subnav').style.display=t==='home'?'flex':'none';
+  if(t==='home'){
+    // Show correct home sub-panel
+    document.getElementById('panel-'+activeHomeTab).style.display='block';
+  } else if(t==='liste'){
+    document.getElementById('tab-liste').style.display='block';
+    if(!activeTypeFilter&&!activeCountryFilter&&!activeWeingutFilter){
+      document.getElementById('filter-label').textContent='Alle Weine';
+      renderGrid(wines);
+    }
+  } else if(t==='karte'){
+    document.getElementById('tab-karte').style.display='block';
+    renderMapView(document.getElementById('karte-content'));
+  } else if(t==='export'){
+    document.getElementById('tab-export').style.display='block';
+    renderExportView(document.getElementById('export-content'));
   }
 }
 
 function renderFilters(){}
 
-function renderAll(){renderStats();renderTypeTiles();renderCountryListHome();renderWeingutListHome();}
+function renderAll(){renderStats();renderTypeTiles();}
 
 
 // ── Navigation ──────────────────────────────────────────
@@ -774,41 +834,58 @@ async function saveWine(){
 // ── Map ─────────────────────────────────────────────────
 const ISO_NAMES={'250':'Frankreich','276':'Deutschland','380':'Italien','724':'Spanien','620':'Portugal','40':'Österreich','300':'Griechenland','348':'Ungarn','840':'USA','152':'Chile','32':'Argentinien','710':'Südafrika','36':'Australien','554':'Neuseeland','756':'Schweiz','076':'Brasilien','858':'Uruguay','268':'Georgien','051':'Armenien','792':'Türkei','191':'Kroatien','705':'Slowenien','100':'Bulgarien','642':'Rumänien','376':'Israel','504':'Marokko','788':'Tunesien','124':'Kanada','484':'Mexiko','604':'Peru'};
 const NAME_ISO={};Object.entries(ISO_NAMES).forEach(([k,v])=>{NAME_ISO[v]=k;});
-let d3Loaded=false;let topoLoaded=false;let worldData=null;
-let currentDrillCountry=null;
 
-const DE_REGIONS={type:'FeatureCollection',features:[
-  {type:'Feature',properties:{name:'Mosel'},geometry:{type:'Polygon',coordinates:[[[6.5,49.4],[7.4,49.4],[7.4,50.4],[6.5,50.4],[6.5,49.4]]]}},
-  {type:'Feature',properties:{name:'Rheingau'},geometry:{type:'Polygon',coordinates:[[[7.9,49.95],[8.5,49.95],[8.5,50.2],[7.9,50.2],[7.9,49.95]]]}},
-  {type:'Feature',properties:{name:'Rheinhessen'},geometry:{type:'Polygon',coordinates:[[[7.9,49.5],[8.5,49.5],[8.5,50.0],[7.9,50.0],[7.9,49.5]]]}},
-  {type:'Feature',properties:{name:'Pfalz'},geometry:{type:'Polygon',coordinates:[[[7.7,49.0],[8.3,49.0],[8.3,49.55],[7.7,49.55],[7.7,49.0]]]}},
-  {type:'Feature',properties:{name:'Baden'},geometry:{type:'Polygon',coordinates:[[[7.5,47.6],[8.5,47.6],[8.5,49.1],[7.5,49.1],[7.5,47.6]]]}},
-  {type:'Feature',properties:{name:'Württemberg'},geometry:{type:'Polygon',coordinates:[[[8.8,48.4],[9.8,48.4],[9.8,49.3],[8.8,49.3],[8.8,48.4]]]}},
-  {type:'Feature',properties:{name:'Franken'},geometry:{type:'Polygon',coordinates:[[[9.8,49.5],[11.0,49.5],[11.0,50.3],[9.8,50.3],[9.8,49.5]]]}},
-  {type:'Feature',properties:{name:'Nahe'},geometry:{type:'Polygon',coordinates:[[[7.4,49.55],[8.0,49.55],[8.0,49.95],[7.4,49.95],[7.4,49.55]]]}},
-  {type:'Feature',properties:{name:'Ahr'},geometry:{type:'Polygon',coordinates:[[[6.7,50.4],[7.2,50.4],[7.2,50.6],[6.7,50.6],[6.7,50.4]]]}},
-  {type:'Feature',properties:{name:'Mittelrhein'},geometry:{type:'Polygon',coordinates:[[[7.2,50.1],[7.7,50.1],[7.7,50.5],[7.2,50.5],[7.2,50.1]]]}},
-  {type:'Feature',properties:{name:'Saale-Unstrut'},geometry:{type:'Polygon',coordinates:[[[11.5,51.1],[12.3,51.1],[12.3,51.5],[11.5,51.5],[11.5,51.1]]]}},
-  {type:'Feature',properties:{name:'Sachsen'},geometry:{type:'Polygon',coordinates:[[[13.1,51.0],[13.8,51.0],[13.8,51.3],[13.1,51.3],[13.1,51.0]]]}},
-]};
+const SVG_REGIONS={
+  Deutschland:{
+    viewBox:'55 18 200 295',
+    regions:[
+      {id:'Ahr',fill:'#B5D4F4',d:'M118 78 L130 75 L134 79 L133 86 L126 90 L118 88 L115 83Z',lx:124,ly:83,grape:'Spätburgunder, Frühburgunder',soil:'Schiefer, Grauwacke, Basalt',type:'Rotwein'},
+      {id:'Mittelrhein',fill:'#CED9F0',d:'M130 62 L142 60 L146 68 L144 80 L136 84 L132 80 L128 68Z',lx:137,ly:73,grape:'Riesling',soil:'Schiefer, Quarzit',type:'Weißwein'},
+      {id:'Mosel',fill:'#85B7EB',d:'M82 80 L100 74 L112 72 L120 76 L118 84 L114 92 L108 100 L100 106 L90 108 L82 102 L78 94 L80 86Z',lx:98,ly:93,grape:'Riesling, Elbling',soil:'Devonschiefer, Grau- & Rotschiefer',type:'Weißwein'},
+      {id:'Nahe',fill:'#9FE1CB',d:'M118 88 L130 86 L136 90 L138 100 L132 106 L120 108 L112 104 L112 94Z',lx:124,ly:98,grape:'Riesling, Müller-Thurgau',soil:'Porphyr, Schiefer, Kalk, Sandstein',type:'Weißwein'},
+      {id:'Rheingau',fill:'#AFA9EC',d:'M136 84 L152 82 L158 88 L156 100 L146 104 L136 102 L134 92Z',lx:145,ly:95,grape:'Riesling, Spätburgunder',soil:'Quarzit, Phyllith, Taunus-Schiefer',type:'Weißwein'},
+      {id:'Hess. Bergstraße',fill:'#FAC775',d:'M156 100 L164 98 L168 108 L164 116 L156 116 L152 108Z',lx:158,ly:108,grape:'Riesling, Grauburgunder',soil:'Granit, Sandstein, Löss',type:'Weißwein'},
+      {id:'Rheinhessen',fill:'#EF9F27',d:'M120 108 L130 106 L136 102 L146 104 L156 106 L158 118 L156 130 L148 136 L136 140 L124 138 L114 132 L112 120Z',lx:134,ly:122,grape:'Riesling, Silvaner, Müller-Thurgau',soil:'Löss, Mergel, Kalk, Ton',type:'Weißwein'},
+      {id:'Pfalz',fill:'#F4C0D1',d:'M112 134 L124 138 L132 142 L134 156 L132 170 L122 176 L110 174 L104 164 L104 148 L106 136Z',lx:118,ly:156,grape:'Riesling, Spätburgunder, Dornfelder',soil:'Sandstein, Kalk, Ton, Löss',type:'Weißwein & Rotwein'},
+      {id:'Baden',fill:'#C0DD97',d:'M108 176 L120 176 L128 172 L136 176 L142 184 L146 200 L148 218 L146 234 L140 248 L132 256 L124 258 L116 254 L110 244 L106 228 L104 212 L104 196 L106 182Z',lx:125,ly:216,grape:'Spätburgunder, Grauburgunder, Riesling',soil:'Löss, Kalk, Muschelkalk, Granit',type:'Rotwein & Weißwein'},
+      {id:'Württemberg',fill:'#F0997B',d:'M136 142 L152 138 L166 136 L174 142 L176 158 L174 172 L168 182 L156 188 L146 186 L138 180 L136 170 L132 158 L134 148Z',lx:155,ly:163,grape:'Trollinger, Lemberger, Riesling',soil:'Muschelkalk, Mergel, Keupermergel',type:'Rotwein'},
+      {id:'Franken',fill:'#CECBF6',d:'M166 108 L184 104 L202 106 L210 114 L212 128 L208 142 L196 150 L180 154 L166 150 L158 142 L156 128 L158 116Z',lx:183,ly:130,grape:'Silvaner, Müller-Thurgau, Bacchus',soil:'Muschelkalk, Keuper, Buntsandstein',type:'Weißwein'},
+      {id:'Saale-Unstrut',fill:'#B5D4F4',d:'M176 46 L198 42 L208 48 L210 60 L204 68 L190 70 L178 66 L172 58Z',lx:191,ly:57,grape:'Müller-Thurgau, Weißburgunder, Silvaner',soil:'Muschelkalk, Buntsandstein, Zechstein',type:'Weißwein'},
+      {id:'Sachsen',fill:'#97C459',d:'M210 46 L228 44 L236 50 L236 62 L226 66 L212 64 L208 56Z',lx:221,ly:56,grape:'Müller-Thurgau, Riesling, Grauburgunder',soil:'Granit, Gneis, Porphyr, Löss',type:'Weißwein'},
+    ]
+  },
+  Italien:{
+    viewBox:'60 28 185 315',
+    regions:[
+      {id:'Piemont',fill:'#AFA9EC',d:'M78 60 L118 55 L130 63 L132 80 L128 94 L114 98 L96 96 L78 88 L72 74Z',lx:103,ly:78,grape:'Nebbiolo, Barbera, Dolcetto',soil:'Mergel, Kalk, Sand, Ton',type:'Rotwein'},
+      {id:'Lombardei',fill:'#B5D4F4',d:'M118 55 L150 50 L170 56 L174 70 L170 82 L154 88 L136 86 L128 80 L130 63Z',lx:150,ly:70,grape:'Nebbiolo, Chardonnay, Pinot Nero',soil:'Kalk, Moräne, Sandstein',type:'Rotwein & Weißwein'},
+      {id:'Südtirol',fill:'#9FE1CB',d:'M134 36 L164 32 L180 38 L182 50 L170 56 L148 50 L132 46Z',lx:157,ly:44,grape:'Vernatsch, Lagrein, Gewürztraminer',soil:'Porphyr, Gneis, Kalk',type:'Rotwein & Weißwein'},
+      {id:'Venetien',fill:'#F4C0D1',d:'M148 52 L182 48 L212 54 L218 66 L212 78 L196 84 L178 84 L160 82 L150 74 L148 62Z',lx:183,ly:67,grape:'Garganega, Glera, Corvina',soil:'Kalk, Basalt, Lehm, Ton',type:'Weißwein & Rotwein'},
+      {id:'Friaul',fill:'#FAC775',d:'M196 54 L220 50 L234 58 L234 70 L220 76 L204 76 L196 68Z',lx:213,ly:65,grape:'Friulano, Pinot Grigio, Refosco',soil:'Flysch, Kalk, Tonschiefer',type:'Weißwein'},
+      {id:'Emilia-Romagna',fill:'#F0997B',d:'M94 96 L130 90 L154 88 L170 94 L174 106 L170 118 L152 124 L130 126 L108 122 L94 114Z',lx:135,ly:108,grape:'Sangiovese, Lambrusco, Albana',soil:'Ton, Lehm, Sand, Kalk',type:'Rotwein & Weißwein'},
+      {id:'Toskana',fill:'#CECBF6',d:'M98 122 L130 126 L154 124 L164 132 L166 148 L162 164 L154 178 L138 184 L120 182 L106 172 L98 156 L94 140Z',lx:130,ly:153,grape:'Sangiovese, Vernaccia, Trebbiano',soil:'Galeo, Alberese, Mergel, Tuff',type:'Rotwein'},
+      {id:'Umbrien',fill:'#C0DD97',d:'M138 184 L160 178 L170 184 L174 198 L170 212 L156 218 L140 216 L130 206 L130 192Z',lx:152,ly:199,grape:'Sagrantino, Sangiovese, Grechetto',soil:'Ton, Kalk, Sandstein',type:'Rotwein'},
+      {id:'Marken',fill:'#EAF3DE',d:'M158 134 L176 128 L188 132 L190 148 L186 164 L174 170 L162 166 L156 152 L156 138Z',lx:172,ly:150,grape:'Verdicchio, Montepulciano',soil:'Ton, Sandstein, Kalk',type:'Weißwein & Rotwein'},
+      {id:'Kampanien',fill:'#F7C1C1',d:'M136 226 L162 220 L180 224 L186 238 L182 252 L168 260 L150 262 L136 254 L128 242Z',lx:156,ly:241,grape:'Aglianico, Fiano, Greco',soil:'Tuff, Kalk, Lehm, Vulkanasche',type:'Rotwein & Weißwein'},
+      {id:'Apulien',fill:'#F5C4B3',d:'M162 252 L190 244 L210 246 L220 258 L222 274 L214 290 L196 298 L178 296 L162 286 L154 272 L154 258Z',lx:187,ly:271,grape:'Primitivo, Negroamaro, Verdeca',soil:'Kalk, Terra Rossa, Ton',type:'Rotwein'},
+      {id:'Sizilien',fill:'#FAC775',d:'M90 304 L128 298 L158 300 L174 308 L176 320 L164 330 L140 334 L114 330 L96 320Z',lx:133,ly:316,grape:'Nero d\'Avola, Grillo, Catarratto',soil:'Kalk, Ton, Sandstein, Vulkanasche',type:'Rotwein & Weißwein'},
+      {id:'Sardinien',fill:'#9FE1CB',d:'M68 228 L96 222 L108 230 L110 252 L104 270 L88 276 L70 272 L60 260 L60 240Z',lx:84,ly:249,grape:'Cannonau, Vermentino, Carignano',soil:'Granit, Kalk, Basalt',type:'Rotwein & Weißwein'},
+    ]
+  }
+};
 
-const IT_REGIONS={type:'FeatureCollection',features:[
-  {type:'Feature',properties:{name:'Piemont'},geometry:{type:'Polygon',coordinates:[[[7.0,44.1],[9.2,44.1],[9.2,45.8],[7.0,45.8],[7.0,44.1]]]}},
-  {type:'Feature',properties:{name:'Venetien'},geometry:{type:'Polygon',coordinates:[[[10.8,45.0],[12.8,45.0],[12.8,46.7],[10.8,46.7],[10.8,45.0]]]}},
-  {type:'Feature',properties:{name:'Toskana'},geometry:{type:'Polygon',coordinates:[[[9.8,42.3],[12.4,42.3],[12.4,44.5],[9.8,44.5],[9.8,42.3]]]}},
-  {type:'Feature',properties:{name:'Lombardei'},geometry:{type:'Polygon',coordinates:[[[8.5,44.8],[11.2,44.8],[11.2,46.7],[8.5,46.7],[8.5,44.8]]]}},
-  {type:'Feature',properties:{name:'Sizilien'},geometry:{type:'Polygon',coordinates:[[[12.4,36.6],[15.7,36.6],[15.7,38.3],[12.4,38.3],[12.4,36.6]]]}},
-  {type:'Feature',properties:{name:'Kampanien'},geometry:{type:'Polygon',coordinates:[[[13.8,39.9],[16.1,39.9],[16.1,41.5],[13.8,41.5],[13.8,39.9]]]}},
-  {type:'Feature',properties:{name:'Apulien'},geometry:{type:'Polygon',coordinates:[[[15.0,38.9],[18.5,38.9],[18.5,41.9],[15.0,41.9],[15.0,38.9]]]}},
-  {type:'Feature',properties:{name:'Friaul-Julisch Venetien'},geometry:{type:'Polygon',coordinates:[[[12.3,45.5],[13.9,45.5],[13.9,46.7],[12.3,46.7],[12.3,45.5]]]}},
-  {type:'Feature',properties:{name:'Abruzzen'},geometry:{type:'Polygon',coordinates:[[[13.0,41.7],[14.8,41.7],[14.8,42.9],[13.0,42.9],[13.0,41.7]]]}},
-  {type:'Feature',properties:{name:'Sardinien'},geometry:{type:'Polygon',coordinates:[[[8.1,38.8],[9.9,38.8],[9.9,41.3],[8.1,41.3],[8.1,38.8]]]}},
-  {type:'Feature',properties:{name:'Südtirol'},geometry:{type:'Polygon',coordinates:[[[10.4,46.2],[12.5,46.2],[12.5,47.1],[10.4,47.1],[10.4,46.2]]]}},
-  {type:'Feature',properties:{name:'Emilia-Romagna'},geometry:{type:'Polygon',coordinates:[[[9.2,43.7],[12.8,43.7],[12.8,45.1],[9.2,45.1],[9.2,43.7]]]}},
-]};
+function getRegionInfo(country,region){
+  const key=`rinfo_${country}_${region}`;
+  const saved=localStorage.getItem(key);
+  if(saved)return JSON.parse(saved);
+  const r=(SVG_REGIONS[country]?.regions||[]).find(x=>x.id===region);
+  return{grape:r?.grape||'',soil:r?.soil||''};
+}
+function saveRegionInfo(country,region,grape,soil){
+  localStorage.setItem(`rinfo_${country}_${region}`,JSON.stringify({grape,soil}));
+}
 
-const REGION_GEODATA={'Deutschland':DE_REGIONS,'Italien':IT_REGIONS};
-let _mapSvg=null;let _mapZoom=null;let _mapG=null;let _mapProjection=null;let _mapPath=null;
+let d3Loaded=false;let topoLoaded=false;let worldData=null;let currentDrillCountry=null;
 
 function renderMapView(el){
   el.innerHTML=`
@@ -821,21 +898,94 @@ function renderMapView(el){
       </div>
       <div id="map-breadcrumb" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--ink);background:rgba(247,243,236,0.92);padding:4px 12px;border-radius:100px;display:none;white-space:nowrap"></div>
     </div>
-    <div style="display:flex;gap:12px;padding:8px 16px 6px;border-bottom:0.5px solid var(--border)">
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3);font-weight:500"><span style="width:10px;height:10px;border-radius:50%;background:var(--wine);display:inline-block"></span>Weine</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3);font-weight:500"><span style="width:10px;height:10px;border-radius:3px;background:var(--wine);opacity:.3;display:inline-block"></span>Anbaugebiete (DE/IT)</div>
+    <div id="map-region-detail" style="display:none;padding:12px 16px;border-bottom:0.5px solid var(--border)"></div>
+    <div style="display:flex;gap:12px;padding:7px 16px 5px;border-bottom:0.5px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3);font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:var(--wine);display:inline-block"></span>Weine</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink3);font-weight:500"><span style="width:8px;height:8px;border-radius:2px;background:var(--wine);opacity:.3;display:inline-block"></span>Anbaugebiete</div>
     </div>
     <div id="map-country-list" style="padding:0"></div>`;
   loadD3AndDraw();
 }
 
+function showStaticRegionMap(countryName){
+  const container=document.getElementById('map-svg-container');if(!container)return;
+  const data=SVG_REGIONS[countryName];if(!data)return;
+  const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
+  const countryWines=getCountryWines();
+  const myWineRegions=new Set((countryWines[countryName]||[]).map(w=>w.region).filter(Boolean));
+  container.innerHTML=`<svg viewBox="${data.viewBox}" width="100%" height="100%" style="display:block">
+    <rect width="9999" height="9999" x="-999" y="-999" fill="#dae8f0"/>
+    ${data.regions.map(r=>{
+      const hasWine=[...myWineRegions].some(mr=>mr.toLowerCase().includes(r.id.toLowerCase())||r.id.toLowerCase().includes(mr.toLowerCase()));
+      return`<path id="svgr-${r.id.replace(/[^a-zA-Z0-9]/g,'_')}" d="${r.d}" fill="${r.fill}" stroke="white" stroke-width="0.8" stroke-linejoin="round" style="cursor:pointer;opacity:${hasWine?1:0.6}" onclick="selectSvgRegion('${countryName}','${r.id}','${r.fill}')"/>
+      <text x="${r.lx}" y="${r.ly}" text-anchor="middle" dominant-baseline="middle" style="pointer-events:none;font-size:5px;font-weight:600;fill:#1a1209;font-family:sans-serif">${r.id}</text>`;
+    }).join('')}
+  </svg>`;
+}
+
+function selectSvgRegion(countryName,regionId,fill){
+  document.querySelectorAll('[id^="svgr-"]').forEach(p=>{p.style.stroke='white';p.style.strokeWidth='0.8';});
+  const pid=regionId.replace(/[^a-zA-Z0-9]/g,'_');
+  const el=document.getElementById('svgr-'+pid);
+  if(el){el.style.stroke='#1a1209';el.style.strokeWidth='2';}
+  const info=getRegionInfo(countryName,regionId);
+  const countryWines=getCountryWines();
+  const myWines=(countryWines[countryName]||[]).filter(w=>w.region&&(w.region.toLowerCase().includes(regionId.toLowerCase())||regionId.toLowerCase().includes(w.region.toLowerCase())));
+  const detailEl=document.getElementById('map-region-detail');
+  detailEl.style.display='block';
+  detailEl.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink)">${regionId}</div>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="editRegionInfo('${countryName}','${regionId}','${fill}')"><i class="ti ti-edit" style="font-size:11px"></i> Bearbeiten</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+      <div style="background:var(--bg2);border-radius:8px;padding:7px 9px">
+        <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Rebsorten</div>
+        <div style="font-size:10px;color:var(--ink);line-height:1.4">${info.grape||'—'}</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:8px;padding:7px 9px">
+        <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Boden</div>
+        <div style="font-size:10px;color:var(--ink);line-height:1.4">${info.soil||'—'}</div>
+      </div>
+    </div>
+    ${myWines.length?`<div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Deine Weine</div>
+    ${myWines.map(w=>`<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:10px;cursor:pointer" onclick="goDetail(${w.id})">
+      <span style="background:var(--ink);color:var(--bg);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700">${w.vintage||'NV'}</span>
+      <span style="font-weight:600;color:var(--ink);flex:1">${w.weingut||w.name}</span>
+      <i class="ti ti-chevron-right" style="font-size:11px;color:var(--ink3)"></i>
+    </div>`).join('')}`
+    :`<div style="font-size:10px;color:var(--ink3);font-style:italic">Noch kein Wein eingetragen.</div>`}`;
+}
+
+function editRegionInfo(countryName,regionId,fill){
+  const info=getRegionInfo(countryName,regionId);
+  const esc=fill.replace(/'/g,"\\'");
+  document.getElementById('map-region-detail').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink)">${regionId}</div>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="selectSvgRegion('${countryName}','${regionId}','${esc}')"><i class="ti ti-x" style="font-size:11px"></i></button>
+    </div>
+    <div style="margin-bottom:7px">
+      <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Rebsorten</label>
+      <input id="edit-grape" class="finput" value="${(info.grape||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px">
+    </div>
+    <div style="margin-bottom:9px">
+      <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Bodenart</label>
+      <input id="edit-soil" class="finput" value="${(info.soil||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px">
+    </div>
+    <button class="btn btn-wine" style="font-size:11px;width:100%;justify-content:center" onclick="saveRegionEdit('${countryName}','${regionId}','${esc}')"><i class="ti ti-check"></i> Speichern</button>`;
+}
+
+function saveRegionEdit(countryName,regionId,fill){
+  saveRegionInfo(countryName,regionId,
+    document.getElementById('edit-grape')?.value.trim()||'',
+    document.getElementById('edit-soil')?.value.trim()||'');
+  selectSvgRegion(countryName,regionId,fill);
+}
+
 function loadD3AndDraw(){
   if(d3Loaded&&topoLoaded&&worldData){drawWorldMap();return;}
-  // Load D3 and TopoJSON in parallel, then fetch world data
-  const loadScript=(src)=>new Promise((res,rej)=>{
-    const s=document.createElement('script');s.src=src;
-    s.onload=res;s.onerror=rej;document.head.appendChild(s);
-  });
+  const loadScript=(src)=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});
   const scripts=[];
   if(!d3Loaded)scripts.push(loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js').then(()=>{d3Loaded=true;}));
   if(!topoLoaded)scripts.push(loadScript('https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js').then(()=>{topoLoaded=true;}));
@@ -843,19 +993,21 @@ function loadD3AndDraw(){
     if(worldData){drawWorldMap();return;}
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .then(r=>r.json()).then(data=>{worldData=data;drawWorldMap();})
-      .catch(()=>{const l=document.getElementById('map-loading');if(l){l.innerHTML='<i class="ti ti-wifi-off" style="font-size:24px;opacity:.4;display:block;margin-bottom:8px"></i>Karte konnte nicht geladen werden.<br><small style="color:#9a9088">Internetverbindung prüfen</small>';}});
-  }).catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Fehler beim Laden der Kartenbibliothek.';});
+      .catch(()=>{const l=document.getElementById('map-loading');if(l)l.innerHTML='<i class="ti ti-wifi-off" style="font-size:20px;opacity:.4;display:block;margin-bottom:6px"></i><span style="font-size:11px">Karte nicht geladen</span>';});
+  }).catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Fehler beim Laden.';});
 }
+
 function loadTopo(){}
 function fetchWorld(){}
 
 function getCountryWines(){const cw={};wines.forEach(w=>{const c=w.country||'Unbekannt';if(!cw[c])cw[c]=[];cw[c].push(w);});return cw;}
 
+let _mapSvg=null;let _mapZoom=null;let _mapG=null;let _mapProjection=null;let _mapPath=null;
+
 function drawWorldMap(){
   currentDrillCountry=null;
   const container=document.getElementById('map-svg-container');if(!container)return;
   const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
-  // Wait a frame for layout on iPhone
   const W=container.getBoundingClientRect().width||container.offsetWidth||360;const H=280;
   if(W<10){setTimeout(drawWorldMap,100);return;}
   const countryWines=getCountryWines();
@@ -883,7 +1035,7 @@ function drawWorldMap(){
     .on('click',(event,d)=>{
       const iso=String(d.id);const name=ISO_NAMES[iso]||ISO_NAMES[iso.padStart(3,'0')];
       if(!name||!countryWines[name])return;
-      if(REGION_GEODATA[name])drillToRegions(d,name,path,svg,g,zoom,W,H,countryWines);
+      if(SVG_REGIONS[name])zoomThenStatic(d,name,path,svg,g,zoom,W,H,countryWines);
       else zoomToCountry(d,name,path,svg,g,zoom,W,H,countryWines);
     });
   g.selectAll('circle.wine-marker').data(countries.features.filter(d=>{const iso=String(d.id);return wineIsos.has(iso)||wineIsos.has(iso.padStart(3,'0'));}))
@@ -893,63 +1045,34 @@ function drawWorldMap(){
     .attr('r',3).attr('fill','#fff').attr('stroke','#8b1a2e').attr('stroke-width',1).style('pointer-events','none');
   document.getElementById('map-back-btn').style.display='none';
   document.getElementById('map-breadcrumb').style.display='none';
+  document.getElementById('map-region-detail').style.display='none';
   renderCountryList(countryWines);
 }
 
-function drillToRegions(feature,countryName,path,svg,g,zoom,W,H,countryWines){
+function zoomThenStatic(feature,countryName,path,svg,g,zoom,W,H,countryWines){
   currentDrillCountry=countryName;
-  const [[x0,y0],[x1,y1]]=path.bounds(feature);if(isNaN(x0))return;
-  const dx=x1-x0,dy=y1-y0,cx=(x0+x1)/2,cy=(y0+y1)/2;
-  const scale=Math.min(8,0.78/Math.max(dx/W,dy/H));
-  svg.transition().duration(700).call(zoom.transform,d3.zoomIdentity.translate(W/2-scale*cx,H/2-scale*cy).scale(scale));
-  const regionGeo=REGION_GEODATA[countryName];
-  const countryWineList=countryWines[countryName]||[];
-  const regionWines={};
-  countryWineList.forEach(w=>{const r=w.region||'';if(!regionWines[r])regionWines[r]=[];regionWines[r].push(w);});
-  const regionColors=['#8b1a2e','#b5472a','#5c6e2a','#2a5c6e','#6e2a5c','#2a6e5c','#6e5c2a','#2a3d6e'];
-  const regionPath=d3.geoPath().projection(_mapProjection);
-  setTimeout(()=>{
-    g.selectAll('path.region').remove();g.selectAll('text.region-label').remove();
-    g.selectAll('path.region').data(regionGeo.features).join('path').attr('class','region').attr('d',regionPath)
-      .attr('fill',(d,i)=>{
-        const rname=d.properties.name;
-        const hasWine=Object.keys(regionWines).some(k=>k&&(k.toLowerCase().includes(rname.toLowerCase())||rname.toLowerCase().includes((k||'').toLowerCase())));
-        return hasWine?regionColors[i%regionColors.length]+'cc':'rgba(180,170,160,0.25)';
-      })
-      .attr('stroke','#fff').attr('stroke-width',1.2/scale).style('cursor','pointer')
-      .on('click',(event,d)=>{
-        event.stopPropagation();
-        try{
-          const [[rx0,ry0],[rx1,ry1]]=regionPath.bounds(d);
-          if(!isNaN(rx0)){const rdx=rx1-rx0,rdy=ry1-ry0,rcx=(rx0+rx1)/2,rcy=(ry0+ry1)/2;
-            const rscale=Math.min(10,0.7/Math.max(rdx/W,rdy/H));
-            svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(W/2-rscale*rcx,H/2-rscale*rcy).scale(rscale));}
-        }catch(e){}
-        scrollToRegion(countryName,d.properties.name);
-      });
-    g.selectAll('text.region-label').data(regionGeo.features).join('text').attr('class','region-label')
-      .attr('x',d=>{try{const c=regionPath.centroid(d);return isNaN(c[0])?0:c[0];}catch(e){return 0;}})
-      .attr('y',d=>{try{const c=regionPath.centroid(d);return isNaN(c[1])?0:c[1];}catch(e){return 0;}})
-      .attr('text-anchor','middle').attr('dominant-baseline','middle')
-      .attr('font-size',9/scale).attr('font-family','DM Sans, sans-serif').attr('font-weight','700')
-      .attr('fill','#fff').attr('stroke','rgba(0,0,0,0.4)').attr('stroke-width',0.3/scale)
-      .attr('paint-order','stroke').attr('pointer-events','none').text(d=>d.properties.name);
-  },400);
+  try{
+    const [[x0,y0],[x1,y1]]=path.bounds(feature);if(isNaN(x0))return;
+    const scale=Math.min(8,0.78/Math.max((x1-x0)/W,(y1-y0)/H));
+    const cx=(x0+x1)/2,cy=(y0+y1)/2;
+    svg.transition().duration(600).call(zoom.transform,d3.zoomIdentity.translate(W/2-scale*cx,H/2-scale*cy).scale(scale))
+      .on('end',()=>setTimeout(()=>showStaticRegionMap(countryName),100));
+  }catch(e){showStaticRegionMap(countryName);}
   document.getElementById('map-back-btn').style.display='block';
   const bc=document.getElementById('map-breadcrumb');
-  bc.textContent=`${COUNTRY_FLAGS[countryName]||''} ${countryName} — Gebiet antippen`;bc.style.display='block';
+  bc.textContent=`${COUNTRY_FLAGS[countryName]||''} ${countryName} — Region antippen`;bc.style.display='block';
   setTimeout(()=>{
     document.querySelectorAll('.map-country-card').forEach(card=>{
       if(card.dataset.country===countryName){card.querySelector('.map-country-wines').classList.add('open');card.scrollIntoView({behavior:'smooth',block:'start'});}
     });
-  },600);
+  },700);
 }
 
 function zoomToCountry(feature,countryName,path,svg,g,zoom,W,H,countryWines){
   try{
     const [[x0,y0],[x1,y1]]=path.bounds(feature);if(isNaN(x0))return;
-    const dx=x1-x0,dy=y1-y0,cx=(x0+x1)/2,cy=(y0+y1)/2;
-    const scale=Math.min(8,0.8/Math.max(dx/W,dy/H));
+    const scale=Math.min(8,0.8/Math.max((x1-x0)/W,(y1-y0)/H));
+    const cx=(x0+x1)/2,cy=(y0+y1)/2;
     svg.transition().duration(650).call(zoom.transform,d3.zoomIdentity.translate(W/2-scale*cx,H/2-scale*cy).scale(scale));
     document.getElementById('map-back-btn').style.display='block';
     const bc=document.getElementById('map-breadcrumb');bc.textContent=`${COUNTRY_FLAGS[countryName]||''} ${countryName}`;bc.style.display='block';
@@ -960,8 +1083,10 @@ function zoomToCountry(feature,countryName,path,svg,g,zoom,W,H,countryWines){
 function mapBack(){
   currentDrillCountry=null;
   if(_mapSvg&&_mapZoom){_mapSvg.transition().duration(500).call(_mapZoom.transform,d3.zoomIdentity);_mapG.selectAll('path.region').remove();_mapG.selectAll('text.region-label').remove();}
+  else if(worldData){drawWorldMap();return;}
   document.getElementById('map-back-btn').style.display='none';
   document.getElementById('map-breadcrumb').style.display='none';
+  document.getElementById('map-region-detail').style.display='none';
 }
 
 function scrollToRegion(countryName,regionName){
