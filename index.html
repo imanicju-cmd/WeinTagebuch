@@ -222,9 +222,9 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 .type-tile{border-radius:20px;padding:0;cursor:pointer;transition:all .15s;border:none;overflow:hidden;aspect-ratio:1;position:relative;display:flex;align-items:flex-end}
 .type-tile:active{transform:scale(0.96)}
 .type-tile-gradient{position:absolute;inset:0;border-radius:20px}
-.type-tile-body{position:relative;padding:14px;z-index:1;width:100%}
-.type-tile-label{font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.3px;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,0.2)}
-.type-tile-count{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;font-weight:500}
+.type-tile-body{position:relative;padding:0;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.type-tile-label{font-size:18px;font-weight:700;color:#fff;letter-spacing:3px;line-height:1;font-family:'DM Sans',sans-serif;text-shadow:0 1px 6px rgba(0,0,0,0.25);text-align:center}
+.type-tile-count{font-size:11px;color:rgba(255,255,255,0.7);font-weight:500;letter-spacing:0.5px}
 .type-tile.active::after{content:'';position:absolute;inset:0;border-radius:20px;border:3px solid rgba(255,255,255,0.8)}
 
 /* COUNTRY TILES */
@@ -286,10 +286,11 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   </div>
 
   <!-- HOME SUB-NAV -->
-  <div id="home-subnav" style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);flex-shrink:0">
+  <div id="home-subnav" style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto">
     <button class="home-tab-btn active" id="htab-weinart" onclick="if(typeof switchHomeTab==='function')switchHomeTab('weinart')">Weinart</button>
     <button class="home-tab-btn" id="htab-laender" onclick="if(typeof switchHomeTab==='function')switchHomeTab('laender')">Länder</button>
     <button class="home-tab-btn" id="htab-weingueter" onclick="if(typeof switchHomeTab==='function')switchHomeTab('weingueter')">Weingüter</button>
+    <button class="home-tab-btn" id="htab-rebsorten" onclick="if(typeof switchHomeTab==='function')switchHomeTab('rebsorten')">Rebsorten</button>
   </div>
 
   <!-- WEINART PANEL -->
@@ -312,6 +313,15 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
     <div style="padding:16px 14px">
       <div id="weingut-alpha-list"></div>
     </div>
+  </div>
+
+  <!-- REBSORTEN PANEL -->
+  <div id="panel-rebsorten" class="scroll-body" style="display:none">
+    <div style="padding:12px 14px 6px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:10px;color:var(--ink3);font-weight:500" id="rebsorten-count"></div>
+      <button class="btn" style="font-size:10px;padding:5px 12px" onclick="showAddRebsorte()"><i class="ti ti-plus" style="font-size:12px"></i> Neue Rebsorte</button>
+    </div>
+    <div id="rebsorten-alpha-list" style="padding:0 14px 20px"></div>
   </div>
 
   <!-- LISTE TAB (filtered results) -->
@@ -361,17 +371,39 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
     <button class="btn btn-wine" onclick="saveWine()"><i class="ti ti-check"></i> Speichern</button>
   </div>
   <div class="add-scroll">
-    <!-- FOTO -->
+    <!-- FOTO & URL -->
     <div class="form-section">
-      <div class="form-section-title">Etikett-Foto</div>
-      <label class="photo-zone" for="photo-input">
-        <i class="ti ti-camera photo-zone-icon"></i>
-        <div class="photo-zone-text">Foto aufnehmen oder hochladen</div>
-        <div class="photo-zone-badge"><i class="ti ti-sparkles" style="font-size:11px"></i> KI erkennt automatisch</div>
-      </label>
-      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
-      <img id="photo-preview" class="photo-preview" alt="Etikett Vorschau">
-      <div class="ai-loading" id="ai-loading" style="margin-top:8px"><i class="ti ti-sparkles"></i><span>KI analysiert das Etikett<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
+      <div class="form-section-title">KI-Erkennung</div>
+      <!-- Toggle buttons -->
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button type="button" id="ki-tab-foto" class="btn" style="flex:1;justify-content:center;font-size:11px;background:var(--ink);color:var(--bg);border-color:var(--ink)" onclick="switchKiTab('foto')"><i class="ti ti-camera" style="font-size:13px"></i> Foto</button>
+        <button type="button" id="ki-tab-url" class="btn" style="flex:1;justify-content:center;font-size:11px" onclick="switchKiTab('url')"><i class="ti ti-link" style="font-size:13px"></i> Link</button>
+      </div>
+
+      <!-- FOTO TAB -->
+      <div id="ki-panel-foto">
+        <label class="photo-zone" for="photo-input">
+          <i class="ti ti-camera photo-zone-icon"></i>
+          <div class="photo-zone-text">Foto aufnehmen oder hochladen</div>
+          <div class="photo-zone-badge"><i class="ti ti-sparkles" style="font-size:11px"></i> KI erkennt automatisch</div>
+        </label>
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+        <img id="photo-preview" class="photo-preview" alt="Etikett Vorschau">
+      </div>
+
+      <!-- URL TAB -->
+      <div id="ki-panel-url" style="display:none">
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div style="flex:1">
+            <label class="form-label">Link zur Weinseite</label>
+            <input class="form-input" id="f-url" type="url" placeholder="z.B. https://www.hawesko.de/…" style="font-size:12px">
+          </div>
+          <button type="button" class="btn btn-wine" style="font-size:11px;padding:8px 12px;flex-shrink:0" onclick="analyzeUrl()"><i class="ti ti-sparkles"></i> Analysieren</button>
+        </div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:6px">Funktioniert gut mit: Hawesko, Jacques', Wine in Black, Gute-Weine.de, Weingut-Websites</div>
+      </div>
+
+      <div class="ai-loading" id="ai-loading" style="margin-top:8px"><i class="ti ti-sparkles"></i><span>KI analysiert<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
       <div class="ai-result" id="ai-result">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div style="font-size:10px;font-weight:500;color:var(--ink3);display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles" style="font-size:11px"></i> KI-Erkennung</div>
@@ -428,6 +460,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
         <div><label class="form-label">Anlass</label><input class="form-input" id="f-occasion" placeholder="z.B. Geburtstag…"></div>
         <div><label class="form-label">Preis (€)</label><input class="form-input" id="f-price" placeholder="28" type="number"></div>
       </div>
+      <div class="form-group"><label class="form-label">Link zum Wein</label><input class="form-input" id="f-link" type="url" placeholder="https://…" style="font-size:12px"></div>
     </div>
     <!-- NOTIZEN -->
     <div class="form-section">
@@ -521,26 +554,70 @@ async function renderGrid(list){
 }
 
 const TYPE_GRADIENTS={
-  'Schaumwein':'linear-gradient(135deg,#c8d8f0 0%,#e0c8e8 60%,#f0d8c0 100%)',
-  'Weißwein':'linear-gradient(135deg,#f0e8a0 0%,#e8d070 60%,#c8b040 100%)',
-  'Rosé':'linear-gradient(135deg,#f8c0c8 0%,#e88898 60%,#d06070 100%)',
-  'Orange':'linear-gradient(135deg,#f8d090 0%,#e89858 60%,#c86830 100%)',
-  'Rotwein':'linear-gradient(135deg,#c05060 0%,#882838 60%,#581020 100%)',
-  'Portwein':'linear-gradient(135deg,#9868b0 0%,#683880 60%,#401858 100%)',
-  'Süßwein':'linear-gradient(135deg,#f8e090 0%,#e8b850 60%,#c88820 100%)',
-  'Sonstiges':'linear-gradient(135deg,#c8c8c8 0%,#989898 60%,#686868 100%)',
+  'Schaumwein':{grad:'linear-gradient(135deg,#c8d8f0 0%,#e0c8e8 60%,#f0d8c0 100%)',label:'SCHAUM'},
+  'Weißwein':{grad:'linear-gradient(135deg,#f0e8a0 0%,#e8d070 60%,#c8b040 100%)',label:'WEISS'},
+  'Rosé':{grad:'linear-gradient(135deg,#f8c0c8 0%,#e88898 60%,#d06070 100%)',label:'ROSÉ'},
+  'Orange':{grad:'linear-gradient(135deg,#f8d090 0%,#e89858 60%,#c86830 100%)',label:'ORANGE'},
+  'Rotwein':{grad:'linear-gradient(135deg,#c05060 0%,#882838 60%,#581020 100%)',label:'ROT'},
+  'Süßwein':{grad:'linear-gradient(135deg,#f8e090 0%,#e8b850 60%,#c88820 100%)',label:'SÜSS'},
+  'Sonstiges':{grad:'linear-gradient(135deg,#c8c8c8 0%,#989898 60%,#686868 100%)',label:'MEHR'},
 };
 let activeTypeFilter=null;let activeCountryFilter=null;let activeWeingutFilter=null;
 let activeHomeTab='weinart';
 
+function switchKiTab(tab){
+  ['foto','url'].forEach(t=>{
+    document.getElementById('ki-panel-'+t).style.display=t===tab?'block':'none';
+    const btn=document.getElementById('ki-tab-'+t);
+    if(t===tab){btn.style.background='var(--ink)';btn.style.color='var(--bg)';btn.style.borderColor='var(--ink)';}
+    else{btn.style.background='transparent';btn.style.color='var(--ink)';btn.style.borderColor='var(--border2)';}
+  });
+}
+
+async function analyzeUrl(){
+  const url=document.getElementById('f-url').value.trim();
+  if(!url){alert('Bitte zuerst einen Link eingeben.');return;}
+  document.getElementById('ai-loading').classList.add('show');
+  document.getElementById('ai-result').classList.remove('show');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:800,
+      messages:[{role:'user',content:[{type:'text',text:`Analysiere diese Weinprodukt-URL und extrahiere alle Weindaten. URL: ${url}
+
+Besuche die Seite gedanklich und extrahiere: Weingut, Weinname, Jahrgang, Weinart, Rebsorte, Alkohol, Land, Anbaugebiet, Lage, Klassifikation, Bodenart falls angegeben, Beschreibung.
+
+Antworte NUR mit diesem JSON (kein Markdown):
+{"weingut":"","weinname":"","vintage":"","type":"Rotwein|Weißwein|Rosé|Schaumwein|Süßwein|Portwein|Sonstiges","grape":"","alc":"","country":"auf Deutsch","region":"","lage":"","klass":"","soil":"","notes":"2-3 Sätze Beschreibung auf Deutsch","confidence":"high|medium|low"}
+
+Falls du die URL nicht laden kannst, versuche aus dem URL-Text selbst Informationen zu extrahieren (Produktname, Weingut etc. sind oft in der URL enthalten).`}]}]})});
+    const d=await resp.json();
+    const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+    aiData=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    if(aiData.weingut&&!aiData.name)aiData.name=aiData.weingut+(aiData.weinname?' '+aiData.weinname:'');
+    // Auto-fill link field
+    const linkEl=document.getElementById('f-link');if(linkEl&&!linkEl.value)linkEl.value=url;
+    const conf=aiData.confidence||'medium';
+    const confColor=conf==='high'?'#3a7a28':conf==='medium'?'#b8860b':'#a32d2d';
+    const confLabel=conf==='high'?'✓ Sicher erkannt':conf==='medium'?'⚠ Bitte prüfen':'✗ URL nicht lesbar — manuell ergänzen';
+    const fields=[['weingut','Weingut'],['weinname','Weinname'],['vintage','Jahrgang'],['country','Land'],['region','Anbaugebiet'],['lage','Lage'],['type','Art'],['grape','Rebsorte'],['alc','Alkohol'],['klass','Klassifikation']];
+    document.getElementById('ai-grid').innerHTML=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:${confColor};padding:2px 0 6px">${confLabel}</div>`+fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
+    document.getElementById('ai-result').classList.add('show');
+  }catch(err){
+    document.getElementById('ai-result').innerHTML='<div style="font-size:11px;color:var(--ink3)">URL konnte nicht analysiert werden — bitte manuell eintragen.</div>';
+    document.getElementById('ai-result').classList.add('show');
+  }
+  document.getElementById('ai-loading').classList.remove('show');
+}
+
 function switchHomeTab(tab){
   activeHomeTab=tab;
-  ['weinart','laender','weingueter'].forEach(t=>{
+  ['weinart','laender','weingueter','rebsorten'].forEach(t=>{
     document.getElementById('htab-'+t)?.classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
   });
   if(tab==='laender')renderCountryTiles();
   if(tab==='weingueter')renderWeingutAlpha();
+  if(tab==='rebsorten')renderRebsortenList();
 }
 
 function renderStats(){
@@ -555,17 +632,23 @@ function renderStats(){
 
 function renderTypeTiles(){
   const el=document.getElementById('type-tiles');if(!el)return;
-  const typeCounts={};wines.forEach(w=>{const t=w.type||'Sonstiges';typeCounts[t]=(typeCounts[t]||0)+1;});
-  const types=['Schaumwein','Weißwein','Rosé','Orange','Rotwein','Portwein','Süßwein'];
+  const typeCounts={};
+  wines.forEach(w=>{
+    const t=w.type||'Sonstiges';
+    // Group Portwein + Süßwein together
+    const bucket=t==='Portwein'?'Süßwein':t;
+    typeCounts[bucket]=(typeCounts[bucket]||0)+1;
+  });
+  const types=['Schaumwein','Weißwein','Rosé','Orange','Rotwein','Süßwein'];
   el.innerHTML=types.map(t=>{
-    const grad=TYPE_GRADIENTS[t]||TYPE_GRADIENTS['Sonstiges'];
+    const cfg=TYPE_GRADIENTS[t]||TYPE_GRADIENTS['Sonstiges'];
     const count=typeCounts[t]||0;
     const isActive=activeTypeFilter===t;
     return`<div class="type-tile${isActive?' active':''}" onclick="filterByType('${t}')">
-      <div class="type-tile-gradient" style="background:${grad}"></div>
+      <div class="type-tile-gradient" style="background:${cfg.grad}"></div>
       <div class="type-tile-body">
-        <div class="type-tile-label">${t}</div>
-        <div class="type-tile-count">${count} ${count===1?'Wein':'Weine'}</div>
+        <div class="type-tile-label">${cfg.label}</div>
+        <div class="type-tile-count">${count}</div>
       </div>
     </div>`;
   }).join('');
@@ -619,8 +702,10 @@ function filterByType(type){
   activeCountryFilter=null;activeWeingutFilter=null;
   renderTypeTiles();
   if(activeTypeFilter){
-    document.getElementById('filter-label').textContent=type;
-    showFilteredList(wines.filter(w=>w.type===type));
+    const label=TYPE_GRADIENTS[type]?.label||type;
+    document.getElementById("filter-label").textContent=label;
+    const list=type==="Süßwein"?wines.filter(w=>w.type==="Süßwein"||w.type==="Portwein"):wines.filter(w=>w.type===type);
+    showFilteredList(list);
   }
 }
 
@@ -660,7 +745,7 @@ function switchMainTab(t){
     const btn=document.getElementById('bnav-'+x);if(btn)btn.classList.toggle('active',x===t);
   });
   // Hide all top-level panels
-  ['panel-weinart','panel-laender','panel-weingueter','tab-liste','tab-karte','tab-export'].forEach(id=>{
+  ['panel-weinart','panel-laender','panel-weingueter','panel-rebsorten','tab-liste','tab-karte','tab-export'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display='none';
   });
   document.getElementById('home-subnav').style.display=t==='home'?'flex':'none';
@@ -739,6 +824,7 @@ async function goDetail(id){
         ${w.price?`<div class="detail-stat"><div class="detail-stat-n">${w.price} €</div><div class="detail-stat-l">${w.format||'Preis'}</div></div>`:''}
         ${w.alc?`<div class="detail-stat"><div class="detail-stat-n">${w.alc}%</div><div class="detail-stat-l">Alkohol</div></div>`:''}
       </div>
+      ${w.link?`<div class="section-label">Link</div><a href="${w.link}" target="_blank" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--wine);text-decoration:none;padding:8px 0"><i class="ti ti-external-link" style="font-size:14px"></i>${w.link.replace(/^https?:\/\//,'').slice(0,50)}…</a>`:''}
     </div>`;
   showScreen('detail');
 }
@@ -752,7 +838,7 @@ async function deleteWine(){
 
 // ── Form ────────────────────────────────────────────────
 function resetForm(){
-  ['f-weingut','f-name','f-vintage','f-grape','f-alc','f-country','f-region','f-lage','f-klass','f-soil','f-notes','f-price','f-ort','f-with','f-occasion','f-from','f-to'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['f-weingut','f-name','f-vintage','f-grape','f-alc','f-country','f-region','f-lage','f-klass','f-soil','f-notes','f-price','f-ort','f-with','f-occasion','f-from','f-to','f-url','f-link'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});;
   document.getElementById('f-type').value='Rotwein';
   document.getElementById('f-format').value='Flasche (0,75L)';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
@@ -824,7 +910,7 @@ async function saveWine(){
   if(!weingut){alert('Weingut ist Pflichtfeld');return;}
   const name=weinname?`${weingut} ${weinname}`:weingut;
   const id=Date.now();
-  const wine={id,name,weingut,weinname,vintage:document.getElementById('f-vintage').value.trim(),type:document.getElementById('f-type').value,grape:document.getElementById('f-grape').value.trim(),alc:document.getElementById('f-alc').value.trim(),country:document.getElementById('f-country').value.trim(),region:document.getElementById('f-region').value.trim(),lage:document.getElementById('f-lage').value.trim(),klass:document.getElementById('f-klass').value.trim(),soil:document.getElementById('f-soil').value.trim(),notes:document.getElementById('f-notes').value.trim(),rating:editRating,price:parseFloat(document.getElementById('f-price').value)||0,date:document.getElementById('f-date').value,ort:document.getElementById('f-ort').value.trim(),withwho:document.getElementById('f-with').value.trim(),occasion:document.getElementById('f-occasion').value.trim(),format:document.getElementById('f-format').value,drinkFrom:document.getElementById('f-from').value.trim(),drinkTo:document.getElementById('f-to').value.trim()};
+  const wine={id,name,weingut,weinname,vintage:document.getElementById('f-vintage').value.trim(),type:document.getElementById('f-type').value,grape:document.getElementById('f-grape').value.trim(),alc:document.getElementById('f-alc').value.trim(),country:document.getElementById('f-country').value.trim(),region:document.getElementById('f-region').value.trim(),lage:document.getElementById('f-lage').value.trim(),klass:document.getElementById('f-klass').value.trim(),soil:document.getElementById('f-soil').value.trim(),notes:document.getElementById('f-notes').value.trim(),rating:editRating,price:parseFloat(document.getElementById('f-price').value)||0,date:document.getElementById('f-date').value,ort:document.getElementById('f-ort').value.trim(),withwho:document.getElementById('f-with').value.trim(),occasion:document.getElementById('f-occasion').value.trim(),format:document.getElementById('f-format').value,drinkFrom:document.getElementById('f-from').value.trim(),drinkTo:document.getElementById('f-to').value.trim(),link:document.getElementById('f-link').value.trim()};
   await dbPut('wines',wine);
   if(currentPhotoB64)await dbPut('photos',{id,data:currentPhotoB64});
   wines.unshift(wine);currentPhotoB64=null;
@@ -839,19 +925,19 @@ const SVG_REGIONS={
   Deutschland:{
     viewBox:'55 18 200 295',
     regions:[
-      {id:'Ahr',fill:'#B5D4F4',d:'M118 78 L130 75 L134 79 L133 86 L126 90 L118 88 L115 83Z',lx:124,ly:83,grape:'Spätburgunder, Frühburgunder',soil:'Schiefer, Grauwacke, Basalt',type:'Rotwein'},
-      {id:'Mittelrhein',fill:'#CED9F0',d:'M130 62 L142 60 L146 68 L144 80 L136 84 L132 80 L128 68Z',lx:137,ly:73,grape:'Riesling',soil:'Schiefer, Quarzit',type:'Weißwein'},
-      {id:'Mosel',fill:'#85B7EB',d:'M82 80 L100 74 L112 72 L120 76 L118 84 L114 92 L108 100 L100 106 L90 108 L82 102 L78 94 L80 86Z',lx:98,ly:93,grape:'Riesling, Elbling',soil:'Devonschiefer, Grau- & Rotschiefer',type:'Weißwein'},
-      {id:'Nahe',fill:'#9FE1CB',d:'M118 88 L130 86 L136 90 L138 100 L132 106 L120 108 L112 104 L112 94Z',lx:124,ly:98,grape:'Riesling, Müller-Thurgau',soil:'Porphyr, Schiefer, Kalk, Sandstein',type:'Weißwein'},
-      {id:'Rheingau',fill:'#AFA9EC',d:'M136 84 L152 82 L158 88 L156 100 L146 104 L136 102 L134 92Z',lx:145,ly:95,grape:'Riesling, Spätburgunder',soil:'Quarzit, Phyllith, Taunus-Schiefer',type:'Weißwein'},
-      {id:'Hess. Bergstraße',fill:'#FAC775',d:'M156 100 L164 98 L168 108 L164 116 L156 116 L152 108Z',lx:158,ly:108,grape:'Riesling, Grauburgunder',soil:'Granit, Sandstein, Löss',type:'Weißwein'},
-      {id:'Rheinhessen',fill:'#EF9F27',d:'M120 108 L130 106 L136 102 L146 104 L156 106 L158 118 L156 130 L148 136 L136 140 L124 138 L114 132 L112 120Z',lx:134,ly:122,grape:'Riesling, Silvaner, Müller-Thurgau',soil:'Löss, Mergel, Kalk, Ton',type:'Weißwein'},
-      {id:'Pfalz',fill:'#F4C0D1',d:'M112 134 L124 138 L132 142 L134 156 L132 170 L122 176 L110 174 L104 164 L104 148 L106 136Z',lx:118,ly:156,grape:'Riesling, Spätburgunder, Dornfelder',soil:'Sandstein, Kalk, Ton, Löss',type:'Weißwein & Rotwein'},
-      {id:'Baden',fill:'#C0DD97',d:'M108 176 L120 176 L128 172 L136 176 L142 184 L146 200 L148 218 L146 234 L140 248 L132 256 L124 258 L116 254 L110 244 L106 228 L104 212 L104 196 L106 182Z',lx:125,ly:216,grape:'Spätburgunder, Grauburgunder, Riesling',soil:'Löss, Kalk, Muschelkalk, Granit',type:'Rotwein & Weißwein'},
-      {id:'Württemberg',fill:'#F0997B',d:'M136 142 L152 138 L166 136 L174 142 L176 158 L174 172 L168 182 L156 188 L146 186 L138 180 L136 170 L132 158 L134 148Z',lx:155,ly:163,grape:'Trollinger, Lemberger, Riesling',soil:'Muschelkalk, Mergel, Keupermergel',type:'Rotwein'},
-      {id:'Franken',fill:'#CECBF6',d:'M166 108 L184 104 L202 106 L210 114 L212 128 L208 142 L196 150 L180 154 L166 150 L158 142 L156 128 L158 116Z',lx:183,ly:130,grape:'Silvaner, Müller-Thurgau, Bacchus',soil:'Muschelkalk, Keuper, Buntsandstein',type:'Weißwein'},
-      {id:'Saale-Unstrut',fill:'#B5D4F4',d:'M176 46 L198 42 L208 48 L210 60 L204 68 L190 70 L178 66 L172 58Z',lx:191,ly:57,grape:'Müller-Thurgau, Weißburgunder, Silvaner',soil:'Muschelkalk, Buntsandstein, Zechstein',type:'Weißwein'},
-      {id:'Sachsen',fill:'#97C459',d:'M210 46 L228 44 L236 50 L236 62 L226 66 L212 64 L208 56Z',lx:221,ly:56,grape:'Müller-Thurgau, Riesling, Grauburgunder',soil:'Granit, Gneis, Porphyr, Löss',type:'Weißwein'},
+      {id:'Ahr',fill:'#B5D4F4',d:'M118 78 L130 75 L134 79 L133 86 L126 90 L118 88 L115 83Z',lx:124,ly:83,grape:'Spätburgunder, Frühburgunder',soil:'Schiefer, Grauwacke, Basalt',type:'Rotwein',desc:'Nördlichstes Rotweingebiet Deutschlands. Steile Schieferlagen am Ahrtal.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Mittelrhein',fill:'#CED9F0',d:'M130 62 L142 60 L146 68 L144 80 L136 84 L132 80 L128 68Z',lx:137,ly:73,grape:'Riesling',soil:'Schiefer, Quarzit',type:'Weißwein',desc:'Dramatische Steillagen am Rhein. UNESCO-Welterbe. Mineralischer Riesling.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Mosel',fill:'#85B7EB',d:'M82 80 L100 74 L112 72 L120 76 L118 84 L114 92 L108 100 L100 106 L90 108 L82 102 L78 94 L80 86Z',lx:98,ly:93,grape:'Riesling, Elbling',soil:'Devonschiefer, Grau- & Rotschiefer',type:'Weißwein',desc:'Steiles Flusstal mit weltberühmten Rieslingen. Elegante Leichtigkeit bei niedrigem Alkohol.',klass:'Qualitätswein, Kabinett, Spätlese, Auslese, BA, TBA, Eiswein'},
+      {id:'Nahe',fill:'#9FE1CB',d:'M118 88 L130 86 L136 90 L138 100 L132 106 L120 108 L112 104 L112 94Z',lx:124,ly:98,grape:'Riesling, Müller-Thurgau',soil:'Porphyr, Schiefer, Kalk, Sandstein',type:'Weißwein',desc:'Vielfältige Böden zwischen Mosel und Rheinhessen. Mineralische Rieslinge mit Frucht.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Rheingau',fill:'#AFA9EC',d:'M136 84 L152 82 L158 88 L156 100 L146 104 L136 102 L134 92Z',lx:145,ly:95,grape:'Riesling, Spätburgunder',soil:'Quarzit, Phyllith, Taunus-Schiefer',type:'Weißwein',desc:'Klassisches Rieslinggebiet. Südexponierte Hänge am Rhein. Heimat des Spätlese-Begriffs.',klass:'Erstes Gewächs, Qualitätswein, Kabinett bis TBA'},
+      {id:'Hess. Bergstraße',fill:'#FAC775',d:'M156 100 L164 98 L168 108 L164 116 L156 116 L152 108Z',lx:158,ly:108,grape:'Riesling, Grauburgunder',soil:'Granit, Sandstein, Löss',type:'Weißwein',desc:'Kleinstes Anbaugebiet. Frühlingsblüte. Milder Klimaeinfluss.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Rheinhessen',fill:'#EF9F27',d:'M120 108 L130 106 L136 102 L146 104 L156 106 L158 118 L156 130 L148 136 L136 140 L124 138 L114 132 L112 120Z',lx:134,ly:122,grape:'Riesling, Silvaner, Müller-Thurgau',soil:'Löss, Mergel, Kalk, Ton',type:'Weißwein',desc:'Größtes deutsches Anbaugebiet. Neue Winzergeneration mit modernen Weinen.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Pfalz',fill:'#F4C0D1',d:'M112 134 L124 138 L132 142 L134 156 L132 170 L122 176 L110 174 L104 164 L104 148 L106 136Z',lx:118,ly:156,grape:'Riesling, Spätburgunder, Dornfelder',soil:'Sandstein, Kalk, Ton, Löss',type:'Weißwein & Rotwein',desc:'Zweitgrößtes Gebiet. Mediterranes Klima. Vielfalt von trocken bis edelsüß.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
+      {id:'Baden',fill:'#C0DD97',d:'M108 176 L120 176 L128 172 L136 176 L142 184 L146 200 L148 218 L146 234 L140 248 L132 256 L124 258 L116 254 L110 244 L106 228 L104 212 L104 196 L106 182Z',lx:125,ly:216,grape:'Spätburgunder, Grauburgunder, Riesling',soil:'Löss, Kalk, Muschelkalk, Granit',type:'Rotwein & Weißwein',desc:'Wärmstes Anbaugebiet. Kaiserstuhl, Markgräflerland, Ortenau. Bodensee.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Württemberg',fill:'#F0997B',d:'M136 142 L152 138 L166 136 L174 142 L176 158 L174 172 L168 182 L156 188 L146 186 L138 180 L136 170 L132 158 L134 148Z',lx:155,ly:163,grape:'Trollinger, Lemberger, Riesling',soil:'Muschelkalk, Mergel, Keupermergel',type:'Rotwein',desc:'Weinland mit Tradition. Neckartal. Schwäbische Weinbauern und Genossenschaften.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Franken',fill:'#CECBF6',d:'M166 108 L184 104 L202 106 L210 114 L212 128 L208 142 L196 150 L180 154 L166 150 L158 142 L156 128 L158 116Z',lx:183,ly:130,grape:'Silvaner, Müller-Thurgau, Bacchus',soil:'Muschelkalk, Keuper, Buntsandstein',type:'Weißwein',desc:'Trockene Frankenweine im Bocksbeutel. Würzburg als Zentrum. Kontinentales Klima.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
+      {id:'Saale-Unstrut',fill:'#B5D4F4',d:'M176 46 L198 42 L208 48 L210 60 L204 68 L190 70 L178 66 L172 58Z',lx:191,ly:57,grape:'Müller-Thurgau, Weißburgunder, Silvaner',soil:'Muschelkalk, Buntsandstein, Zechstein',type:'Weißwein',desc:'Nördlichstes Anbaugebiet. Terrassen-Weinbau. Historische Klosterweingüter.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Sachsen',fill:'#97C459',d:'M210 46 L228 44 L236 50 L236 62 L226 66 L212 64 L208 56Z',lx:221,ly:56,grape:'Müller-Thurgau, Riesling, Grauburgunder',soil:'Granit, Gneis, Porphyr, Löss',type:'Weißwein',desc:'Kleinstes Gebiet an der Elbe. Dresden, Meißen. Steilhang-Weinbau.',klass:'Qualitätswein, Prädikatswein'},
     ]
   },
   Italien:{
@@ -879,10 +965,10 @@ function getRegionInfo(country,region){
   const saved=localStorage.getItem(key);
   if(saved)return JSON.parse(saved);
   const r=(SVG_REGIONS[country]?.regions||[]).find(x=>x.id===region);
-  return{grape:r?.grape||'',soil:r?.soil||''};
+  return{grape:r?.grape||'',soil:r?.soil||'',desc:r?.desc||'',klass:r?.klass||''};
 }
-function saveRegionInfo(country,region,grape,soil){
-  localStorage.setItem(`rinfo_${country}_${region}`,JSON.stringify({grape,soil}));
+function saveRegionInfo(country,region,grape,soil,desc,klass){
+  localStorage.setItem(`rinfo_${country}_${region}`,JSON.stringify({grape,soil,desc,klass}));
 }
 
 let d3Loaded=false;let topoLoaded=false;let worldData=null;let currentDrillCountry=null;
@@ -913,11 +999,19 @@ function showStaticRegionMap(countryName){
   const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
   const countryWines=getCountryWines();
   const myWineRegions=new Set((countryWines[countryName]||[]).map(w=>w.region).filter(Boolean));
+
+  // Country outline paths
+  const outlines={
+    Deutschland:'M82 34 L100 28 L120 26 L148 30 L168 28 L192 32 L212 40 L236 44 L240 58 L236 72 L226 78 L218 86 L210 94 L212 114 L210 132 L208 148 L196 158 L180 162 L168 168 L164 180 L158 196 L150 212 L148 228 L146 244 L140 258 L130 268 L118 262 L106 248 L100 232 L100 214 L102 196 L104 180 L112 172 L108 160 L100 150 L94 138 L88 126 L80 116 L72 104 L76 90 L80 76 L78 62 L78 48Z',
+    Italien:'M94 38 L116 34 L134 36 L150 34 L168 32 L186 38 L198 46 L210 54 L218 64 L216 78 L208 88 L196 96 L180 100 L168 108 L166 122 L162 136 L156 150 L156 168 L160 182 L164 196 L170 210 L172 226 L170 242 L164 258 L168 272 L176 284 L192 296 L204 308 L192 320 L178 328 L164 332 L148 332 L132 328 L118 318 L108 306 L98 318 L88 328 L78 322 L68 310 L66 296 L72 282 L80 270 L88 256 L98 244 L104 230 L108 214 L106 198 L104 182 L100 168 L100 152 L98 136 L96 120 L92 106 L86 92 L82 76 L84 60 L90 46Z',
+  };
+
   container.innerHTML=`<svg viewBox="${data.viewBox}" width="100%" height="100%" style="display:block">
     <rect width="9999" height="9999" x="-999" y="-999" fill="#dae8f0"/>
+    ${outlines[countryName]?`<path d="${outlines[countryName]}" fill="#e8e0d4" stroke="#c0b8a8" stroke-width="0.8" stroke-linejoin="round" opacity="0.5"/>`:''}
     ${data.regions.map(r=>{
       const hasWine=[...myWineRegions].some(mr=>mr.toLowerCase().includes(r.id.toLowerCase())||r.id.toLowerCase().includes(mr.toLowerCase()));
-      return`<path id="svgr-${r.id.replace(/[^a-zA-Z0-9]/g,'_')}" d="${r.d}" fill="${r.fill}" stroke="white" stroke-width="0.8" stroke-linejoin="round" style="cursor:pointer;opacity:${hasWine?1:0.6}" onclick="selectSvgRegion('${countryName}','${r.id}','${r.fill}')"/>
+      return`<path id="svgr-${r.id.replace(/[^a-zA-Z0-9]/g,'_')}" d="${r.d}" fill="${r.fill}" stroke="white" stroke-width="0.8" stroke-linejoin="round" style="cursor:pointer;opacity:${hasWine?1:0.6}" onclick="selectSvgRegion('${countryName}','${r.id.replace(/'/g,"\\'")}','${r.fill}')"/>
       <text x="${r.lx}" y="${r.ly}" text-anchor="middle" dominant-baseline="middle" style="pointer-events:none;font-size:5px;font-weight:600;fill:#1a1209;font-family:sans-serif">${r.id}</text>`;
     }).join('')}
   </svg>`;
@@ -933,11 +1027,14 @@ function selectSvgRegion(countryName,regionId,fill){
   const myWines=(countryWines[countryName]||[]).filter(w=>w.region&&(w.region.toLowerCase().includes(regionId.toLowerCase())||regionId.toLowerCase().includes(w.region.toLowerCase())));
   const detailEl=document.getElementById('map-region-detail');
   detailEl.style.display='block';
+  const fillEsc=fill.replace(/'/g,"\\'");
+  const idEsc=regionId.replace(/'/g,"\\'");
   detailEl.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:var(--ink)">${regionId}</div>
-      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="editRegionInfo('${countryName}','${regionId}','${fill}')"><i class="ti ti-edit" style="font-size:11px"></i> Bearbeiten</button>
+      <div style="font-size:13px;font-weight:700;color:var(--ink)">${regionId}</div>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="editRegionInfo('${countryName}','${idEsc}','${fillEsc}')"><i class="ti ti-edit" style="font-size:11px"></i> Bearbeiten</button>
     </div>
+    ${info.desc?`<div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px;font-style:italic">${info.desc}</div>`:''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
       <div style="background:var(--bg2);border-radius:8px;padding:7px 9px">
         <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Rebsorten</div>
@@ -948,6 +1045,10 @@ function selectSvgRegion(countryName,regionId,fill){
         <div style="font-size:10px;color:var(--ink);line-height:1.4">${info.soil||'—'}</div>
       </div>
     </div>
+    ${info.klass?`<div style="background:var(--bg2);border-radius:8px;padding:7px 9px;margin-bottom:8px">
+      <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Klassifikationen</div>
+      <div style="font-size:10px;color:var(--ink);line-height:1.4">${info.klass}</div>
+    </div>`:''}
     ${myWines.length?`<div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Deine Weine</div>
     ${myWines.map(w=>`<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:10px;cursor:pointer" onclick="goDetail(${w.id})">
       <span style="background:var(--ink);color:var(--bg);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700">${w.vintage||'NV'}</span>
@@ -960,26 +1061,37 @@ function selectSvgRegion(countryName,regionId,fill){
 function editRegionInfo(countryName,regionId,fill){
   const info=getRegionInfo(countryName,regionId);
   const esc=fill.replace(/'/g,"\\'");
+  const idEsc=regionId.replace(/'/g,"\\'");
   document.getElementById('map-region-detail').innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:12px;font-weight:700;color:var(--ink)">${regionId}</div>
-      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="selectSvgRegion('${countryName}','${regionId}','${esc}')"><i class="ti ti-x" style="font-size:11px"></i></button>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="selectSvgRegion('${countryName}','${idEsc}','${esc}')"><i class="ti ti-x" style="font-size:11px"></i></button>
+    </div>
+    <div style="margin-bottom:7px">
+      <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Beschreibung</label>
+      <textarea id="edit-desc" class="finput" style="font-size:11px;padding:7px 10px;min-height:56px;resize:none">${(info.desc||'').replace(/"/g,'&quot;')}</textarea>
     </div>
     <div style="margin-bottom:7px">
       <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Rebsorten</label>
       <input id="edit-grape" class="finput" value="${(info.grape||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px">
     </div>
-    <div style="margin-bottom:9px">
+    <div style="margin-bottom:7px">
       <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Bodenart</label>
       <input id="edit-soil" class="finput" value="${(info.soil||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px">
     </div>
-    <button class="btn btn-wine" style="font-size:11px;width:100%;justify-content:center" onclick="saveRegionEdit('${countryName}','${regionId}','${esc}')"><i class="ti ti-check"></i> Speichern</button>`;
+    <div style="margin-bottom:9px">
+      <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Klassifikationen / Appellationen</label>
+      <input id="edit-klass" class="finput" value="${(info.klass||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px" placeholder="z.B. Großes Gewächs, Erstes Gewächs…">
+    </div>
+    <button class="btn btn-wine" style="font-size:11px;width:100%;justify-content:center" onclick="saveRegionEdit('${countryName}','${idEsc}','${esc}')"><i class="ti ti-check"></i> Speichern</button>`;
 }
 
 function saveRegionEdit(countryName,regionId,fill){
   saveRegionInfo(countryName,regionId,
     document.getElementById('edit-grape')?.value.trim()||'',
-    document.getElementById('edit-soil')?.value.trim()||'');
+    document.getElementById('edit-soil')?.value.trim()||'',
+    document.getElementById('edit-desc')?.value.trim()||'',
+    document.getElementById('edit-klass')?.value.trim()||'');
   selectSvgRegion(countryName,regionId,fill);
 }
 
@@ -1230,7 +1342,195 @@ async function importJson(e){
   r.readAsText(file);
 }
 
-// ── Autocomplete ──────────────────────────────────────────
+// ── Rebsorten ──────────────────────────────────────────────────────
+const DEFAULT_REBSORTEN=[
+  {name:'Barbera',farbe:'Rot',herkunft:'Italien (Piemont)',profil:'Kräftige Säure, dunkle Kirschen, Pflaume. Wenig Tannin. Zugänglich und alltagstauglich.',aromen:'Schwarzkirsche, Brombeere, Gewürze, Veilchen'},
+  {name:'Blaufränkisch',farbe:'Rot',herkunft:'Österreich, Ungarn',profil:'Würzig-pfeffrig mit dunklen Früchten und lebendiger Säure. Gut lagerbar.',aromen:'Schwarzkirsche, Pfeffer, Schokolade, Gewürze'},
+  {name:'Cabernet Franc',farbe:'Rot',herkunft:'Frankreich (Loire, Bordeaux)',profil:'Leichter als Cabernet Sauvignon. Elegante Kräuternoten, rote Früchte, feine Tannine.',aromen:'Rote Johannisbeere, Paprika, Veilchen, Bleistift'},
+  {name:'Cabernet Sauvignon',farbe:'Rot',herkunft:'Weltweit, Ursprung Bordeaux',profil:'Körperreich, hohe Tannine, lange Lagerfähigkeit. Internationaler Leitrotwein.',aromen:'Schwarze Johannisbeere, Zeder, Tabak, Minze, Cassis'},
+  {name:'Cannonau',farbe:'Rot',herkunft:'Sardinien',profil:'Reife, warme Aromen. Vollmundig, samtige Tannine. Identisch mit Grenache.',aromen:'Getrocknete Kirschen, Leder, Rosmarin, Lakritz'},
+  {name:'Chardonnay',farbe:'Weiß',herkunft:'Weltweit, Ursprung Burgund',profil:'Stilistisch sehr variabel — von schlank-mineralisch bis üppig-buttig je nach Ausbau.',aromen:'Grüner Apfel, Zitrus, Butter, Vanille, Haselnuss'},
+  {name:'Chenin Blanc',farbe:'Weiß',herkunft:'Frankreich (Loire)',profil:'Hohe Säure, breites Spektrum von trocken bis edelsüß. Große Lagerfähigkeit.',aromen:'Quitte, Honig, Wachs, Feuerstein, Kamille'},
+  {name:'Corvina',farbe:'Rot',herkunft:'Italien (Venetien)',profil:'Basis für Valpolicella und Amarone. Leicht bitter, kirschig, säurebetont.',aromen:'Sauerkirsche, Mandel, Gewürze, Bitterschokolade'},
+  {name:'Dornfelder',farbe:'Rot',herkunft:'Deutschland',profil:'Tiefe Farbe, weiche Tannine, dunkle Früchte. Zugänglicher Alltagswein.',aromen:'Schwarzkirsche, Brombeere, Schokolade, Veilchen'},
+  {name:'Frühburgunder',farbe:'Rot',herkunft:'Deutschland (Ahr)',profil:'Frühe Reife, samtige Textur, leichter als Spätburgunder. Fein und elegant.',aromen:'Rote Früchte, Erdbeere, Rosen, dezente Würze'},
+  {name:'Garganega',farbe:'Weiß',herkunft:'Italien (Venetien)',profil:'Basis des Soave. Mandel-bitter im Abgang, frisch und leicht.',aromen:'Zitrus, Mandel, Apfel, Blüten, Kräuter'},
+  {name:'Gewürztraminer',farbe:'Weiß/Rosé',herkunft:'Elsass, Südtirol',profil:'Intensives Bouquet, tiefes Gold, geringe Säure. Üppig und exotisch.',aromen:'Litschi, Rosen, Ingwer, Mango, Muskat'},
+  {name:'Glera',farbe:'Weiß',herkunft:'Italien (Venetien)',profil:'Basis des Prosecco. Leicht, frisch, angenehme Perlage.',aromen:'Pfirsich, Apfel, Birne, Akazienblüten'},
+  {name:'Grauburgunder',farbe:'Weiß',herkunft:'Deutschland, Elsass, Italien',profil:'Voller Körper, wenig Säure, reife Frucht. Als Pinot Gris/Grigio bekannt.',aromen:'Pfirsich, Birne, Mandeln, Honig, Gewürze'},
+  {name:'Grenache',farbe:'Rot',herkunft:'Spanien, Südfrankreich',profil:'Reife, warme Aromen, hoher Alkohol, wenig Tannin. Basis vieler Rosés.',aromen:'Erdbeere, Himbeere, Kräuter, Zimt, Lakritz'},
+  {name:'Grüner Veltliner',farbe:'Weiß',herkunft:'Österreich',profil:'Pfeffrig-würzige Spezialität. Frisch und trocken, elegant bis kraftvoll.',aromen:'Pfeffer, Zitrus, Limette, Kräuter, Minerale'},
+  {name:'Lagrein',farbe:'Rot',herkunft:'Südtirol',profil:'Tiefe Farbe, kräftige Tannine, typisch bitterer Abgang. Regional und charakterstark.',aromen:'Brombeere, Pflaume, Schokolade, Leder, Veilchen'},
+  {name:'Lemberger',farbe:'Rot',herkunft:'Deutschland (Württemberg)',profil:'Würzig, pfeffrig, mittleres Tannin. In Österreich als Blaufränkisch bekannt.',aromen:'Dunkle Kirschen, Pfeffer, Gewürze, Veilchen'},
+  {name:'Macabeu',farbe:'Weiß',herkunft:'Spanien (Katalonien)',profil:'Basis von Cava. Neutral, frisch, gute Säure.',aromen:'Apfel, Zitrus, Blüten, Mandel'},
+  {name:'Merlot',farbe:'Rot',herkunft:'Weltweit, Ursprung Bordeaux',profil:'Weiche Tannine, zugänglich, samtig. Großes Stilspektrum.',aromen:'Pflaume, Schokolade, Veilchen, Kräuter, Tabak'},
+  {name:'Müller-Thurgau',farbe:'Weiß',herkunft:'Deutschland, Österreich',profil:'Kreuzung Riesling × Madeleine Royale. Mild, fruchtig, früh reifend.',aromen:'Muskat, Apfel, Pfirsich, Kräuter'},
+  {name:'Nebbiolo',farbe:'Rot',herkunft:'Italien (Piemont)',profil:'Hohe Tannine, hohe Säure, blasses Rubinrot. Basis von Barolo und Barbaresco. Lagerwein par excellence.',aromen:'Rosen, Teer, Trüffel, Veilchen, Kirschen, Tabak'},
+  {name:'Negroamaro',farbe:'Rot',herkunft:'Italien (Apulien)',profil:'Kräftig, warm, bittersüßer Charakter. Name bedeutet "schwarz und bitter".',aromen:'Feigen, Pflaume, Bitterschokolade, Kräuter'},
+  {name:'Nero d\'Avola',farbe:'Rot',herkunft:'Italien (Sizilien)',profil:'Vollmundig, reichhaltig, warm. Flaggschiff Siziliens.',aromen:'Schwarze Kirsche, Pflaume, Schokolade, Leder'},
+  {name:'Pinot Meunier',farbe:'Rot',herkunft:'Frankreich (Champagne)',profil:'Dritte Champagner-Traube. Fruchtig, früh reifend, Frische.',aromen:'Apfel, Erdbeere, Brioche, Würze'},
+  {name:'Pinot Noir',farbe:'Rot',herkunft:'Weltweit, Ursprung Burgund',profil:'Dünne Schale, wenig Tannin, delikat. Große Terroir-Sensibilität. Schwierig zu vinifizieren.',aromen:'Erdbeere, Himbeere, Rosen, Pilze, Erde, Trüffel'},
+  {name:'Primitivo',farbe:'Rot',herkunft:'Italien (Apulien)',profil:'Identisch mit Zinfandel. Üppig, reif, hoher Alkohol, süßliche Frucht.',aromen:'Brombeere, Pflaume, Rosinen, Schokolade, Gewürze'},
+  {name:'Refosco',farbe:'Rot',herkunft:'Italien (Friaul)',profil:'Tanninreich, säurebetont, dunkel. Regional typisch und charakterstark.',aromen:'Dunkle Beeren, Bitterschokolade, Kräuter, Erde'},
+  {name:'Riesling',farbe:'Weiß',herkunft:'Deutschland, Elsass, Österreich',profil:'Höchste Säure, ausgeprägter Mineralcharakter, große Lagerfähigkeit. Stilistisch von trocken bis edelsüß.',aromen:'Pfirsich, Aprikose, Zitrus, Petroleum, Schiefer, Honig'},
+  {name:'Sagrantino',farbe:'Rot',herkunft:'Italien (Umbrien)',profil:'Höchste Tanninkonzentration aller Rebsorten. Braucht Jahre der Reifung.',aromen:'Brombeere, Schwarzkirsche, Tabak, Leder, Schokolade'},
+  {name:'Sangiovese',farbe:'Rot',herkunft:'Italien (Toskana)',profil:'Mittleres Tannin, hohe Säure, kirschig. Basis von Chianti, Brunello, Morellino.',aromen:'Sauerkirsche, Tomate, Leder, Tabak, Kräuter'},
+  {name:'Sauvignon Blanc',farbe:'Weiß',herkunft:'Frankreich, Neuseeland, weltweit',profil:'Ausgeprägte Aromatik, hohe Säure, schlank. Stilistisch sehr erkennbar.',aromen:'Stachelbeere, Gras, Grapefruit, Holunder, Kräuter'},
+  {name:'Silvaner',farbe:'Weiß',herkunft:'Deutschland (Franken), Österreich',profil:'Neutral, erdgebunden, trocken. Größte Terroir-Durchlässigkeit.',aromen:'Kräuter, Stachelbeere, Quitte, Erde, Minerale'},
+  {name:'Spätburgunder',farbe:'Rot',herkunft:'Deutschland',profil:'Deutschlands Pinot Noir. Feiner, kühler Stil mit Eleganz und Säure.',aromen:'Erdbeere, Himbeere, Kirsche, Erde, Gewürze'},
+  {name:'Syrah',farbe:'Rot',herkunft:'Nordrhône, weltweit (als Shiraz)',profil:'Pfeffrig-würzig im kühlen Klima, üppig-reif im warmen. Großes Stilspektrum.',aromen:'Schwarze Olive, Pfeffer, Brombeere, Rauch, Fleisch'},
+  {name:'Tempranillo',farbe:'Rot',herkunft:'Spanien',profil:'Spaniens bedeutendste Rotweinrebe. Erdbeere, Leder, mittleres Tannin.',aromen:'Erdbeere, Kirsche, Leder, Tabak, Vanille'},
+  {name:'Touriga Nacional',farbe:'Rot',herkunft:'Portugal (Douro)',profil:'Wichtigste Port-Rebe. Intensiv, komplex, hochwertig.',aromen:'Blaubeere, Schwarzkirsche, Veilchen, Schokolade'},
+  {name:'Trollinger',farbe:'Rot',herkunft:'Deutschland (Württemberg)',profil:'Leicht, unkompliziert, fruchtig. Württemberger Alltags-Rotwein.',aromen:'Erdbeere, Himbeere, Blüten, dezente Würze'},
+  {name:'Verdicchio',farbe:'Weiß',herkunft:'Italien (Marken)',profil:'Charakteristische Bittermandel-Note im Abgang. Frisch, kräutrig.',aromen:'Zitrus, Pfirsich, Mandel, Kräuter, Fenchel'},
+  {name:'Vermentino',farbe:'Weiß',herkunft:'Sardinien, Korsika, Ligurien',profil:'Mediterraner Weißwein. Frisch, kräutrig, leicht salzig.',aromen:'Zitrone, Pampelmuse, Mandel, Rosmarin, Salzluft'},
+  {name:'Vernaccia',farbe:'Weiß',herkunft:'Italien (Toskana)',profil:'Älteste genannte Rebsorte Italiens. Trocken, frisch, leicht bitter.',aromen:'Pfirsich, Mandel, Kräuter, Mineralität'},
+  {name:'Weißburgunder',farbe:'Weiß',herkunft:'Deutschland, Österreich, Italien',profil:'Als Pinot Blanc bekannt. Körperreich, wenig Säure, cremig.',aromen:'Apfel, Birne, Mandel, Kräuter, Butter'},
+  {name:'Xarello',farbe:'Weiß',herkunft:'Spanien (Katalonien)',profil:'Cava-Rebe. Struktur und Körper, gute Säure.',aromen:'Apfel, Kräuter, Zitrus, Mandel'},
+  {name:'Zinfandel',farbe:'Rot',herkunft:'USA (Kalifornien)',profil:'Üppig, reif, hoher Alkohol. Identisch mit Primitivo.',aromen:'Brombeere, Rosinen, Pfeffer, Schokolade, Marmelade'},
+];
+
+function getAllRebsorten(){
+  const saved=localStorage.getItem('rb_custom');
+  const custom=saved?JSON.parse(saved):[];
+  const all=[...DEFAULT_REBSORTEN,...custom];
+  return all.sort((a,b)=>a.name.localeCompare(b.name,'de'));
+}
+
+function saveCustomRebsorte(rb){
+  const saved=localStorage.getItem('rb_custom');
+  const custom=saved?JSON.parse(saved):[];
+  const idx=custom.findIndex(r=>r.name===rb.name);
+  if(idx>=0)custom[idx]=rb; else custom.push(rb);
+  localStorage.setItem('rb_custom',JSON.stringify(custom));
+}
+
+function deleteCustomRebsorte(name){
+  const saved=localStorage.getItem('rb_custom');
+  const custom=saved?JSON.parse(saved):[];
+  localStorage.setItem('rb_custom',JSON.stringify(custom.filter(r=>r.name!==name)));
+}
+
+function isCustomRebsorte(name){
+  const saved=localStorage.getItem('rb_custom');
+  const custom=saved?JSON.parse(saved):[];
+  return custom.some(r=>r.name===name);
+}
+
+function renderRebsortenList(){
+  const el=document.getElementById('rebsorten-alpha-list');if(!el)return;
+  const all=getAllRebsorten();
+  const countEl=document.getElementById('rebsorten-count');
+  if(countEl)countEl.textContent=`${all.length} Rebsorten`;
+
+  // Group by first letter
+  const byLetter={};
+  all.forEach(r=>{const l=r.name[0].toUpperCase();if(!byLetter[l])byLetter[l]=[];byLetter[l].push(r);});
+
+  el.innerHTML=Object.entries(byLetter).map(([letter,items])=>`
+    <div class="alpha-section">
+      <div class="alpha-letter">${letter}</div>
+      ${items.map(r=>`
+        <div class="weingut-row" style="flex-direction:column;align-items:flex-start;gap:0;padding:10px 0" onclick="showRebsorteDetail('${r.name.replace(/'/g,"\\'")}')">
+          <div style="display:flex;align-items:center;width:100%;gap:8px">
+            <div class="weingut-row-name">${r.name}</div>
+            <span style="font-size:9px;padding:2px 7px;border-radius:20px;border:0.5px solid var(--border2);color:var(--ink3)">${r.farbe}</span>
+            ${isCustomRebsorte(r.name)?'<span style="font-size:9px;color:var(--wine);font-weight:600">Eigene</span>':''}
+            <div class="weingut-row-count" style="margin-left:auto">${wines.filter(w=>w.grape&&w.grape.toLowerCase().includes(r.name.toLowerCase())).length||''}</div>
+          </div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px">${r.herkunft}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function showRebsorteDetail(name){
+  const all=getAllRebsorten();
+  const r=all.find(x=>x.name===name);if(!r)return;
+  const myWines=wines.filter(w=>w.grape&&w.grape.toLowerCase().includes(name.toLowerCase()));
+  const custom=isCustomRebsorte(name);
+
+  const el=document.getElementById('rebsorten-alpha-list');
+  el.innerHTML=`
+    <div style="padding:4px 0 14px">
+      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Alle Rebsorten</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-0.5px">${r.name}</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px">${r.farbe} · ${r.herkunft}</div>
+        </div>
+        <button class="btn" style="font-size:10px;padding:5px 10px;flex-shrink:0" onclick="showEditRebsorte('${name.replace(/'/g,"\\'")}')"><i class="ti ti-edit" style="font-size:11px"></i> ${custom?'Bearbeiten':'Anpassen'}</button>
+      </div>
+
+      <div style="background:var(--bg2);border-radius:var(--r2);padding:12px 14px;margin-bottom:10px">
+        <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Charakterprofil</div>
+        <div style="font-size:13px;color:var(--ink);line-height:1.65">${r.profil}</div>
+      </div>
+
+      <div style="background:var(--bg2);border-radius:var(--r2);padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Typische Aromen</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${r.aromen.split(',').map(a=>`<span style="font-size:11px;padding:3px 9px;border-radius:20px;background:var(--bg);border:0.5px solid var(--border2);color:var(--ink2)">${a.trim()}</span>`).join('')}
+        </div>
+      </div>
+
+      ${myWines.length?`
+        <div style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Meine Weine mit ${r.name}</div>
+        ${myWines.map(w=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);cursor:pointer" onclick="goDetail(${w.id})">
+          <span style="background:var(--ink);color:var(--bg);border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700">${w.vintage||'NV'}</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--ink)">${w.weingut||w.name}</div>
+            <div style="font-size:10px;color:var(--ink3)">${w.region||''}</div>
+          </div>
+          <i class="ti ti-chevron-right" style="font-size:12px;color:var(--ink3)"></i>
+        </div>`).join('')}`
+      :`<div style="font-size:12px;color:var(--ink3);font-style:italic;text-align:center;padding:16px 0">Noch kein ${r.name} in deiner Sammlung.</div>`}
+
+      ${custom?`<button class="btn" style="font-size:10px;color:var(--wine);border-color:rgba(139,26,46,0.3);margin-top:14px" onclick="deleteRebsorte('${name.replace(/'/g,"\\'")}')"><i class="ti ti-trash" style="font-size:11px"></i> Löschen</button>`:''}
+    </div>`;
+}
+
+function showAddRebsorte(name=''){
+  const all=getAllRebsorten();
+  const r=name?all.find(x=>x.name===name):null;
+  const el=document.getElementById('rebsorten-alpha-list');
+  el.innerHTML=`
+    <div style="padding:4px 0 20px">
+      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Zurück</button>
+      <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px">${r?'Rebsorte bearbeiten':'Neue Rebsorte'}</div>
+      <div style="margin-bottom:9px"><label class="form-label">Name *</label><input class="form-input" id="rb-name" value="${r?.name||''}" placeholder="z.B. Agiorgitiko" style="font-size:13px" ${r?'readonly':''}></div>
+      <div style="margin-bottom:9px"><label class="form-label">Farbe</label>
+        <select class="form-input" id="rb-farbe" style="font-size:13px">
+          ${['Rot','Weiß','Rosé/Weiß','Rot/Weiß'].map(f=>`<option ${r?.farbe===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-bottom:9px"><label class="form-label">Herkunft</label><input class="form-input" id="rb-herkunft" value="${r?.herkunft||''}" placeholder="z.B. Griechenland" style="font-size:13px"></div>
+      <div style="margin-bottom:9px"><label class="form-label">Charakterprofil</label><textarea class="form-input" id="rb-profil" style="font-size:12px;min-height:70px;resize:none">${r?.profil||''}</textarea></div>
+      <div style="margin-bottom:14px"><label class="form-label">Typische Aromen (kommagetrennt)</label><input class="form-input" id="rb-aromen" value="${r?.aromen||''}" placeholder="z.B. Kirsche, Pfeffer, Rosen" style="font-size:13px"></div>
+      <button class="btn btn-wine" style="width:100%;justify-content:center;font-size:12px" onclick="saveRebsorte()"><i class="ti ti-check"></i> Speichern</button>
+    </div>`;
+}
+
+function showEditRebsorte(name){showAddRebsorte(name);}
+
+function saveRebsorte(){
+  const name=document.getElementById('rb-name')?.value.trim();
+  if(!name){alert('Name ist Pflichtfeld');return;}
+  saveCustomRebsorte({
+    name,
+    farbe:document.getElementById('rb-farbe')?.value||'Rot',
+    herkunft:document.getElementById('rb-herkunft')?.value.trim()||'',
+    profil:document.getElementById('rb-profil')?.value.trim()||'',
+    aromen:document.getElementById('rb-aromen')?.value.trim()||'',
+  });
+  renderRebsortenList();
+}
+
+function deleteRebsorte(name){
+  if(!confirm(`${name} löschen?`))return;
+  deleteCustomRebsorte(name);
+  renderRebsortenList();
+}
+
 const AC_FIELDS={
   grape:w=>w.grape,region:w=>w.region,country:w=>w.country,
   lage:w=>w.lage,klass:w=>w.klass,soil:w=>w.soil
