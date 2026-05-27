@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Weintagebuch">
+<meta name="theme-color" content="#1a1209">
+<title>Weintagebuch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #faf8f4;
+  --bg2: #f3efe8;
+  --bg3: #ebe5da;
+  --ink: #1a1209;
+  --ink2: #6b5c47;
+  --ink3: #a8957c;
+  --wine: #7a1c2e;
+  --wine2: #a02840;
+  --gold: #b8860b;
+  --gold2: #d4a017;
+  --green: #2d5a27;
+  --border: rgba(26,18,9,0.12);
+  --border2: rgba(26,18,9,0.22);
+  --shadow: 0 1px 8px rgba(26,18,9,0.08);
+  --r: 10px;
+  --r2: 16px;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #140f09;
+    --bg2: #1e1710;
+    --bg3: #2a2118;
+    --ink: #f0e8d8;
+    --ink2: #b8a48a;
+    --ink3: #7a6a55;
+    --border: rgba(240,232,216,0.1);
+    --border2: rgba(240,232,216,0.2);
+    --shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font-body);color:var(--ink)}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;padding-top:max(12px, env(safe-area-inset-top))}
+.topbar-title{font-family:var(--font-display);font-size:20px;font-weight:500;flex:1;color:var(--ink);font-style:italic}
+.topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:600;flex:1;color:var(--ink);letter-spacing:-0.5px}
+.topbar-logo span{color:var(--wine)}
+
+/* BUTTONS */
+.btn{font-family:var(--font-body);background:transparent;border:0.5px solid var(--border2);border-radius:var(--r);padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:5px;transition:all .15s;letter-spacing:0.2px}
+.btn:active{transform:scale(0.97)}
+.btn-wine{background:var(--wine);color:#fff;border-color:var(--wine)}
+.btn-wine:active{background:var(--wine2)}
+.btn-icon{padding:7px;border-radius:var(--r)}
+.btn-ghost{border-color:transparent}
+
+/* SCROLLABLE BODY */
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-body::-webkit-scrollbar{display:none}
+
+/* BOTTOM NAV */
+.bottom-nav{display:flex;border-top:0.5px solid var(--border);background:var(--bg);flex-shrink:0;padding-bottom:max(8px, env(safe-area-inset-bottom))}
+.bnav-btn{flex:1;padding:10px 4px 8px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:500;color:var(--ink3);letter-spacing:0.4px;text-transform:uppercase;font-family:var(--font-body)}
+.bnav-btn.active{color:var(--wine)}
+.bnav-btn i{font-size:20px}
+
+/* STATS */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.stat-item{padding:12px 8px;text-align:center;border-right:0.5px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--font-display);font-size:22px;font-weight:500;color:var(--wine);display:block;line-height:1}
+.stat-label{font-size:9px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{font-family:var(--font-body);font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg);color:var(--ink2);cursor:pointer;white-space:nowrap;font-weight:400;transition:all .15s}
+.filter-chip.active{background:var(--wine);color:#fff;border-color:var(--wine)}
+select.filter-chip{-webkit-appearance:none;appearance:none;padding-right:20px;background-image:none}
+
+/* SEARCH */
+.search-row{padding:10px 14px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.search-wrap{position:relative}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--ink3)}
+.search-input{width:100%;font-family:var(--font-body);font-size:13px;padding:8px 12px 8px 32px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--ink)}
+.search-input:focus{outline:none;border-color:var(--wine);background:var(--bg)}
+
+/* WINE GRID */
+.wine-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:14px}
+.wine-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .15s}
+.wine-card:active{transform:scale(0.98);border-color:var(--border2)}
+.wine-thumb{width:100%;height:100px;background:var(--bg2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.wine-thumb img{width:100%;height:100%;object-fit:cover}
+.wine-thumb-icon{font-size:30px;color:var(--ink3)}
+.wine-card-body{padding:9px 11px 11px}
+.wine-card-name{font-family:var(--font-display);font-size:14px;font-weight:500;line-height:1.3;color:var(--ink);margin-bottom:3px}
+.wine-card-sub{font-size:10px;color:var(--ink3);margin-bottom:6px;line-height:1.4}
+.wine-card-foot{display:flex;align-items:center;justify-content:space-between}
+.stars-sm{color:var(--gold);font-size:10px;letter-spacing:0.5px}
+.type-badge{font-size:9px;padding:2px 6px;border-radius:20px;background:var(--bg3);color:var(--ink2);font-weight:500}
+.ripeness-dot{width:7px;height:7px;border-radius:50%;display:inline-block;vertical-align:middle;margin-left:3px}
+.rd-now{background:#2d5a27}.rd-soon{background:#b8860b}.rd-wait{background:#185fa5}.rd-over{background:#a32d2d}
+
+/* DETAIL */
+.detail-hero{width:100%;height:200px;background:var(--bg2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.detail-hero img{width:100%;height:100%;object-fit:cover}
+.detail-hero-icon{font-size:60px;color:var(--ink3)}
+.detail-body{padding:18px 16px 32px}
+.detail-name{font-family:var(--font-display);font-size:26px;font-weight:500;font-style:italic;color:var(--ink);margin-bottom:4px;line-height:1.2}
+.detail-origin{font-size:13px;color:var(--ink2);margin-bottom:12px}
+.tags-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500}
+.tag-r{background:#E1F5EE;color:#085041}.tag-v{background:#EEEDFE;color:#3C3489}
+.tag-g{background:#FAEEDA;color:#633806}.tag-t{background:rgba(122,28,46,0.1);color:var(--wine)}
+.tag-k{background:#EAF3DE;color:#27500A}
+.detail-stars{font-size:22px;color:var(--gold);letter-spacing:2px;margin-bottom:14px}
+.section-label{font-size:9px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;margin-top:16px}
+.section-text{font-size:13px;color:var(--ink);line-height:1.7}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.detail-stat{background:var(--bg2);border-radius:var(--r);padding:10px 12px;text-align:center}
+.detail-stat-n{font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--wine)}
+.detail-stat-l{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+.experience-box{background:var(--bg2);border-radius:var(--r);padding:12px 14px;margin-top:8px}
+.exp-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);padding:3px 0}
+.exp-row i{font-size:14px;color:var(--ink3);flex-shrink:0}
+
+/* ADD FORM */
+.add-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.add-scroll::-webkit-scrollbar{display:none}
+.form-section{padding:14px 16px;border-bottom:0.5px solid var(--border)}
+.form-section-title{font-family:var(--font-display);font-size:15px;font-weight:500;font-style:italic;color:var(--ink2);margin-bottom:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.form-group{margin-bottom:10px}
+.form-label{font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block}
+.form-input{font-family:var(--font-body);font-size:13px;padding:8px 11px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--ink);width:100%}
+.form-input:focus{outline:none;border-color:var(--wine);background:var(--bg)}
+.form-textarea{resize:none;min-height:80px;font-family:var(--font-body)}
+
+/* PHOTO UPLOAD */
+.photo-zone{border:1.5px dashed var(--border2);border-radius:var(--r2);padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg2)}
+.photo-zone:active{border-color:var(--wine)}
+.photo-zone-icon{font-size:28px;color:var(--ink3);display:block;margin-bottom:6px}
+.photo-zone-text{font-size:12px;color:var(--ink2)}
+.photo-zone-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ink3);border:0.5px solid var(--border);border-radius:20px;padding:2px 8px;margin-top:6px}
+.photo-preview{width:100%;max-height:180px;object-fit:cover;border-radius:var(--r);display:none;margin-top:10px}
+
+/* AI */
+.ai-loading{display:none;align-items:center;gap:8px;padding:9px 12px;background:var(--bg2);border-radius:var(--r);font-size:11px;color:var(--ink2)}
+.ai-loading.show{display:flex}
+.ai-result{background:var(--bg2);border-radius:var(--r);padding:10px 12px;display:none;margin-top:8px}
+.ai-result.show{display:block}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ai-field{background:var(--bg);border-radius:6px;border:0.5px solid var(--border);padding:6px 8px}
+.ai-field-l{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.4px}
+.ai-field-v{font-size:11px;font-weight:500;color:var(--ink);margin-top:1px}
+.dots span{animation:blink 1.2s infinite;opacity:0}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+
+/* STARS RATING */
+.star-row{display:flex;gap:4px}
+.star-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:2px;color:var(--border2);transition:color .1s}
+.star-btn.lit{color:var(--gold)}
+
+/* RIPENESS BAR */
+.ripe-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--ink3);margin-top:8px}
+.ripe-legend-item{display:flex;align-items:center;gap:4px}
+
+/* MAP */
+.map-wrap{padding:14px}
+.map-country-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r2);margin-bottom:10px;overflow:hidden}
+.map-country-header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:var(--bg2)}
+.map-country-flag{font-size:22px}
+.map-country-name{font-family:var(--font-display);font-size:16px;font-weight:500;font-style:italic;flex:1;color:var(--ink)}
+.map-country-count{font-size:11px;color:var(--ink3)}
+.map-country-wines{display:none;padding:0 14px 12px}
+.map-country-wines.open{display:block}
+.map-region-item{border-top:0.5px solid var(--border);padding:10px 0}
+.map-region-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.map-region-meta{font-size:10px;color:var(--ink3);margin-bottom:6px}
+.map-region-wines-list{display:flex;flex-direction:column;gap:4px}
+.map-wine-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);padding:3px 0;cursor:pointer}
+.map-wine-row:active{color:var(--wine)}
+
+/* MAP SVG */
+.world-map-container{border:0.5px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:14px;background:#dde8f0;height:220px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.wm-note{font-size:11px;color:var(--ink3);text-align:center;padding:0 20px;line-height:1.5}
+
+/* EXPORT */
+.export-section{padding:14px}
+.export-title-row{font-family:var(--font-display);font-size:18px;font-style:italic;color:var(--ink);margin-bottom:14px}
+.export-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.export-icon{width:42px;height:42px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.export-info{flex:1}
+.export-name{font-size:13px;font-weight:500;color:var(--ink)}
+.export-desc{font-size:10px;color:var(--ink3);margin-top:2px}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:var(--ink3)}
+.empty i{font-size:44px;display:block;margin-bottom:12px;opacity:.3}
+.empty-title{font-family:var(--font-display);font-size:18px;font-style:italic;color:var(--ink2);margin-bottom:6px}
+.empty-sub{font-size:12px;line-height:1.6}
+
+/* RIPENESS */
+.ripe-bar{height:4px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:6px}
+.ripe-fill{height:100%;border-radius:2px;transition:width .3s}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- LIST SCREEN -->
+<div id="screen-list" class="screen active">
+  <div class="topbar">
+    <div class="topbar-logo">Wein<span>buch</span></div>
+    <button class="btn btn-wine" onclick="goAdd()"><i class="ti ti-plus"></i> Eintragen</button>
+  </div>
+  <div id="stats-strip" class="stats-strip"></div>
+  <div class="search-row">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input class="search-input" id="sinput" placeholder="Wein, Region, Notizen…" oninput="filterWines()">
+    </div>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="scroll-body">
+    <div id="wine-grid" class="wine-grid"></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="bnav-btn active" id="bnav-liste" onclick="switchMainTab('liste')"><i class="ti ti-layout-grid"></i>Liste</button>
+    <button class="bnav-btn" id="bnav-karte" onclick="switchMainTab('karte')"><i class="ti ti-map-2"></i>Karte</button>
+    <button class="bnav-btn" id="bnav-export" onclick="switchMainTab('export')"><i class="ti ti-download"></i>Export</button>
+  </div>
+</div>
+
+<!-- DETAIL SCREEN -->
+<div id="screen-detail" class="screen">
+  <div class="topbar">
+    <button class="btn-icon btn btn-ghost" onclick="goList()"><i class="ti ti-arrow-left"></i></button>
+    <div class="topbar-title" id="detail-topbar"></div>
+    <button class="btn btn-ghost btn-icon" onclick="deleteWine()" style="color:#a32d2d;border-color:rgba(163,45,45,0.3)"><i class="ti ti-trash"></i></button>
+  </div>
+  <div class="scroll-body">
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ADD SCREEN -->
+<div id="screen-add" class="screen">
+  <div class="topbar">
+    <button class="btn-icon btn btn-ghost" onclick="goList()"><i class="ti ti-x"></i></button>
+    <div class="topbar-title">Neuer Eintrag</div>
+    <button class="btn btn-wine" onclick="saveWine()"><i class="ti ti-check"></i> Speichern</button>
+  </div>
+  <div class="add-scroll">
+    <!-- FOTO -->
+    <div class="form-section">
+      <div class="form-section-title">Etikett-Foto</div>
+      <label class="photo-zone" for="photo-input">
+        <i class="ti ti-camera photo-zone-icon"></i>
+        <div class="photo-zone-text">Foto aufnehmen oder hochladen</div>
+        <div class="photo-zone-badge"><i class="ti ti-sparkles" style="font-size:11px"></i> KI erkennt automatisch</div>
+      </label>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+      <img id="photo-preview" class="photo-preview" alt="Etikett Vorschau">
+      <div class="ai-loading" id="ai-loading" style="margin-top:8px"><i class="ti ti-sparkles"></i><span>KI analysiert das Etikett<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
+      <div class="ai-result" id="ai-result">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:10px;font-weight:500;color:var(--ink3);display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles" style="font-size:11px"></i> KI-Erkennung</div>
+          <button class="btn" style="font-size:10px;padding:4px 10px" onclick="applyAi()"><i class="ti ti-check"></i> Übernehmen</button>
+        </div>
+        <div id="ai-grid" class="ai-grid"></div>
+      </div>
+    </div>
+    <!-- WEIN -->
+    <div class="form-section">
+      <div class="form-section-title">Wein</div>
+      <div class="form-group"><label class="form-label">Weingut / Name *</label><input class="form-input" id="f-name" placeholder="z.B. Barolo Monfortino, André Clouet…"></div>
+      <div class="form-row">
+        <div><label class="form-label">Jahrgang</label><input class="form-input" id="f-vintage" placeholder="2019" maxlength="4" type="number"></div>
+        <div><label class="form-label">Art</label><select class="form-input" id="f-type"><option>Rotwein</option><option>Weißwein</option><option>Rosé</option><option>Schaumwein</option><option>Süßwein</option><option>Portwein</option><option>Sonstiges</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Rebsorte(n)</label><input class="form-input" id="f-grape" placeholder="z.B. Nebbiolo, Chardonnay…"></div>
+      <div class="form-row">
+        <div><label class="form-label">Alkohol (%)</label><input class="form-input" id="f-alc" placeholder="13.5" type="number" step="0.1"></div>
+        <div><label class="form-label">Format</label><select class="form-input" id="f-format"><option>Flasche (0,75L)</option><option>Magnum (1,5L)</option><option>Glas</option><option>Halbe (0,375L)</option><option>Jeroboam (3L)</option><option>Sonstiges</option></select></div>
+      </div>
+    </div>
+    <!-- HERKUNFT -->
+    <div class="form-section">
+      <div class="form-section-title">Herkunft</div>
+      <div class="form-row">
+        <div><label class="form-label">Land</label><input class="form-input" id="f-country" placeholder="z.B. Frankreich"></div>
+        <div><label class="form-label">Anbaugebiet</label><input class="form-input" id="f-region" placeholder="z.B. Burgund"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Lage / Appellation</label><input class="form-input" id="f-lage" placeholder="z.B. Vosne-Romanée"></div>
+        <div><label class="form-label">Klassifikation</label><input class="form-input" id="f-klass" placeholder="z.B. Premier Cru"></div>
+      </div>
+    </div>
+    <!-- TRINKREIFE -->
+    <div class="form-section">
+      <div class="form-section-title">Trinkreife</div>
+      <div class="form-row">
+        <div><label class="form-label">Trinken ab</label><input class="form-input" id="f-from" placeholder="2024" type="number" maxlength="4"></div>
+        <div><label class="form-label">Trinken bis</label><input class="form-input" id="f-to" placeholder="2035" type="number" maxlength="4"></div>
+      </div>
+    </div>
+    <!-- ERLEBNIS -->
+    <div class="form-section">
+      <div class="form-section-title">Erlebnis</div>
+      <div class="form-row">
+        <div><label class="form-label">Datum</label><input class="form-input" id="f-date" type="date"></div>
+        <div><label class="form-label">Preis (€)</label><input class="form-input" id="f-price" placeholder="28" type="number"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Ort / Restaurant</label><input class="form-input" id="f-ort" placeholder="z.B. Bar-rique Bremen, zuhause…"></div>
+      <div class="form-group"><label class="form-label">Mit wem</label><input class="form-input" id="f-with" placeholder="z.B. Jannis, Familie…"></div>
+      <div class="form-group"><label class="form-label">Anlass</label><input class="form-input" id="f-occasion" placeholder="z.B. Geburtstag, Weindegustation…"></div>
+    </div>
+    <!-- NOTIZEN -->
+    <div class="form-section">
+      <div class="form-section-title">Notizen & Bewertung</div>
+      <div class="form-group"><label class="form-label">Notizen</label><textarea class="form-input form-textarea" id="f-notes" placeholder="Aromen, Struktur, Abgang, persönlicher Eindruck…"></textarea></div>
+      <div class="form-group"><label class="form-label">Bewertung</label><div class="star-row" id="add-stars"></div></div>
+    </div>
+    <div style="height:32px"></div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// IndexedDB setup
+let db;
+const DB_NAME='weinbuch';const DB_VER=1;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('wines'))d.createObjectStore('wines',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});
+    };
+    req.onsuccess=e=>{db=e.target.result;res(db)};
+    req.onerror=()=>rej(req.error);
+  });
+}
+function dbGet(store,id){return new Promise((res,rej)=>{const tx=db.transaction(store,'readonly');const req=tx.objectStore(store).get(id);req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)})}
+function dbGetAll(store){return new Promise((res,rej)=>{const tx=db.transaction(store,'readonly');const req=tx.objectStore(store).getAll();req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)})}
+function dbPut(store,val){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const req=tx.objectStore(store).put(val);req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)})}
+function dbDelete(store,id){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const req=tx.objectStore(store).delete(id);req.onsuccess=()=>res();req.onerror=()=>rej(req.error)})}
+
+let wines=[];let editRating=3;let currentId=null;let aiData=null;let activeMainTab='liste';
+const COUNTRY_FLAGS={'Frankreich':'🇫🇷','Deutschland':'🇩🇪','Italien':'🇮🇹','Spanien':'🇪🇸','Portugal':'🇵🇹','Österreich':'🇦🇹','USA':'🇺🇸','Chile':'🇨🇱','Argentinien':'🇦🇷','Südafrika':'🇿🇦','Australien':'🇦🇺','Neuseeland':'🇳🇿','Griechenland':'🇬🇷','Ungarn':'🇭🇺'};
+const DEMO=[
+  {id:1,name:'André Clouet Grand Réserve',vintage:'NV',type:'Schaumwein',grape:'Pinot Noir',alc:'12',country:'Frankreich',region:'Champagne',lage:'',klass:'NM',notes:'Elegante Brioche-Note, feines Mousseux. Klassischer Blanc de Noirs Stil.',rating:5,price:38,date:'2025-03-19',ort:'Bar-rique Bremen',withwho:'Jannis',occasion:'Weindegustation',format:'Glas',drinkFrom:'',drinkTo:''},
+  {id:2,name:'Christmann & Kaufmann Riesling',vintage:'2022',type:'Weißwein',grape:'Riesling',alc:'12.5',country:'Deutschland',region:'Pfalz',lage:'Idig',klass:'Großes Gewächs',notes:'Mineralisch, zitrusbetont. Noch jung und entwicklungsfähig.',rating:4,price:22,date:'2025-04-02',ort:'zuhause',withwho:'',occasion:'',format:'Flasche (0,75L)',drinkFrom:'2025',drinkTo:'2030'},
+  {id:3,name:'Niepoort Tawny 10 Anos',vintage:'NV',type:'Portwein',grape:'Touriga Nacional',alc:'20',country:'Portugal',region:'Douro',lage:'',klass:'',notes:'Nuss, Trockenfrüchte, Karamell. Wunderbare Oxidationsnoten.',rating:5,price:29,date:'2025-04-15',ort:'Bar-rique Bremen',withwho:'Stammgast Müller',occasion:'Geburtstag',format:'Glas',drinkFrom:'',drinkTo:''},
+  {id:4,name:'Gramona Imperial Gran Reserva',vintage:'2017',type:'Schaumwein',grape:'Macabeu, Xarello',alc:'11.5',country:'Spanien',region:'Cava DO',lage:'',klass:'Gran Reserva',notes:'Langer Ausbau, hefig, nussig, sehr komplex.',rating:4,price:32,date:'2025-05-01',ort:'Bar-rique Bremen',withwho:'Team',occasion:'Terrasseneröffnung',format:'Flasche (0,75L)',drinkFrom:'2025',drinkTo:'2032'},
+  {id:5,name:'Raumland Cuvée Rosé Brut',vintage:'2019',type:'Schaumwein',grape:'Spätburgunder',alc:'12',country:'Deutschland',region:'Rheinhessen',lage:'',klass:'Sekt b.A.',notes:'Frisch, rote Beeren, feines Mousseux. Schöne Lebendigkeit.',rating:4,price:45,date:'2025-02-14',ort:'Restaurant',withwho:'Familie',occasion:'Valentinstag',format:'Flasche (0,75L)',drinkFrom:'',drinkTo:'2027'},
+  {id:6,name:'Barolo Riserva Monfortino',vintage:'2016',type:'Rotwein',grape:'Nebbiolo',alc:'14.5',country:'Italien',region:'Piemont',lage:'Castiglione Falletto',klass:'DOCG Riserva',notes:'Gerbstoffreich, Teer und Rosen, enorme Tiefe. Trinkreife Fenster gerade öffnend.',rating:5,price:180,date:'2025-05-15',ort:'Weinprobe',withwho:'Jannis',occasion:'Sommelier-Kurs',format:'Flasche (0,75L)',drinkFrom:'2026',drinkTo:'2045'},
+];
+
+async function init(){
+  await openDB();
+  const stored=await dbGetAll('wines');
+  if(stored.length>0){wines=stored.sort((a,b)=>b.id-a.id);}
+  else{wines=[...DEMO];for(const w of DEMO)await dbPut('wines',w);}
+  renderAll();
+}
+
+function ripeDot(w){
+  const f=parseInt(w.drinkFrom)||0,t=parseInt(w.drinkTo)||9999,n=2025;
+  if(!w.drinkFrom&&!w.drinkTo)return'';
+  if(n<f)return`<span class="ripeness-dot rd-wait" title="Noch warten"></span>`;
+  if(n>t)return`<span class="ripeness-dot rd-over" title="Überlagert"></span>`;
+  if(t-n<=2)return`<span class="ripeness-dot rd-soon" title="Bald trinken"></span>`;
+  return`<span class="ripeness-dot rd-now" title="Jetzt trinken"></span>`;
+}
+
+async function renderGrid(list){
+  const grid=document.getElementById('wine-grid');
+  if(!list||!list.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><i class="ti ti-wine"></i><div class="empty-title">Noch keine Weine</div><div class="empty-sub">Tippe auf „Eintragen" um deinen ersten Wein hinzuzufügen</div></div>`;
+    return;
+  }
+  const items=await Promise.all(list.map(async w=>{
+    let imgHtml=`<div class="wine-thumb"><i class="ti ti-bottle wine-thumb-icon"></i></div>`;
+    const photo=await dbGet('photos',w.id);
+    if(photo)imgHtml=`<div class="wine-thumb"><img src="${photo.data}" alt="Etikett" loading="lazy"></div>`;
+    return`<div class="wine-card" onclick="goDetail(${w.id})">${imgHtml}<div class="wine-card-body"><div class="wine-card-name">${w.name}${ripeDot(w)}</div><div class="wine-card-sub">${[w.vintage,w.country].filter(Boolean).join(' · ')||'—'}</div><div class="wine-card-foot"><span class="stars-sm">${'★'.repeat(w.rating)}</span>${w.type?`<span class="type-badge">${w.type}</span>`:''}</div></div></div>`;
+  }));
+  grid.innerHTML=items.join('');
+}
+
+function renderStats(){
+  const el=document.getElementById('stats-strip');
+  const avg=wines.length?(wines.reduce((a,w)=>a+w.rating,0)/wines.length).toFixed(1):0;
+  const countries=[...new Set(wines.map(w=>w.country).filter(Boolean))].length;
+  const regions=[...new Set(wines.map(w=>w.region).filter(Boolean))].length;
+  el.innerHTML=`
+    <div class="stat-item"><span class="stat-num">${wines.length}</span><div class="stat-label">Weine</div></div>
+    <div class="stat-item"><span class="stat-num">${avg}</span><div class="stat-label">Ø Punkte</div></div>
+    <div class="stat-item"><span class="stat-num">${countries}</span><div class="stat-label">Länder</div></div>
+    <div class="stat-item"><span class="stat-num">${regions}</span><div class="stat-label">Regionen</div></div>`;
+}
+
+function renderFilters(){
+  const vintages=[...new Set(wines.map(w=>w.vintage).filter(Boolean))].sort().reverse();
+  const types=[...new Set(wines.map(w=>w.type).filter(Boolean))].sort();
+  const countries=[...new Set(wines.map(w=>w.country).filter(Boolean))].sort();
+  const row=document.getElementById('filter-row');
+  row.innerHTML=`
+    <select class="filter-chip" id="f-yr" onchange="filterWines()"><option value="">Jahrgang</option>${vintages.map(v=>`<option>${v}</option>`).join('')}</select>
+    <select class="filter-chip" id="f-co" onchange="filterWines()"><option value="">Land</option>${countries.map(c=>`<option>${c}</option>`).join('')}</select>
+    <select class="filter-chip" id="f-ty" onchange="filterWines()"><option value="">Art</option>${types.map(t=>`<option>${t}</option>`).join('')}</select>
+    <select class="filter-chip" id="f-ra" onchange="filterWines()"><option value="">Bewertung</option><option value="5">★★★★★</option><option value="4">★★★★+</option><option value="3">★★★+</option></select>`;
+}
+
+function filterWines(){
+  const q=(document.getElementById('sinput')?.value||'').toLowerCase();
+  const yr=document.getElementById('f-yr')?.value||'';
+  const co=document.getElementById('f-co')?.value||'';
+  const ty=document.getElementById('f-ty')?.value||'';
+  const ra=parseInt(document.getElementById('f-ra')?.value)||0;
+  const filtered=wines.filter(w=>{
+    if(q&&![w.name,w.region,w.grape,w.notes,w.country,w.withwho,w.ort,w.lage,w.klass].join(' ').toLowerCase().includes(q))return false;
+    if(yr&&w.vintage!==yr)return false;
+    if(co&&w.country!==co)return false;
+    if(ty&&w.type!==ty)return false;
+    if(ra&&w.rating<ra)return false;
+    return true;
+  });
+  renderGrid(filtered);
+}
+
+async function goDetail(id){
+  currentId=id;
+  const w=wines.find(x=>x.id===id);if(!w)return;
+  document.getElementById('detail-topbar').textContent=w.name;
+  const photo=await dbGet('photos',id);
+  const heroHtml=photo?`<div class="detail-hero"><img src="${photo.data}" alt="Etikett"></div>`:`<div class="detail-hero"><i class="ti ti-bottle detail-hero-icon"></i></div>`;
+  const fullOrigin=[w.country,w.region,w.lage,w.klass].filter(Boolean).join(' › ');
+  const ripeText=()=>{
+    const f=parseInt(w.drinkFrom)||0,t=parseInt(w.drinkTo)||9999,n=2025;
+    if(!w.drinkFrom&&!w.drinkTo)return'';
+    const label=n<f?`<span style="color:#185fa5">Noch warten (ab ${w.drinkFrom})</span>`:n>t?`<span style="color:#a32d2d">Überlagert (bis ${w.drinkTo})</span>`:t-n<=2?`<span style="color:#b8860b">Bald trinken (bis ${w.drinkTo})</span>`:`<span style="color:#2d5a27">Jetzt trinken · noch ${t-n} Jahre</span>`;
+    const total=t-parseInt(w.drinkFrom||w.vintage||n);const elapsed=n-parseInt(w.drinkFrom||n);const pct=total>0?Math.min(100,Math.round(elapsed/total*100)):50;
+    return`<div class="section-label">Trinkreife</div><div class="section-text">${w.drinkFrom||'?'} – ${w.drinkTo||'?'} · ${label}</div><div class="ripe-bar"><div class="ripe-fill" style="width:${pct}%;background:${n<f?'#185fa5':n>t?'#a32d2d':t-n<=2?'#b8860b':'#2d5a27'}"></div></div>`;
+  };
+  document.getElementById('detail-content').innerHTML=`
+    ${heroHtml}
+    <div class="detail-body">
+      <div class="detail-name">${w.name}</div>
+      <div class="detail-origin">${fullOrigin||'—'}</div>
+      <div class="tags-row">
+        ${w.type?`<span class="tag tag-t">${w.type}</span>`:''}
+        ${w.country?`<span class="tag tag-r">${w.country}</span>`:''}
+        ${w.region?`<span class="tag tag-r">${w.region}</span>`:''}
+        ${w.lage?`<span class="tag tag-k">${w.lage}</span>`:''}
+        ${w.klass?`<span class="tag tag-k">${w.klass}</span>`:''}
+        ${w.grape?`<span class="tag tag-g">${w.grape}</span>`:''}
+        ${w.vintage?`<span class="tag tag-v">${w.vintage}</span>`:''}
+      </div>
+      <div class="detail-stars">${'★'.repeat(w.rating)}${'☆'.repeat(5-w.rating)}</div>
+      ${w.notes?`<div class="section-label">Notizen</div><div class="section-text">${w.notes}</div>`:''}
+      ${ripeText()}
+      ${(w.date||w.ort||w.withwho||w.occasion)?`
+        <div class="section-label">Erlebnis</div>
+        <div class="experience-box">
+          ${w.date?`<div class="exp-row"><i class="ti ti-calendar"></i><span>${w.date.split('-').reverse().join('.')}</span></div>`:''}
+          ${w.ort?`<div class="exp-row"><i class="ti ti-map-pin"></i><span>${w.ort}</span></div>`:''}
+          ${w.withwho?`<div class="exp-row"><i class="ti ti-users"></i><span>${w.withwho}</span></div>`:''}
+          ${w.occasion?`<div class="exp-row"><i class="ti ti-confetti"></i><span>${w.occasion}</span></div>`:''}
+        </div>`:''}
+      <div class="detail-grid">
+        ${w.price?`<div class="detail-stat"><div class="detail-stat-n">${w.price} €</div><div class="detail-stat-l">${w.format||'Preis'}</div></div>`:''}
+        ${w.alc?`<div class="detail-stat"><div class="detail-stat-n">${w.alc}%</div><div class="detail-stat-l">Alkohol</div></div>`:''}
+      </div>
+    </div>`;
+  showScreen('detail');
+}
+
+async function deleteWine(){
+  if(!confirm('Wein löschen?'))return;
+  await dbDelete('wines',currentId);
+  await dbDelete('photos',currentId);
+  wines=wines.filter(w=>w.id!==currentId);
+  goList();
+}
+
+function goAdd(){editRating=3;aiData=null;resetForm();renderAddStars();showScreen('add')}
+function goList(){showScreen('list');renderAll()}
+function showScreen(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById('screen-'+s).classList.add('active')}
+
+function switchMainTab(t){
+  activeMainTab=t;
+  ['liste','karte','export'].forEach(x=>document.getElementById('bnav-'+x).classList.toggle('active',x===t));
+  const listEl=document.getElementById('wine-grid').closest('.scroll-body');
+  const filterEl=document.getElementById('filter-row');
+  const searchEl=document.querySelector('.search-row');
+  const statsEl=document.getElementById('stats-strip');
+  if(t==='liste'){
+    listEl.style.display='';filterEl.parentElement.style.display='';searchEl.style.display='';statsEl.style.display='';
+    document.getElementById('map-view')?.remove();document.getElementById('export-view')?.remove();
+  } else {
+    listEl.style.display='none';filterEl.parentElement.style.display='none';searchEl.style.display='none';statsEl.style.display='none';
+    document.getElementById('map-view')?.remove();document.getElementById('export-view')?.remove();
+    const wrap=document.createElement('div');wrap.id=t+'-view';wrap.style.cssText='flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch';
+    document.getElementById('screen-list').insertBefore(wrap,document.querySelector('.bottom-nav'));
+    if(t==='karte')renderMapView(wrap);
+    if(t==='export')renderExportView(wrap);
+  }
+}
+
+function renderMapView(el){
+  const countryWines={};
+  wines.forEach(w=>{if(!countryWines[w.country||'Unbekannt'])countryWines[w.country||'Unbekannt']=[];countryWines[w.country||'Unbekannt'].push(w);});
+  const countries=Object.keys(countryWines).sort();
+  el.innerHTML=`<div class="map-wrap">
+    <div class="world-map-container">
+      ${buildMapSVG(countryWines)}
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:var(--wine);display:inline-block"></span>Einträge vorhanden</div>
+      <div style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:var(--bg3);display:inline-block;border:0.5px solid var(--border2)"></span>Noch keine</div>
+    </div>
+    ${countries.map(c=>{
+      const ws=countryWines[c];const flag=COUNTRY_FLAGS[c]||'🍷';
+      const avg=(ws.reduce((a,w)=>a+w.rating,0)/ws.length).toFixed(1);
+      const regionGroups={};ws.forEach(w=>{const r=w.region||'—';if(!regionGroups[r])regionGroups[r]=[];regionGroups[r].push(w);});
+      return`<div class="map-country-card">
+        <div class="map-country-header" onclick="this.nextElementSibling.classList.toggle('open')">
+          <span class="map-country-flag">${flag}</span>
+          <span class="map-country-name">${c}</span>
+          <span class="map-country-count">${ws.length} Weine · ★ ${avg}</span>
+          <i class="ti ti-chevron-down" style="font-size:14px;color:var(--ink3)"></i>
+        </div>
+        <div class="map-country-wines">
+          ${Object.entries(regionGroups).map(([r,rws])=>`
+            <div class="map-region-item">
+              <div class="map-region-name">${r}</div>
+              <div class="map-region-meta">${[...new Set(rws.map(w=>w.lage).filter(Boolean))].join(', ')||''} ${[...new Set(rws.map(w=>w.klass).filter(Boolean))].join(', ')||''}</div>
+              <div class="map-region-wines-list">
+                ${rws.map(w=>`<div class="map-wine-row" onclick="goDetail(${w.id})">
+                  <span style="color:var(--gold);font-size:10px">${'★'.repeat(w.rating)}</span>
+                  <span style="flex:1">${w.name}</span>
+                  <span style="color:var(--ink3);font-size:11px">${w.vintage||'NV'}</span>
+                </div>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+function buildMapSVG(countryWines){
+  const wineCountries=Object.keys(countryWines);
+  const europePoints={
+    'Frankreich':'M 195 118 L 215 108 L 240 112 L 248 130 L 242 148 L 220 155 L 198 148 L 188 132 Z',
+    'Deutschland':'M 220 88 L 245 82 L 262 90 L 258 108 L 242 112 L 218 108 L 212 96 Z',
+    'Italien':'M 240 148 L 258 145 L 272 152 L 278 165 L 270 178 L 260 185 L 248 175 L 244 162 Z',
+    'Spanien':'M 170 128 L 195 118 L 198 148 L 182 158 L 162 152 L 155 138 Z',
+    'Portugal':'M 158 132 L 170 128 L 165 150 L 155 155 L 150 145 Z',
+    'Österreich':'M 248 100 L 268 96 L 278 104 L 270 112 L 250 114 L 242 108 Z',
+    'Griechenland':'M 272 148 L 290 145 L 295 155 L 285 165 L 272 162 Z',
+    'Ungarn':'M 268 104 L 285 102 L 292 112 L 282 120 L 266 118 Z',
+  };
+  const otherCountryCircles={
+    'USA':'248 75',
+    'Australien':'370 195',
+    'Neuseeland':'400 205',
+    'Chile':'220 210',
+    'Argentinien':'225 220',
+    'Südafrika':'295 200',
+  };
+  const svgPaths=Object.entries(europePoints).map(([country,path])=>{
+    const hasWine=wineCountries.includes(country);
+    return`<path d="${path}" fill="${hasWine?'#7a1c2e':'#d0c8bc'}" stroke="white" stroke-width="1.5" opacity="${hasWine?1:0.6}" style="cursor:${hasWine?'pointer':'default'}" onclick="${hasWine?`openCountryOnMap('${country}')`:''}"><title>${country}${hasWine?` (${countryWines[country].length} Weine)`:''}</title></path>`;
+  });
+  const svgCircles=Object.entries(otherCountryCircles).map(([country,pos])=>{
+    const [cx,cy]=pos.split(' ');const hasWine=wineCountries.includes(country);
+    return`<circle cx="${cx}" cy="${cy}" r="${hasWine?8:5}" fill="${hasWine?'#7a1c2e':'#d0c8bc'}" stroke="white" stroke-width="1.5" opacity="${hasWine?1:0.5}" style="cursor:${hasWine?'pointer':'default'}" onclick="${hasWine?`openCountryOnMap('${country}')`:''}"><title>${country}${hasWine?` (${countryWines[country].length} Weine)`:''}</title></circle>`;
+  });
+  return`<svg viewBox="100 60 360 180" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+    <rect x="100" y="60" width="360" height="180" fill="#c8dce8"/>
+    ${svgPaths.join('')}${svgCircles.join('')}
+    <text x="110" y="72" font-size="8" fill="#7a8a95" font-family="sans-serif">Weltkarte</text>
+  </svg>`;
+}
+
+function openCountryOnMap(country){
+  const cards=document.querySelectorAll('.map-country-card');
+  cards.forEach(card=>{
+    const header=card.querySelector('.map-country-name');
+    if(header&&header.textContent===country){
+      card.querySelector('.map-country-wines').classList.add('open');
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+}
+
+function renderExportView(el){
+  el.innerHTML=`<div class="export-section">
+    <div class="export-title-row">Export & Backup</div>
+    <div class="export-card">
+      <div class="export-icon" style="background:#EAF3DE;color:#3B6D11"><i class="ti ti-table"></i></div>
+      <div class="export-info"><div class="export-name">Excel (.xlsx)</div><div class="export-desc">Alle Felder, filterbar, sortierbar</div></div>
+      <button class="btn btn-wine" onclick="exportXlsx()"><i class="ti ti-download"></i></button>
+    </div>
+    <div class="export-card">
+      <div class="export-icon" style="background:#FBEAF0;color:#993556"><i class="ti ti-file-type-pdf"></i></div>
+      <div class="export-info"><div class="export-name">PDF-Liste</div><div class="export-desc">Druckfreundliche Übersicht</div></div>
+      <button class="btn" onclick="exportPdf()"><i class="ti ti-download"></i></button>
+    </div>
+    <div class="export-card">
+      <div class="export-icon" style="background:#E6F1FB;color:#185FA5"><i class="ti ti-file-code"></i></div>
+      <div class="export-info"><div class="export-name">JSON-Backup</div><div class="export-desc">Alle Daten sichern (ohne Fotos)</div></div>
+      <button class="btn" onclick="exportJson()"><i class="ti ti-download"></i></button>
+    </div>
+    <div class="export-card">
+      <div class="export-icon" style="background:#EEEDFE;color:#3C3489"><i class="ti ti-upload"></i></div>
+      <div class="export-info"><div class="export-name">JSON importieren</div><div class="export-desc">Backup wiederherstellen</div></div>
+      <label><input type="file" accept=".json" style="display:none" onchange="importJson(event)"><span class="btn" style="display:inline-flex"><i class="ti ti-folder-open"></i> Wählen</span></label>
+    </div>
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+function resetForm(){
+  ['f-name','f-vintage','f-grape','f-alc','f-country','f-region','f-lage','f-klass','f-notes','f-price','f-ort','f-with','f-occasion','f-from','f-to'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('f-type').value='Rotwein';
+  document.getElementById('f-format').value='Flasche (0,75L)';
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('photo-preview').style.display='none';
+  document.getElementById('ai-result').classList.remove('show');
+  document.getElementById('ai-loading').classList.remove('show');
+}
+
+function renderAddStars(){
+  const el=document.getElementById('add-stars');if(!el)return;
+  el.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const b=document.createElement('button');b.className='star-btn'+(i<=editRating?' lit':'');b.textContent='★';b.type='button';
+    b.onclick=(v=>()=>{editRating=v;renderAddStars()})(i);el.appendChild(b);
+  }
+}
+
+let currentPhotoB64=null;
+async function handlePhoto(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    currentPhotoB64=ev.target.result;
+    const prev=document.getElementById('photo-preview');prev.src=currentPhotoB64;prev.style.display='block';
+    document.getElementById('ai-loading').classList.add('show');
+    document.getElementById('ai-result').classList.remove('show');
+    const b64=currentPhotoB64.split(',')[1];
+    const mt=currentPhotoB64.split(';')[0].split(':')[1]||'image/jpeg';
+    try{
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:700,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+          {type:'text',text:`Analysiere dieses Weinetikett. Antworte NUR mit einem JSON-Objekt, kein Markdown:
+{"name":"Weingut + Weinname","vintage":"Jahrgang 4-stellig oder NV","type":"Rotwein|Weißwein|Rosé|Schaumwein|Süßwein|Portwein|Sonstiges","grape":"Rebsorte(n)","alc":"Alkohol als Zahl","country":"Herkunftsland auf Deutsch","region":"Anbaugebiet","lage":"Lage oder Appellation","klass":"Klassifikation z.B. Grand Cru","notes":"2-3 Sätze Beschreibung auf Deutsch"}
+Leere Strings wenn nicht erkennbar.`}
+        ]}]})});
+      const d=await resp.json();
+      const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+      aiData=JSON.parse(txt.replace(/```json|```/g,'').trim());
+      const fields=[['name','Name'],['vintage','Jahrgang'],['country','Land'],['region','Anbaugebiet'],['lage','Lage'],['type','Art'],['grape','Rebsorte'],['alc','Alkohol']];
+      document.getElementById('ai-grid').innerHTML=fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
+      document.getElementById('ai-result').classList.add('show');
+    }catch(err){
+      document.getElementById('ai-result').innerHTML='<div style="font-size:11px;color:var(--ink3)">Etikett nicht erkannt — bitte manuell eintragen.</div>';
+      document.getElementById('ai-result').classList.add('show');
+    }
+    document.getElementById('ai-loading').classList.remove('show');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyAi(){
+  if(!aiData)return;
+  const m={'name':'f-name','vintage':'f-vintage','grape':'f-grape','alc':'f-alc','country':'f-country','region':'f-region','lage':'f-lage','klass':'f-klass','notes':'f-notes'};
+  Object.entries(m).forEach(([k,id])=>{if(aiData[k]){const e=document.getElementById(id);if(e)e.value=aiData[k];}});
+  if(aiData.type){const sel=document.getElementById('f-type');[...sel.options].forEach(o=>{if(o.value===aiData.type)sel.value=aiData.type;});}
+}
+
+async function saveWine(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('Name ist Pflichtfeld');return;}
+  const id=Date.now();
+  const wine={id,name,vintage:document.getElementById('f-vintage').value.trim(),type:document.getElementById('f-type').value,grape:document.getElementById('f-grape').value.trim(),alc:document.getElementById('f-alc').value.trim(),country:document.getElementById('f-country').value.trim(),region:document.getElementById('f-region').value.trim(),lage:document.getElementById('f-lage').value.trim(),klass:document.getElementById('f-klass').value.trim(),notes:document.getElementById('f-notes').value.trim(),rating:editRating,price:parseFloat(document.getElementById('f-price').value)||0,date:document.getElementById('f-date').value,ort:document.getElementById('f-ort').value.trim(),withwho:document.getElementById('f-with').value.trim(),occasion:document.getElementById('f-occasion').value.trim(),format:document.getElementById('f-format').value,drinkFrom:document.getElementById('f-from').value.trim(),drinkTo:document.getElementById('f-to').value.trim()};
+  await dbPut('wines',wine);
+  if(currentPhotoB64)await dbPut('photos',{id,data:currentPhotoB64});
+  wines.unshift(wine);currentPhotoB64=null;
+  goList();
+}
+
+function renderAll(){renderStats();renderFilters();filterWines();}
+
+async function exportXlsx(){
+  if(typeof XLSX==='undefined'){alert('xlsx lädt noch, kurz warten.');return;}
+  const rows=wines.map(w=>({Name:w.name,Jahrgang:w.vintage,Art:w.type,Rebsorte:w.grape,Land:w.country,Anbaugebiet:w.region,Lage:w.lage,Klassifikation:w.klass,Bewertung:w.rating,Preis:w.price,Alkohol:w.alc,Datum:w.date,Ort:w.ort,'Mit wem':w.withwho,Anlass:w.occasion,Format:w.format,'Trinkreife ab':w.drinkFrom,'Trinkreife bis':w.drinkTo,Notizen:w.notes}));
+  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Weinbuch');XLSX.writeFile(wb,'Weinbuch.xlsx');
+}
+
+function exportPdf(){
+  const now=new Date().toLocaleDateString('de-DE');
+  const rows=wines.map(w=>`<tr><td>${w.name}</td><td>${w.vintage||'—'}</td><td>${w.country||'—'}</td><td>${w.region||'—'}</td><td>${w.lage||'—'}</td><td>${w.type||'—'}</td><td>${'★'.repeat(w.rating)}</td><td>${w.date||'—'}</td><td>${w.ort||'—'}</td><td>${w.withwho||'—'}</td></tr>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Weinbuch</title><style>body{font-family:Georgia,serif;font-size:10px;padding:20px;color:#1a1209}h1{font-size:18px;font-style:italic;margin-bottom:4px}p{color:#6b5c47;font-size:9px;margin-bottom:16px}table{width:100%;border-collapse:collapse}th{background:#f3efe8;padding:5px 6px;text-align:left;font-size:9px;border-bottom:1px solid #d4c8b4;font-weight:600}td{padding:4px 6px;border-bottom:0.5px solid #ebe5da;vertical-align:top}tr:nth-child(even){background:#faf8f4}@media print{body{padding:10px}}</style></head><body><h1>Weinbuch</h1><p>Erstellt am ${now} · ${wines.length} Einträge</p><table><tr><th>Wein</th><th>JG</th><th>Land</th><th>Anbaugebiet</th><th>Lage</th><th>Art</th><th>Bewertung</th><th>Datum</th><th>Ort</th><th>Mit wem</th></tr>${rows}</table></body></html>`;
+  const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='Weinbuch.html';a.click();URL.revokeObjectURL(url);
+}
+
+function exportJson(){
+  const blob=new Blob([JSON.stringify(wines,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='weinbuch-backup.json';a.click();URL.revokeObjectURL(url);
+}
+
+async function importJson(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(Array.isArray(d)&&d.length>0){
+        if(confirm(`${d.length} Weine importieren?`)){
+          for(const w of d)await dbPut('wines',w);
+          wines=await dbGetAll('wines');wines.sort((a,b)=>b.id-a.id);
+          goList();alert('Import erfolgreich!');
+        }
+      }
+    }catch{alert('Ungültige Datei');}
+  };
+  r.readAsText(file);
+}
+
+init();
+</script>
+</body>
+</html>
