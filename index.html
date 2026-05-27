@@ -337,7 +337,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 <!-- ADD SCREEN -->
 <div id="screen-add" class="screen">
   <div class="topbar">
-    <button class="btn-icon btn btn-ghost" onclick="goList()"><i class="ti ti-x"></i></button>
+    <button class="btn btn-ghost" onclick="cancelAdd()" style="gap:4px;padding:6px 10px"><i class="ti ti-arrow-left"></i> Abbrechen</button>
     <div class="topbar-title">Neuer Eintrag</div>
     <button class="btn btn-wine" onclick="saveWine()"><i class="ti ti-check"></i> Speichern</button>
   </div>
@@ -629,7 +629,8 @@ function renderAll(){renderStats();renderTypeTiles();renderCountryListHome();ren
 
 // ── Navigation ──────────────────────────────────────────
 function goList(){switchMainTab('home');renderAll();}
-function goAdd(){editRating=3;aiData=null;resetForm();renderAddStars();showScreen('add');}
+function cancelAdd(){showScreen('list');switchMainTab('home');renderAll();}
+function goAdd(){editRating=3;aiData=null;currentPhotoB64=null;resetForm();renderAddStars();showScreen('add');}
 function showScreen(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById('screen-'+s).classList.add('active');}
 
 // ── Detail ──────────────────────────────────────────────
@@ -1051,8 +1052,14 @@ function renderExportView(el){
 // Swipe back on detail screen
 (function(){
   let sx=0,sy=0;
-  document.addEventListener('touchstart',e=>{if(document.getElementById('screen-detail').classList.contains('active')){sx=e.touches[0].clientX;sy=e.touches[0].clientY;}},{passive:true});
-  document.addEventListener('touchend',e=>{if(document.getElementById('screen-detail').classList.contains('active')){const dx=e.changedTouches[0].clientX-sx,dy=Math.abs(e.changedTouches[0].clientY-sy);if(dx>60&&dy<50)goList();}},{passive:true});
+  document.addEventListener('touchstart',e=>{if(document.getElementById('screen-detail').classList.contains('active')||document.getElementById('screen-add').classList.contains('active')){sx=e.touches[0].clientX;sy=e.touches[0].clientY;}},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx,dy=Math.abs(e.changedTouches[0].clientY-sy);
+    if(dx>60&&dy<50){
+      if(document.getElementById('screen-detail').classList.contains('active'))goList();
+      else if(document.getElementById('screen-add').classList.contains('active'))cancelAdd();
+    }
+  },{passive:true});
 })();
 
 async function exportXlsx(){
