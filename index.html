@@ -188,21 +188,31 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 .star-btn{background:none;border:none;font-size:28px;cursor:pointer;padding:2px;color:var(--border2);transition:color .1s}
 .star-btn.lit{color:var(--wine)}
 
-/* MAP */
+/* MAP hierarchy */
 .map-country-card{background:var(--bg);border-bottom:0.5px solid var(--border);overflow:hidden}
 .map-country-header{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer}
-.map-country-flag{font-size:22px}
+.map-country-flag{font-size:20px}
 .map-country-name{font-size:15px;font-weight:700;flex:1;color:var(--ink);letter-spacing:-0.3px}
 .map-country-count{font-size:10px;color:var(--ink3);font-weight:500}
-.map-country-wines{display:none;padding:0 18px 14px;background:var(--bg2)}
+.map-country-wines{display:none;padding:0 0 8px}
 .map-country-wines.open{display:block}
-.map-region-item{border-top:0.5px solid var(--border);padding:12px 0}
-.map-region-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:2px;letter-spacing:-0.2px}
-.map-region-meta{font-size:10px;color:var(--ink3);margin-bottom:8px;font-weight:500}
-.map-region-wines-list{display:flex;flex-direction:column;gap:0}
-.map-wine-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);padding:7px 0;cursor:pointer;border-bottom:0.5px solid var(--border)}
-.map-wine-row:last-child{border-bottom:none}
-.map-wine-row:active{color:var(--wine)}
+.map-region-item{border-top:0.5px solid var(--border);padding:10px 18px 4px}
+.map-region-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:-0.2px;text-transform:uppercase;font-size:10px;color:var(--ink3)}
+.map-weingut-block{margin-bottom:4px}
+.map-weingut-name{display:flex;align-items:center;gap:7px;padding:9px 0;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:700;color:var(--ink)}
+.map-weingut-name span:first-of-type{flex:1}
+.map-weingut-wines{display:none;padding-left:16px}
+.map-weingut-wines.open{display:block}
+.map-weinname-block{border-bottom:0.5px solid var(--border)}
+.map-weinname-block:last-child{border-bottom:none}
+.map-weinname-row{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer}
+.map-weinname-label{font-size:13px;font-style:italic;color:var(--ink2);flex:1}
+.map-vintage-list{display:none;padding-left:12px}
+.map-vintage-list.open{display:block}
+.map-vintage-row{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;border-bottom:0.5px solid var(--border)}
+.map-vintage-row:last-child{border-bottom:none}
+.map-vintage-row:active{background:var(--wine-pale)}
+.map-vintage-chip{background:var(--ink);color:var(--bg);font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.3px}
 
 /* EXPORT */
 .export-section{padding:18px}
@@ -258,11 +268,11 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 <!-- DETAIL SCREEN -->
 <div id="screen-detail" class="screen">
   <div class="topbar">
-    <button class="btn-icon btn btn-ghost" onclick="goList()"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn-icon btn btn-ghost" onclick="goList()" aria-label="Zurück"><i class="ti ti-arrow-left"></i></button>
     <div class="topbar-title" id="detail-topbar"></div>
     <button class="btn btn-ghost btn-icon" onclick="deleteWine()" style="color:#a32d2d;border-color:rgba(163,45,45,0.3)"><i class="ti ti-trash"></i></button>
   </div>
-  <div class="scroll-body">
+  <div class="scroll-body" id="detail-scroll">
     <div id="detail-content"></div>
   </div>
 </div>
@@ -832,31 +842,58 @@ function renderCountryList(countryWines){
   const countries=Object.keys(countryWines).sort();
   el.innerHTML=countries.map(c=>{
     const ws=countryWines[c];const flag=COUNTRY_FLAGS[c]||'🍷';
-    const avg=(ws.reduce((a,w)=>a+w.rating,0)/ws.length).toFixed(1);
-    const regionGroups={};ws.forEach(w=>{const r=w.region||'—';if(!regionGroups[r])regionGroups[r]=[];regionGroups[r].push(w);});
     const hasRegionMap=!!REGION_GEODATA[c];
+
+    // Group by region → weingut → wines
+    const regionGroups={};
+    ws.forEach(w=>{
+      const r=w.region||'—';
+      if(!regionGroups[r])regionGroups[r]={};
+      const wg=w.weingut||w.name;
+      if(!regionGroups[r][wg])regionGroups[r][wg]=[];
+      regionGroups[r][wg].push(w);
+    });
+
     return`<div class="map-country-card" data-country="${c}">
       <div class="map-country-header" onclick="this.nextElementSibling.classList.toggle('open')">
         <span class="map-country-flag">${flag}</span>
         <span class="map-country-name">${c}</span>
         <div style="display:flex;align-items:center;gap:6px">
           ${hasRegionMap?`<span style="font-size:8px;background:var(--wine-pale);color:var(--wine);border-radius:100px;padding:2px 7px;font-weight:700;letter-spacing:0.3px">KARTE</span>`:''}
-          <span class="map-country-count">${ws.length} · ★${avg}</span>
+          <span class="map-country-count">${ws.length} Weine</span>
         </div>
         <i class="ti ti-chevron-down" style="font-size:14px;color:var(--ink3)"></i>
       </div>
       <div class="map-country-wines">
-        ${Object.entries(regionGroups).map(([r,rws])=>`
+        ${Object.entries(regionGroups).sort(([a],[b])=>a.localeCompare(b)).map(([r,weinguts])=>`
           <div class="map-region-item">
             <div class="map-region-name">${r}</div>
-            <div class="map-region-meta">${[...new Set(rws.map(w=>w.lage).filter(Boolean))].join(' · ')} ${[...new Set(rws.map(w=>w.klass).filter(Boolean))].join(' · ')}</div>
-            <div class="map-region-wines-list">
-              ${rws.map(w=>`<div class="map-wine-row" onclick="goDetail(${w.id})">
-                <span style="color:var(--wine);font-size:10px;font-weight:700">${'★'.repeat(w.rating)}</span>
-                <span style="flex:1;font-weight:600;font-size:12px">${w.weingut||w.name}</span>
-                <span style="color:var(--ink3);font-size:11px">${w.vintage||'NV'}</span>
+            ${Object.entries(weinguts).sort(([a],[b])=>a.localeCompare(b)).map(([wg,wlist])=>`
+              <div class="map-weingut-block">
+                <div class="map-weingut-name" onclick="this.nextElementSibling.classList.toggle('open')">
+                  <i class="ti ti-building" style="font-size:11px;color:var(--ink3)"></i>
+                  <span>${wg}</span>
+                  <span style="color:var(--ink3);font-size:10px;margin-left:auto">${wlist.length}</span>
+                  <i class="ti ti-chevron-down" style="font-size:11px;color:var(--ink3)"></i>
+                </div>
+                <div class="map-weingut-wines">
+                  ${Object.entries(wlist.reduce((acc,w)=>{const wn=w.weinname||w.name;if(!acc[wn])acc[wn]=[];acc[wn].push(w);return acc},{})).sort(([a],[b])=>a.localeCompare(b)).map(([wname,wnamelist])=>`
+                    <div class="map-weinname-block">
+                      <div class="map-weinname-row" onclick="this.nextElementSibling.classList.toggle('open')">
+                        <span class="map-weinname-label">${wname}</span>
+                        <i class="ti ti-chevron-right" style="font-size:11px;color:var(--ink3)"></i>
+                      </div>
+                      <div class="map-vintage-list">
+                        ${wnamelist.sort((a,b)=>(b.vintage||'0').localeCompare(a.vintage||'0')).map(w=>`
+                          <div class="map-vintage-row" onclick="goDetail(${w.id})">
+                            <span class="map-vintage-chip">${w.vintage||'NV'}</span>
+                            <span style="font-size:11px;color:var(--ink3)">${w.type||''}</span>
+                            <i class="ti ti-chevron-right" style="font-size:12px;color:var(--ink3);margin-left:auto"></i>
+                          </div>`).join('')}
+                      </div>
+                    </div>`).join('')}
+                </div>
               </div>`).join('')}
-            </div>
           </div>`).join('')}
       </div>
     </div>`;
@@ -1009,6 +1046,19 @@ async function importJson(e){
   };
   r.readAsText(file);
 }
+
+// Swipe back gesture on detail screen
+(function(){
+  let startX=0,startY=0;
+  document.getElementById('screen-detail').addEventListener('touchstart',e=>{
+    startX=e.touches[0].clientX;startY=e.touches[0].clientY;
+  },{passive:true});
+  document.getElementById('screen-detail').addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-startX;
+    const dy=Math.abs(e.changedTouches[0].clientY-startY);
+    if(dx>60&&dy<50)goList();
+  },{passive:true});
+})();
 
 init();
 
