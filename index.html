@@ -601,37 +601,48 @@ function showToast(msg){
 async function analyzeUrl(){
   const url=document.getElementById('f-url').value.trim();
   if(!url){alert('Bitte zuerst einen Link eingeben.');return;}
+  const apiKey=checkApiKey();if(!apiKey)return;
   document.getElementById('ai-loading').classList.add('show');
   document.getElementById('ai-result').classList.remove('show');
-  const apiKey=checkApiKey();if(!apiKey)return;
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',max_tokens:800,
-      messages:[{role:'user',content:[{type:'text',text:`Analysiere diese Weinprodukt-URL und extrahiere alle Weindaten. URL: ${url}
-
-Besuche die Seite gedanklich und extrahiere: Weingut, Weinname, Jahrgang, Weinart, Rebsorte, Alkohol, Land, Anbaugebiet, Lage, Klassifikation, Bodenart falls angegeben, Beschreibung.
-
-Antworte NUR mit diesem JSON (kein Markdown):
-{"weingut":"","weinname":"","vintage":"","type":"Rotwein|Weißwein|Rosé|Schaumwein|Süßwein|Portwein|Sonstiges","grape":"","alc":"","country":"auf Deutsch","region":"","lage":"","klass":"","soil":"","notes":"2-3 Sätze Beschreibung auf Deutsch","confidence":"high|medium|low"}
-
-Falls du die URL nicht laden kannst, versuche aus dem URL-Text selbst Informationen zu extrahieren (Produktname, Weingut etc. sind oft in der URL enthalten).`}]}]})});
-    const d=await resp.json();
-    const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const txt=await callClaudeAPI([{role:'user',content:[{type:'text',text:`Analysiere diese Weinprodukt-URL und extrahiere alle Weindaten. URL: ${url}\n\nExtrahiere: Weingut, Weinname, Jahrgang, Weinart, Rebsorte, Alkohol, Land, Anbaugebiet, Lage, Klassifikation, Beschreibung.\n\nAntworte NUR mit diesem JSON (kein Markdown, keine Erklärung):\n{"weingut":"","weinname":"","vintage":"","type":"Rotwein|Weißwein|Rosé|Schaumwein|Süßwein|Portwein|Sonstiges","grape":"","alc":"","country":"auf Deutsch","region":"","lage":"","klass":"","soil":"","notes":"2-3 Sätze auf Deutsch","confidence":"high|medium|low"}\n\nFalls URL nicht direkt lesbar, extrahiere Infos aus dem URL-Text (Produktname, Weingut etc. stehen oft darin).`}]}]);
     aiData=JSON.parse(txt.replace(/```json|```/g,'').trim());
     if(aiData.weingut&&!aiData.name)aiData.name=aiData.weingut+(aiData.weinname?' '+aiData.weinname:'');
-    // Auto-fill link field
     const linkEl=document.getElementById('f-link');if(linkEl&&!linkEl.value)linkEl.value=url;
     const conf=aiData.confidence||'medium';
-    const confColor=conf==='high'?'#3a7a28':conf==='medium'?'#b8860b':'#a32d2d';
-    const confLabel=conf==='high'?'✓ Sicher erkannt':conf==='medium'?'⚠ Bitte prüfen':'✗ URL nicht lesbar — manuell ergänzen';
+    const confColor=conf==='high'?'#AEB8A0':conf==='medium'?'#E9F056':'#F75C54';
+    const confLabel=conf==='high'?'✓ Erkannt':conf==='medium'?'⚠ Bitte prüfen':'✗ URL nicht lesbar';
     const fields=[['weingut','Weingut'],['weinname','Weinname'],['vintage','Jahrgang'],['country','Land'],['region','Anbaugebiet'],['lage','Lage'],['type','Art'],['grape','Rebsorte'],['alc','Alkohol'],['klass','Klassifikation']];
-    document.getElementById('ai-grid').innerHTML=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:${confColor};padding:2px 0 6px">${confLabel}</div>`+fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
+    document.getElementById('ai-grid').innerHTML=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:${confColor};padding:2px 0 6px;letter-spacing:.4px">${confLabel}</div>`+fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
     document.getElementById('ai-result').classList.add('show');
   }catch(err){
-    document.getElementById('ai-result').innerHTML='<div style="font-size:11px;color:var(--ink3)">URL konnte nicht analysiert werden — bitte manuell eintragen.</div>';
+    console.error('analyzeUrl:',err);
+    document.getElementById('ai-result').innerHTML=`<div style="font-size:11px;color:#F75C54;line-height:1.7">Fehler: ${err.message||'Unbekannt'}<br><span style="color:var(--ink3);font-size:10px">API Key prüfen: Logo antippen → Einstellungen</span></div>`;
     document.getElementById('ai-result').classList.add('show');
   }
   document.getElementById('ai-loading').classList.remove('show');
+}
+
+
+async function callClaudeAPI(messages, maxTokens=800){
+  const apiKey=getApiKey();
+  if(!apiKey)throw new Error('Kein API Key gesetzt');
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages})
+  });
+  if(!resp.ok){
+    const errData=await resp.json().catch(()=>({}));
+    throw new Error(errData.error?.message||`HTTP ${resp.status}`);
+  }
+  const d=await resp.json();
+  return d.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
 }
 
 function switchHomeTab(tab){
@@ -880,37 +891,31 @@ function renderAddStars(){
 let currentPhotoB64=null;
 async function handlePhoto(e){
   const file=e.target.files[0];if(!file)return;
+  const apiKey=checkApiKey();if(!apiKey)return;
   const reader=new FileReader();
   reader.onload=async ev=>{
     currentPhotoB64=ev.target.result;
     const prev=document.getElementById('photo-preview');prev.src=currentPhotoB64;prev.style.display='block';
     document.getElementById('ai-loading').classList.add('show');
     document.getElementById('ai-result').classList.remove('show');
-    const b64=currentPhotoB64.split(',')[1];const mt=currentPhotoB64.split(';')[0].split(':')[1]||'image/jpeg';
+    const b64=currentPhotoB64.split(',')[1];
+    const mt=currentPhotoB64.split(';')[0].split(':')[1]||'image/jpeg';
     try{
-      const apiKey=checkApiKey();if(!apiKey){document.getElementById('ai-loading').classList.remove('show');return;}
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:1000,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:mt,data:b64}},
-          {type:'text',text:`Du bist ein Weinexperte und analysierst ein Weinetikett-Foto für eine Weintagebuch-App. Lies alle sichtbaren Texte sorgfältig — Vorder- UND Rücketikett.
-
-Antworte NUR mit einem JSON-Objekt, absolut kein Markdown:
-{"weingut":"Nur der Produzent/Weingut (z.B. André Clouet, Giacomo Conterno, Dönnhoff)","weinname":"Nur der Weinname ohne Weingut (z.B. Grand Réserve, Monfortino, Idig)","vintage":"Jahrgang 4-stellig oder NV für Non-Vintage","type":"Exakt eines: Rotwein, Weißwein, Rosé, Orange, Schaumwein, Süßwein, Portwein, Sonstiges","grape":"Rebsorte(n) auf Deutsch kommagetrennt","alc":"Nur Zahl ohne % z.B. 13.5","country":"Land auf Deutsch","region":"Anbaugebiet z.B. Mosel, Champagne, Piemont","lage":"Spezifische Lage oder Appellation","klass":"Klassifikation z.B. Großes Gewächs, Grand Cru, Spätlese, DOCG","soil":"Bodenart nur wenn auf Etikett steht sonst leer","notes":"2-3 präzise Sätze zu Stil und typischen Aromen basierend auf deinem Weinwissen","confidence":"high wenn sehr sicher, medium wenn teils unsicher, low wenn schwer lesbar"}
-Regeln: Alles auf Deutsch. Niemals raten — leere Strings für unlesbare Felder. Notes immer ausfüllen.`}
-        ]}]})});
-      const d=await resp.json();
-      const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const txt=await callClaudeAPI([{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+        {type:'text',text:`Weinexperte analysiert Etikett für Weintagebuch-App. Lies Vorder- UND Rücketikett.\n\nAntworte NUR mit JSON, kein Markdown:\n{"weingut":"Produzent/Weingut","weinname":"Weinname ohne Weingut","vintage":"4-stellig oder NV","type":"Rotwein|Weißwein|Rosé|Orange|Schaumwein|Süßwein|Portwein|Sonstiges","grape":"Rebsorte(n) auf Deutsch","alc":"Nur Zahl z.B. 13.5","country":"Land auf Deutsch","region":"Anbaugebiet","lage":"Spezifische Lage","klass":"Klassifikation z.B. Großes Gewächs, Grand Cru","soil":"Bodenart wenn sichtbar","notes":"2-3 Sätze zu Stil und Aromen","confidence":"high|medium|low"}\nAlles auf Deutsch. Leere Strings für unlesbare Felder.`}
+      ]}],1000);
       aiData=JSON.parse(txt.replace(/```json|```/g,'').trim());
       if(aiData.weingut&&!aiData.name)aiData.name=aiData.weingut+(aiData.weinname?' '+aiData.weinname:'');
       const conf=aiData.confidence||'medium';
-      const confColor=conf==='high'?'#3a7a28':conf==='medium'?'#b8860b':'#a32d2d';
-      const confLabel=conf==='high'?'✓ Sicher erkannt':conf==='medium'?'⚠ Bitte prüfen':'✗ Schwer lesbar — bitte prüfen';
+      const confColor=conf==='high'?'#AEB8A0':conf==='medium'?'#E9F056':'#F75C54';
+      const confLabel=conf==='high'?'✓ Erkannt':conf==='medium'?'⚠ Bitte prüfen':'✗ Schwer lesbar';
       const fields=[['weingut','Weingut'],['weinname','Weinname'],['vintage','Jahrgang'],['country','Land'],['region','Anbaugebiet'],['lage','Lage'],['type','Art'],['grape','Rebsorte'],['alc','Alkohol'],['klass','Klassifikation']];
-      document.getElementById('ai-grid').innerHTML=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:${confColor};padding:2px 0 6px">${confLabel}</div>`+fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
+      document.getElementById('ai-grid').innerHTML=`<div style="grid-column:1/-1;font-size:10px;font-weight:700;color:${confColor};padding:2px 0 6px;letter-spacing:.4px">${confLabel}</div>`+fields.filter(([k])=>aiData[k]).map(([k,l])=>`<div class="ai-field"><div class="ai-field-l">${l}</div><div class="ai-field-v">${aiData[k]}</div></div>`).join('');
       document.getElementById('ai-result').classList.add('show');
     }catch(err){
-      document.getElementById('ai-result').innerHTML='<div style="font-size:11px;color:var(--ink3)">Etikett nicht erkannt — bitte manuell eintragen.</div>';
+      console.error('handlePhoto:',err);
+      document.getElementById('ai-result').innerHTML=`<div style="font-size:11px;color:#F75C54;line-height:1.7">Fehler: ${err.message||'Unbekannt'}<br><span style="color:var(--ink3);font-size:10px">API Key prüfen: Logo antippen → Einstellungen</span></div>`;
       document.getElementById('ai-result').classList.add('show');
     }
     document.getElementById('ai-loading').classList.remove('show');
@@ -920,7 +925,6 @@ Regeln: Alles auf Deutsch. Niemals raten — leere Strings für unlesbare Felder
 
 function applyAi(){
   if(!aiData)return;
-  // Use direct weingut/weinname if available, otherwise split name
   if(aiData.weingut){document.getElementById('f-weingut').value=aiData.weingut;}
   else if(aiData.name){const parts=aiData.name.split(' ');document.getElementById('f-weingut').value=parts[0]||aiData.name;}
   if(aiData.weinname){document.getElementById('f-name').value=aiData.weinname;}
