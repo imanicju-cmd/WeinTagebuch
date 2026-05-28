@@ -635,7 +635,7 @@ async function callClaudeAPI(messages, maxTokens=800){
       'anthropic-version':'2023-06-01',
       'anthropic-dangerous-direct-browser-access':'true'
     },
-    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:maxTokens,messages})
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTokens,messages})
   });
   if(!resp.ok){
     const errData=await resp.json().catch(()=>({}));
