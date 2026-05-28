@@ -6,46 +6,34 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Weintagebuch">
-<meta name="theme-color" content="#1a1209">
+<meta name="theme-color" content="#1C1018">
 <title>Weintagebuch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet"><style>
 :root {
-  --bg: #f7f3ec;
-  --bg2: #ede8df;
-  --bg3: #e0d9ce;
-  --ink: #0f0d0a;
-  --ink2: #4a4038;
-  --ink3: #9a9088;
-  --wine: #c0392b;
-  --wine2: #96281b;
-  --wine-pale: #fbecea;
-  --accent1: #e8d5b0;
-  --accent2: #c8ddc8;
-  --border: rgba(15,13,10,0.1);
-  --border2: rgba(15,13,10,0.2);
-  --r: 16px;
-  --r2: 22px;
-  --r3: 32px;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'DM Sans', sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f0d0a;
-    --bg2: #1a1712;
-    --bg3: #252018;
-    --ink: #f2ede4;
-    --ink2: #c0b8a8;
-    --ink3: #706860;
-    --wine-pale: #2a1210;
-    --accent1: #2a2418;
-    --accent2: #1a2418;
-    --border: rgba(242,237,228,0.08);
-    --border2: rgba(242,237,228,0.15);
-  }
+  --bg: #1C1018;
+  --bg2: #241420;
+  --bg3: #2E1A2A;
+  --ink: #F5F2EC;
+  --ink2: #C8C0B0;
+  --ink3: #6A6458;
+  --wine: #E9F056;
+  --wine2: #D4DC30;
+  --wine-pale: #1A1A08;
+  --accent-r: #F75C54;
+  --accent-b: #D7EFFF;
+  --accent-g: #AEB8A0;
+  --accent-s: #C4A882;
+  --accent-p: #F7A07A;
+  --accent-k: #351E28;
+  --border: rgba(245,242,236,0.07);
+  --border2: rgba(245,242,236,0.14);
+  --r: 12px;
+  --r2: 18px;
+  --r3: 26px;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Outfit', sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
@@ -55,129 +43,153 @@ body{font-family:var(--font-body);color:var(--ink)}
 .screen.active{display:flex}
 
 /* TOPBAR */
-.topbar{display:flex;align-items:center;gap:8px;padding:14px 18px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;padding-top:max(14px,env(safe-area-inset-top))}
-.topbar-title{font-size:15px;font-weight:500;flex:1;color:var(--ink);letter-spacing:-0.3px}
-.topbar-logo{font-size:18px;font-weight:700;flex:1;color:var(--ink);letter-spacing:-1px;text-transform:lowercase}
+.topbar{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;padding-top:max(14px,env(safe-area-inset-top))}
+.topbar-title{font-size:14px;font-weight:500;flex:1;color:var(--ink);letter-spacing:.2px}
+.topbar-logo{font-size:22px;font-weight:800;flex:1;color:var(--ink);letter-spacing:-1.5px;text-transform:lowercase;font-family:var(--font-body)}
 .topbar-logo span{color:var(--wine)}
 
 /* BUTTONS */
-.btn{font-family:var(--font-body);background:transparent;border:1.5px solid var(--ink);border-radius:100px;padding:8px 18px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:5px;transition:all .12s;letter-spacing:0.3px;text-transform:uppercase}
-.btn:active{transform:scale(0.96)}
-.btn-wine{background:var(--wine);color:#fff;border-color:var(--wine)}
+.btn{font-family:var(--font-body);background:transparent;border:1px solid var(--border2);border-radius:6px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:5px;transition:all .12s;letter-spacing:.8px;text-transform:uppercase}
+.btn:active{opacity:.7;transform:scale(0.97)}
+.btn-wine{background:var(--wine);color:#0D0D0D;border-color:var(--wine);font-weight:700}
 .btn-wine:active{background:var(--wine2)}
 .btn-dark{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn-icon{padding:8px;border-radius:50%;border-width:1.5px}
+.btn-icon{padding:8px;border-radius:6px}
 .btn-ghost{border-color:transparent}
+.btn-sm{font-size:9px;padding:5px 10px;letter-spacing:.6px}
 
 /* SCROLL */
 .scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .scroll-body::-webkit-scrollbar{display:none}
 
-/* BOTTOM NAV — dark pill style */
-.bottom-nav{display:flex;background:var(--ink);flex-shrink:0;padding:6px 8px;padding-bottom:max(14px,env(safe-area-inset-bottom));border-radius:28px 28px 0 0;margin:0 0}
-.bnav-btn{flex:1;padding:10px 4px 6px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.6px;text-transform:uppercase;font-family:var(--font-body);border-radius:16px;transition:all .15s}
-.bnav-btn.active{color:#fff;background:rgba(255,255,255,0.12)}
+/* BOTTOM NAV */
+.bottom-nav{display:flex;background:#160E14;flex-shrink:0;padding:8px 8px;padding-bottom:max(16px,env(safe-area-inset-bottom));border-top:0.5px solid var(--border)}
+.bnav-btn{flex:1;padding:10px 4px 6px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:8px;font-weight:600;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-body);border-radius:8px;transition:all .15s}
+.bnav-btn.active{color:var(--wine);background:rgba(233,240,86,0.08)}
 .bnav-btn i{font-size:20px}
 
-/* STATS — colored blocks */
-.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px;flex-shrink:0}
-.stat-item{background:var(--bg2);border-radius:var(--r);padding:12px 10px;text-align:center}
-.stat-item:first-child{background:var(--wine-pale)}
-.stat-num{font-size:28px;font-weight:700;color:var(--ink);display:block;line-height:1;letter-spacing:-1px}
-.stat-item:first-child .stat-num{color:var(--wine)}
-.stat-label{font-size:8px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
+/* HOME TABS */
+.home-tab-btn{flex:1;padding:14px 4px;border:none;background:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--ink3);font-family:var(--font-body);border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-tab-btn.active{color:var(--wine);border-bottom-color:var(--wine)}
 
-/* FILTERS */
-.filter-row{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;flex-shrink:0}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-chip{font-family:var(--font-body);font-size:10px;padding:6px 14px;border-radius:100px;border:1.5px solid var(--border2);background:transparent;color:var(--ink2);cursor:pointer;white-space:nowrap;font-weight:500;transition:all .12s;letter-spacing:0.2px}
-.filter-chip.active,.filter-chip:active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-select.filter-chip{-webkit-appearance:none;appearance:none}
+/* STATS */
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px;flex-shrink:0}
+.stat-item{background:var(--bg2);border-radius:var(--r);padding:14px 10px;text-align:center;border:0.5px solid var(--border)}
+.stat-item:first-child{background:var(--wine);border-color:var(--wine)}
+.stat-num{font-size:30px;font-weight:800;color:var(--ink);display:block;line-height:1;letter-spacing:-2px}
+.stat-item:first-child .stat-num{color:#0D0D0D}
+.stat-label{font-size:8px;color:var(--ink3);margin-top:5px;text-transform:uppercase;letter-spacing:1.2px;font-weight:600}
+.stat-item:first-child .stat-label{color:rgba(13,13,13,0.6)}
+
+/* TYPE TILES */
+.type-tile{border-radius:var(--r2);cursor:pointer;transition:all .15s;border:none;overflow:hidden;aspect-ratio:1;position:relative;display:flex;align-items:flex-end}
+.type-tile:active{transform:scale(0.94)}
+.type-tile-gradient{position:absolute;inset:0;border-radius:var(--r2)}
+.type-tile-body{position:relative;padding:0;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.type-tile-label{font-size:15px;font-weight:800;color:#fff;letter-spacing:4px;line-height:1;font-family:var(--font-body);text-shadow:0 1px 12px rgba(0,0,0,.5);text-align:center}
+.type-tile-count{font-size:9px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.5px}
+.type-tile.active::after{content:'';position:absolute;inset:0;border-radius:var(--r2);border:2.5px solid rgba(255,255,255,.85)}
+
+/* COUNTRY TILES */
+.country-tile{border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;background:var(--bg2);margin-bottom:8px;border:0.5px solid var(--border)}
+.country-tile:active{opacity:.7}
+.country-tile.active{border-color:var(--wine)}
+.country-flag{font-size:28px}
+.country-tile-name{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-.3px;flex:1}
+.country-tile-meta{font-size:9px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.country-tile-count{font-size:22px;font-weight:800;color:var(--wine);min-width:28px;text-align:right;letter-spacing:-1px}
+
+/* WEINGUT / ALPHA */
+.alpha-section{margin-bottom:4px}
+.alpha-letter{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:2px;padding:14px 2px 6px}
+.weingut-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border);cursor:pointer;transition:opacity .12s}
+.weingut-row:active{opacity:.6}
+.weingut-row-name{font-size:15px;font-weight:500;color:var(--ink);letter-spacing:-.1px}
+.weingut-row-count{font-size:12px;font-weight:700;color:var(--wine)}
 
 /* SEARCH */
-.search-row{padding:0 16px 10px;flex-shrink:0}
 .search-wrap{position:relative}
 .search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--ink3)}
-.search-input{width:100%;font-family:var(--font-body);font-size:13px;padding:10px 14px 10px 36px;border:1.5px solid var(--border2);border-radius:100px;background:var(--bg2);color:var(--ink);font-weight:400}
-.search-input:focus{outline:none;border-color:var(--ink);background:var(--bg)}
+.search-input{width:100%;font-family:var(--font-body);font-size:13px;padding:11px 14px 11px 38px;border:0.5px solid var(--border2);border-radius:6px;background:var(--bg2);color:var(--ink);font-weight:400}
+.search-input:focus{outline:none;border-color:var(--wine)}
 .search-input::placeholder{color:var(--ink3)}
 
-/* WINE LIST — bold editorial rows */
+/* WINE LIST */
 .wine-list{display:flex;flex-direction:column;padding:4px 0}
-.wine-row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
+.wine-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
 .wine-row:active{background:var(--bg2)}
-.wine-row-thumb{width:46px;height:58px;border-radius:12px;background:var(--bg2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.wine-row-thumb{width:44px;height:56px;border-radius:8px;background:var(--bg2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--border)}
 .wine-row-thumb img{width:100%;height:100%;object-fit:cover}
 .wine-row-thumb-icon{font-size:20px;color:var(--ink3)}
 .wine-row-body{flex:1;min-width:0}
-.wine-row-weingut{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;font-weight:600}
-.wine-row-name{font-size:16px;font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.3px}
+.wine-row-weingut{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px;font-weight:600}
+.wine-row-name{font-size:16px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
 .wine-row-meta{font-size:10px;color:var(--ink3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .wine-row-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.type-badge{font-size:9px;padding:3px 9px;border-radius:100px;border:1px solid var(--border2);color:var(--ink3);white-space:nowrap;font-weight:500}
+.type-badge{font-size:9px;padding:3px 8px;border-radius:4px;border:0.5px solid var(--border2);color:var(--ink3);white-space:nowrap;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
 .type-badge-wine{background:var(--wine-pale);color:var(--wine);border-color:transparent}
-.ripeness-dot{width:6px;height:6px;border-radius:50%;display:inline-block;vertical-align:middle}
+.ripeness-dot{width:5px;height:5px;border-radius:50%;display:inline-block;vertical-align:middle}
 .rd-now{background:#3a7a28}.rd-soon{background:#c08010}.rd-wait{background:#2060a0}.rd-over{background:#a02020}
 
 /* DETAIL */
-.detail-hero{width:100%;height:240px;background:var(--bg2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative}
+.detail-hero{width:100%;height:260px;background:var(--bg2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative}
 .detail-hero img{width:100%;height:100%;object-fit:cover}
-.detail-hero-icon{font-size:64px;color:var(--ink3);opacity:.2}
-.detail-body{padding:22px 18px 48px}
-.detail-eyebrow{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;font-weight:600}
-.detail-name{font-size:32px;font-weight:700;color:var(--ink);line-height:1.05;margin-bottom:4px;letter-spacing:-1px}
-.detail-subname{font-family:var(--font-display);font-size:20px;color:var(--ink2);font-style:italic;margin-bottom:10px;font-weight:400}
-.detail-origin{font-size:12px;color:var(--ink3);margin-bottom:18px;letter-spacing:0.2px}
-.divider{height:0.5px;background:var(--border);margin:18px 0}
+.detail-hero-icon{font-size:72px;color:var(--ink3);opacity:.1}
+.detail-body{padding:24px 20px 56px}
+.detail-eyebrow{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.detail-name{font-size:36px;font-weight:800;color:var(--ink);line-height:.95;margin-bottom:6px;letter-spacing:-2px}
+.detail-subname{font-family:var(--font-display);font-size:22px;color:var(--ink2);font-style:italic;margin-bottom:10px;font-weight:400}
+.detail-origin{font-size:12px;color:var(--ink3);margin-bottom:18px;letter-spacing:.3px}
+.divider{height:0.5px;background:var(--border);margin:20px 0}
 .tags-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.tag{font-size:10px;padding:4px 11px;border-radius:100px;font-weight:500;letter-spacing:0.2px}
-.tag-r{background:var(--bg2);color:var(--ink2)}
-.tag-v{background:var(--ink);color:var(--bg)}
-.tag-g{background:var(--accent1);color:var(--ink2)}
+.tag{font-size:9px;padding:4px 10px;border-radius:4px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.tag-r{background:var(--bg2);color:var(--ink2);border:0.5px solid var(--border2)}
+.tag-v{background:var(--wine);color:#0D0D0D}
+.tag-g{background:rgba(233,240,86,.15);color:var(--wine);border:0.5px solid rgba(233,240,86,.3)}
 .tag-t{background:var(--wine-pale);color:var(--wine)}
-.tag-k{background:var(--accent2);color:var(--ink2)}
-.detail-stars{font-size:22px;color:var(--wine);letter-spacing:3px;margin-bottom:18px}
-.section-label{font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;margin-top:20px}
-.section-text{font-size:14px;color:var(--ink);line-height:1.75}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
-.detail-stat{background:var(--bg2);border-radius:var(--r);padding:14px;text-align:center}
-.detail-stat-n{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-0.5px}
-.detail-stat-l{font-size:8px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;font-weight:600}
-.experience-box{background:var(--bg2);border-radius:var(--r2);padding:16px;margin-top:8px}
-.exp-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink2);padding:5px 0;border-bottom:0.5px solid var(--border)}
+.tag-k{background:rgba(174,184,160,.15);color:var(--accent-g)}
+.detail-stars{font-size:22px;color:var(--wine);letter-spacing:4px;margin-bottom:18px}
+.section-label{font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;margin-top:22px}
+.section-text{font-size:14px;color:var(--ink2);line-height:1.8}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.detail-stat{background:var(--bg2);border-radius:var(--r);padding:14px;text-align:center;border:0.5px solid var(--border)}
+.detail-stat-n{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-1px}
+.detail-stat-l{font-size:8px;color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;font-weight:600}
+.experience-box{background:var(--bg2);border-radius:var(--r2);padding:16px;margin-top:8px;border:0.5px solid var(--border)}
+.exp-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink2);padding:6px 0;border-bottom:0.5px solid var(--border)}
 .exp-row:last-child{border-bottom:none}
 .exp-row i{font-size:15px;color:var(--ink3);flex-shrink:0;width:18px}
-.ripe-bar{height:4px;border-radius:4px;background:var(--bg3);overflow:hidden;margin-top:10px}
-.ripe-fill{height:100%;border-radius:4px;transition:width .3s}
+.ripe-bar{height:3px;border-radius:3px;background:var(--bg3);overflow:hidden;margin-top:10px}
+.ripe-fill{height:100%;border-radius:3px;transition:width .3s}
 
 /* ADD FORM */
 .add-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .add-scroll::-webkit-scrollbar{display:none}
-.form-section{padding:20px 18px;border-bottom:0.5px solid var(--border)}
-.form-section-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:14px;letter-spacing:-0.2px;text-transform:uppercase}
+.form-section{padding:20px 20px;border-bottom:0.5px solid var(--border)}
+.form-section-title{font-size:9px;font-weight:700;color:var(--ink3);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .form-group{margin-bottom:10px}
-.form-label{font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;display:block}
-.form-input{font-family:var(--font-body);font-size:14px;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--ink);width:100%;transition:border-color .15s;font-weight:400}
-.form-input:focus{outline:none;border-color:var(--ink)}
-.form-textarea{resize:none;min-height:80px;font-family:var(--font-body);font-size:13px;line-height:1.6}
+.form-label{font-size:9px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;display:block}
+.form-input,.finput{font-family:var(--font-body);font-size:14px;padding:11px 14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--ink);width:100%;transition:border-color .15s;font-weight:400}
+.form-input:focus,.finput:focus{outline:none;border-color:var(--wine)}
+.form-textarea{resize:none;min-height:80px;font-family:var(--font-body);font-size:13px;line-height:1.7}
 
 /* PHOTO */
-.photo-zone{border:2px dashed var(--border2);border-radius:var(--r2);padding:24px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg2)}
-.photo-zone:active{border-color:var(--ink)}
+.photo-zone{border:1px dashed var(--border2);border-radius:var(--r2);padding:24px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg2)}
+.photo-zone:active{border-color:var(--wine)}
 .photo-zone-icon{font-size:28px;color:var(--ink3);display:block;margin-bottom:8px}
 .photo-zone-text{font-size:12px;color:var(--ink2);font-weight:500}
-.photo-zone-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--wine);border:1.5px solid var(--wine);border-radius:100px;padding:3px 12px;margin-top:10px;font-weight:600;letter-spacing:0.3px}
+.photo-zone-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--wine);border:1px solid var(--wine);border-radius:4px;padding:3px 12px;margin-top:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
 .photo-preview{width:100%;max-height:180px;object-fit:cover;border-radius:var(--r);display:none;margin-top:10px}
 
 /* AI */
-.ai-loading{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border-radius:var(--r);font-size:11px;color:var(--ink2);font-weight:500}
+.ai-loading{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border-radius:var(--r);font-size:11px;color:var(--ink2);font-weight:500;border:0.5px solid var(--border)}
 .ai-loading.show{display:flex}
-.ai-result{background:var(--bg2);border-radius:var(--r);padding:12px;display:none;margin-top:8px}
+.ai-result{background:var(--bg2);border-radius:var(--r);padding:12px;display:none;margin-top:8px;border:0.5px solid var(--border)}
 .ai-result.show{display:block}
 .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-.ai-field{background:var(--bg);border-radius:10px;border:1px solid var(--border);padding:8px 10px}
-.ai-field-l{font-size:8px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.6px;font-weight:700}
+.ai-field{background:var(--bg);border-radius:8px;border:0.5px solid var(--border);padding:8px 10px}
+.ai-field-l{font-size:8px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
 .ai-field-v{font-size:12px;font-weight:600;color:var(--ink);margin-top:2px}
 .dots span{animation:blink 1.2s infinite;opacity:0}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
@@ -188,86 +200,37 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 .star-btn{background:none;border:none;font-size:28px;cursor:pointer;padding:2px;color:var(--border2);transition:color .1s}
 .star-btn.lit{color:var(--wine)}
 
-/* MAP hierarchy */
+/* MAP */
+.map-wrap{height:100%;display:flex;flex-direction:column}
 .map-country-card{background:var(--bg);border-bottom:0.5px solid var(--border);overflow:hidden}
-.map-country-header{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer}
+.map-country-header{display:flex;align-items:center;gap:10px;padding:14px 20px;cursor:pointer}
 .map-country-flag{font-size:20px}
-.map-country-name{font-size:15px;font-weight:700;flex:1;color:var(--ink);letter-spacing:-0.3px}
-.map-country-count{font-size:10px;color:var(--ink3);font-weight:500}
+.map-country-name{font-size:15px;font-weight:600;flex:1;color:var(--ink);letter-spacing:-.2px}
+.map-country-count{font-size:10px;color:var(--ink3);font-weight:600;letter-spacing:.4px}
 .map-country-wines{display:none;padding:0 0 8px}
 .map-country-wines.open{display:block}
-.map-region-item{border-top:0.5px solid var(--border);padding:10px 18px 4px}
-.map-region-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:-0.2px;text-transform:uppercase;font-size:10px;color:var(--ink3)}
-.map-weingut-block{margin-bottom:4px}
-.map-weingut-name{display:flex;align-items:center;gap:7px;padding:9px 0;cursor:pointer;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:700;color:var(--ink)}
-.map-weingut-name span:first-of-type{flex:1}
-.map-weingut-wines{display:none;padding-left:16px}
-.map-weingut-wines.open{display:block}
-.map-weinname-block{border-bottom:0.5px solid var(--border)}
-.map-weinname-block:last-child{border-bottom:none}
-.map-weinname-row{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer}
-.map-weinname-label{font-size:13px;font-style:italic;color:var(--ink2);flex:1}
-.map-vintage-list{display:none;padding-left:12px}
-.map-vintage-list.open{display:block}
-.map-vintage-row{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;border-bottom:0.5px solid var(--border)}
-.map-vintage-row:last-child{border-bottom:none}
-.map-vintage-row:active{background:var(--wine-pale)}
-.map-vintage-chip{background:var(--ink);color:var(--bg);font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.3px}
+.map-region-item{border-top:0.5px solid var(--border);padding:10px 20px 4px}
+.map-region-name{font-size:9px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
 
-/* HOME TAB NAV */
-.home-tab-btn{flex:1;padding:12px 4px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink3);font-family:var(--font-body);border-bottom:2px solid transparent;transition:all .15s;letter-spacing:0.2px}
-.home-tab-btn.active{color:var(--ink);border-bottom-color:var(--ink)}
+/* FILTERS */
+.filter-row{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;flex-shrink:0}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{font-family:var(--font-body);font-size:10px;padding:6px 14px;border-radius:4px;border:0.5px solid var(--border2);background:transparent;color:var(--ink3);cursor:pointer;white-space:nowrap;font-weight:600;transition:all .12s;letter-spacing:.6px;text-transform:uppercase}
+.filter-chip.active,.filter-chip:active{background:var(--wine);color:#0D0D0D;border-color:var(--wine)}
+select.filter-chip{-webkit-appearance:none;appearance:none}
 
-/* GRADIENT TILES */
-.type-tile{border-radius:20px;padding:0;cursor:pointer;transition:all .15s;border:none;overflow:hidden;aspect-ratio:1;position:relative;display:flex;align-items:flex-end}
-.type-tile:active{transform:scale(0.96)}
-.type-tile-gradient{position:absolute;inset:0;border-radius:20px}
-.type-tile-body{position:relative;padding:0;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.type-tile-label{font-size:18px;font-weight:700;color:#fff;letter-spacing:3px;line-height:1;font-family:'DM Sans',sans-serif;text-shadow:0 1px 6px rgba(0,0,0,0.25);text-align:center}
-.type-tile-count{font-size:11px;color:rgba(255,255,255,0.7);font-weight:500;letter-spacing:0.5px}
-.type-tile.active::after{content:'';position:absolute;inset:0;border-radius:20px;border:3px solid rgba(255,255,255,0.8)}
+/* REBSORTEN */
+.rebsorten-tag{font-size:10px;padding:4px 10px;border-radius:4px;background:var(--bg2);border:0.5px solid var(--border2);color:var(--ink2);display:inline-block;margin:3px;font-weight:500}
 
-/* COUNTRY TILES */
-.country-tile{border-radius:16px;padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;background:var(--bg2);margin-bottom:8px;border:1.5px solid transparent}
-.country-tile:active{transform:scale(0.98)}
-.country-tile.active{border-color:var(--ink)}
-.country-flag{font-size:26px}
-.country-tile-name{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;flex:1}
-.country-tile-meta{font-size:10px;color:var(--ink3);font-weight:500}
-.country-tile-count{font-size:18px;font-weight:700;color:var(--wine);min-width:28px;text-align:right}
+/* EXPORT */
+.export-card{background:var(--bg2);border-radius:var(--r2);padding:18px;margin:10px 16px;cursor:pointer;transition:all .12s;border:0.5px solid var(--border)}
+.export-card:active{opacity:.7}
+.export-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-.2px}
+.export-desc{font-size:11px;color:var(--ink3)}
 
-/* WEINGUT ALPHA LIST */
-.alpha-section{margin-bottom:4px}
-.alpha-letter{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;padding:10px 2px 4px}
-.weingut-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;cursor:pointer;transition:all .12s;background:transparent}
-.weingut-row:active{background:var(--bg2)}
-.weingut-row-name{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-0.2px}
-.weingut-row-count{font-size:12px;font-weight:700;color:var(--wine)}
-
-/* TYPE TILE */
-
-/* AUTOCOMPLETE */
-.ac-wrap{position:relative}
-.ac-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg);border:1.5px solid var(--ink);border-radius:var(--r);z-index:100;max-height:160px;overflow-y:auto;display:none;margin-top:2px;box-shadow:0 4px 16px rgba(0,0,0,0.12)}
-.ac-dropdown.show{display:block}
-.ac-item{padding:9px 14px;font-size:13px;color:var(--ink);cursor:pointer;border-bottom:0.5px solid var(--border);font-weight:400}
-.ac-item:last-child{border-bottom:none}
-.ac-item:active,.ac-item:hover{background:var(--bg2)}
-.ac-item strong{color:var(--wine);font-weight:700}
-.export-section{padding:18px}
-.export-title-row{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:18px;letter-spacing:-0.5px}
-.export-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r2);padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:10px}
-.export-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--bg2)}
-.export-info{flex:1}
-.export-name{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.2px}
-.export-desc{font-size:10px;color:var(--ink3);margin-top:2px;font-weight:500}
-
-/* EMPTY */
-.empty{text-align:center;padding:56px 24px}
-.empty i{font-size:44px;display:block;margin-bottom:14px;color:var(--border2)}
-.empty-title{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:-0.5px}
-.empty-sub{font-size:13px;line-height:1.7;color:var(--ink3)}
-</style>
+/* MAP REGION DETAIL */
+.map-svg-container{background:#120B10}
+</style>>
 </head>
 <body>
 <div id="app">
@@ -275,7 +238,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 <!-- LIST SCREEN -->
 <div id="screen-list" class="screen active">
   <div class="topbar">
-    <div class="topbar-logo">wein<span>buch</span></div>
+    <div class="topbar-logo" onclick="showApiKeySettingsMenu()" style="cursor:pointer">wein<span>buch</span></div>
     <div style="display:flex;align-items:center;gap:6px">
       <div style="display:flex;align-items:center;gap:5px;cursor:pointer" onclick="gapi&&gapi.client&&gapi.client.getToken()?disconnectDrive():connectDrive()" title="Google Drive Sync">
         <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#d0c8bc;flex-shrink:0;transition:background .3s"></span>
@@ -574,13 +537,75 @@ function switchKiTab(tab){
   });
 }
 
+
+// ── API Key ─────────────────────────────────────────────────────────
+function getApiKey(){return localStorage.getItem('wb_api_key')||'';}
+function saveApiKey(key){localStorage.setItem('wb_api_key',key.trim());}
+
+function checkApiKey(){
+  const key=getApiKey();
+  if(!key){
+    showApiKeyPrompt();
+    return false;
+  }
+  return key;
+}
+
+
+function showApiKeySettingsMenu(){
+  const key=getApiKey();
+  const overlay=document.createElement('div');
+  overlay.id='settings-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:flex-end;padding:0';
+  overlay.innerHTML=`
+    <div style="background:#241420;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;border:0.5px solid rgba(245,242,236,0.1)" onclick="event.stopPropagation()">
+      <div style="font-size:18px;font-weight:800;color:#F5F2EC;letter-spacing:-0.8px;margin-bottom:20px">Einstellungen</div>
+      <div style="background:#1C1018;border-radius:12px;padding:16px;margin-bottom:12px;border:0.5px solid rgba(245,242,236,0.07)">
+        <div style="font-size:9px;font-weight:700;color:#6A6458;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Anthropic API Key</div>
+        <div style="font-size:13px;color:${key?'#AEB8A0':'#F75C54'};margin-bottom:12px">${key?'✓ Key gespeichert (endet auf ...'+key.slice(-6)+')':'✗ Kein Key — KI-Features deaktiviert'}</div>
+        <button onclick="document.getElementById('settings-overlay').remove();showApiKeyPrompt()" style="background:#E9F056;border:none;border-radius:7px;padding:9px 16px;font-size:10px;font-weight:700;color:#1C1018;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.8px;text-transform:uppercase">${key?'Key ändern':'Key einrichten'}</button>
+        ${key?`<button onclick="localStorage.removeItem('wb_api_key');document.getElementById('settings-overlay').remove();showToast('Key gelöscht')" style="background:transparent;border:0.5px solid rgba(245,242,236,0.14);border-radius:7px;padding:9px 16px;font-size:10px;font-weight:700;color:#F75C54;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;margin-left:8px">Löschen</button>`:''}
+      </div>
+      <button onclick="document.getElementById('settings-overlay').remove()" style="width:100%;background:transparent;border:0.5px solid rgba(245,242,236,0.14);border-radius:10px;padding:13px;font-size:11px;font-weight:700;color:#6A6458;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.8px;text-transform:uppercase">Schließen</button>
+    </div>`;
+  overlay.onclick=()=>overlay.remove();
+  document.body.appendChild(overlay);
+}
+function showApiKeyPrompt(){
+  const existing=getApiKey();
+  const overlay=document.createElement('div');
+  overlay.id='api-key-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=`
+    <div style="background:#241420;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;border:0.5px solid rgba(245,242,236,0.14)">
+      <div style="font-size:22px;font-weight:800;color:#F5F2EC;letter-spacing:-1px;margin-bottom:8px">API Key einrichten</div>
+      <div style="font-size:13px;color:#6A6458;line-height:1.6;margin-bottom:20px">Für KI-Erkennung brauchst du einen Anthropic API Key. Einmalig eingeben, wird lokal gespeichert.<br><br>Holen unter: <span style="color:#E9F056;font-weight:600">console.anthropic.com</span></div>
+      <input id="api-key-input" type="password" placeholder="sk-ant-api..." style="width:100%;background:#1C1018;border:0.5px solid rgba(245,242,236,0.14);border-radius:10px;padding:12px 14px;font-size:14px;color:#F5F2EC;font-family:'Outfit',sans-serif;margin-bottom:12px">
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('api-key-overlay').remove()" style="flex:1;background:transparent;border:0.5px solid rgba(245,242,236,0.14);border-radius:8px;padding:11px;font-size:11px;font-weight:700;color:#6A6458;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.8px;text-transform:uppercase">Abbrechen</button>
+        <button onclick="const k=document.getElementById('api-key-input').value.trim();if(k.startsWith('sk-')){saveApiKey(k);document.getElementById('api-key-overlay').remove();showToast('API Key gespeichert ✓');}else{alert('Bitte einen gültigen Key eingeben (beginnt mit sk-ant-)')}" style="flex:2;background:#E9F056;border:none;border-radius:8px;padding:11px;font-size:11px;font-weight:700;color:#1C1018;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.8px;text-transform:uppercase">Speichern</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>document.getElementById('api-key-input')?.focus(),100);
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#E9F056;color:#1C1018;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:700;z-index:9999;letter-spacing:.4px';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
 async function analyzeUrl(){
   const url=document.getElementById('f-url').value.trim();
   if(!url){alert('Bitte zuerst einen Link eingeben.');return;}
   document.getElementById('ai-loading').classList.add('show');
   document.getElementById('ai-result').classList.remove('show');
+  const apiKey=checkApiKey();if(!apiKey)return;
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
       model:'claude-sonnet-4-20250514',max_tokens:800,
       messages:[{role:'user',content:[{type:'text',text:`Analysiere diese Weinprodukt-URL und extrahiere alle Weindaten. URL: ${url}
 
@@ -863,7 +888,8 @@ async function handlePhoto(e){
     document.getElementById('ai-result').classList.remove('show');
     const b64=currentPhotoB64.split(',')[1];const mt=currentPhotoB64.split(';')[0].split(':')[1]||'image/jpeg';
     try{
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      const apiKey=checkApiKey();if(!apiKey){document.getElementById('ai-loading').classList.remove('show');return;}
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
         model:'claude-sonnet-4-20250514',max_tokens:1000,
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:mt,data:b64}},
@@ -923,39 +949,46 @@ const NAME_ISO={};Object.entries(ISO_NAMES).forEach(([k,v])=>{NAME_ISO[v]=k;});
 
 const SVG_REGIONS={
   Deutschland:{
-    viewBox:'55 18 200 295',
+    viewBox:'50 20 230 295',
     regions:[
-      {id:'Ahr',fill:'#B5D4F4',d:'M118 78 L130 75 L134 79 L133 86 L126 90 L118 88 L115 83Z',lx:124,ly:83,grape:'Spätburgunder, Frühburgunder',soil:'Schiefer, Grauwacke, Basalt',type:'Rotwein',desc:'Nördlichstes Rotweingebiet Deutschlands. Steile Schieferlagen am Ahrtal.',klass:'Qualitätswein, Prädikatswein'},
-      {id:'Mittelrhein',fill:'#CED9F0',d:'M130 62 L142 60 L146 68 L144 80 L136 84 L132 80 L128 68Z',lx:137,ly:73,grape:'Riesling',soil:'Schiefer, Quarzit',type:'Weißwein',desc:'Dramatische Steillagen am Rhein. UNESCO-Welterbe. Mineralischer Riesling.',klass:'Qualitätswein, Prädikatswein'},
-      {id:'Mosel',fill:'#85B7EB',d:'M82 80 L100 74 L112 72 L120 76 L118 84 L114 92 L108 100 L100 106 L90 108 L82 102 L78 94 L80 86Z',lx:98,ly:93,grape:'Riesling, Elbling',soil:'Devonschiefer, Grau- & Rotschiefer',type:'Weißwein',desc:'Steiles Flusstal mit weltberühmten Rieslingen. Elegante Leichtigkeit bei niedrigem Alkohol.',klass:'Qualitätswein, Kabinett, Spätlese, Auslese, BA, TBA, Eiswein'},
-      {id:'Nahe',fill:'#9FE1CB',d:'M118 88 L130 86 L136 90 L138 100 L132 106 L120 108 L112 104 L112 94Z',lx:124,ly:98,grape:'Riesling, Müller-Thurgau',soil:'Porphyr, Schiefer, Kalk, Sandstein',type:'Weißwein',desc:'Vielfältige Böden zwischen Mosel und Rheinhessen. Mineralische Rieslinge mit Frucht.',klass:'Qualitätswein, Prädikatswein'},
-      {id:'Rheingau',fill:'#AFA9EC',d:'M136 84 L152 82 L158 88 L156 100 L146 104 L136 102 L134 92Z',lx:145,ly:95,grape:'Riesling, Spätburgunder',soil:'Quarzit, Phyllith, Taunus-Schiefer',type:'Weißwein',desc:'Klassisches Rieslinggebiet. Südexponierte Hänge am Rhein. Heimat des Spätlese-Begriffs.',klass:'Erstes Gewächs, Qualitätswein, Kabinett bis TBA'},
-      {id:'Hess. Bergstraße',fill:'#FAC775',d:'M156 100 L164 98 L168 108 L164 116 L156 116 L152 108Z',lx:158,ly:108,grape:'Riesling, Grauburgunder',soil:'Granit, Sandstein, Löss',type:'Weißwein',desc:'Kleinstes Anbaugebiet. Frühlingsblüte. Milder Klimaeinfluss.',klass:'Qualitätswein, Prädikatswein'},
-      {id:'Rheinhessen',fill:'#EF9F27',d:'M120 108 L130 106 L136 102 L146 104 L156 106 L158 118 L156 130 L148 136 L136 140 L124 138 L114 132 L112 120Z',lx:134,ly:122,grape:'Riesling, Silvaner, Müller-Thurgau',soil:'Löss, Mergel, Kalk, Ton',type:'Weißwein',desc:'Größtes deutsches Anbaugebiet. Neue Winzergeneration mit modernen Weinen.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
-      {id:'Pfalz',fill:'#F4C0D1',d:'M112 134 L124 138 L132 142 L134 156 L132 170 L122 176 L110 174 L104 164 L104 148 L106 136Z',lx:118,ly:156,grape:'Riesling, Spätburgunder, Dornfelder',soil:'Sandstein, Kalk, Ton, Löss',type:'Weißwein & Rotwein',desc:'Zweitgrößtes Gebiet. Mediterranes Klima. Vielfalt von trocken bis edelsüß.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
-      {id:'Baden',fill:'#C0DD97',d:'M108 176 L120 176 L128 172 L136 176 L142 184 L146 200 L148 218 L146 234 L140 248 L132 256 L124 258 L116 254 L110 244 L106 228 L104 212 L104 196 L106 182Z',lx:125,ly:216,grape:'Spätburgunder, Grauburgunder, Riesling',soil:'Löss, Kalk, Muschelkalk, Granit',type:'Rotwein & Weißwein',desc:'Wärmstes Anbaugebiet. Kaiserstuhl, Markgräflerland, Ortenau. Bodensee.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
-      {id:'Württemberg',fill:'#F0997B',d:'M136 142 L152 138 L166 136 L174 142 L176 158 L174 172 L168 182 L156 188 L146 186 L138 180 L136 170 L132 158 L134 148Z',lx:155,ly:163,grape:'Trollinger, Lemberger, Riesling',soil:'Muschelkalk, Mergel, Keupermergel',type:'Rotwein',desc:'Weinland mit Tradition. Neckartal. Schwäbische Weinbauern und Genossenschaften.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
-      {id:'Franken',fill:'#CECBF6',d:'M166 108 L184 104 L202 106 L210 114 L212 128 L208 142 L196 150 L180 154 L166 150 L158 142 L156 128 L158 116Z',lx:183,ly:130,grape:'Silvaner, Müller-Thurgau, Bacchus',soil:'Muschelkalk, Keuper, Buntsandstein',type:'Weißwein',desc:'Trockene Frankenweine im Bocksbeutel. Würzburg als Zentrum. Kontinentales Klima.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
-      {id:'Saale-Unstrut',fill:'#B5D4F4',d:'M176 46 L198 42 L208 48 L210 60 L204 68 L190 70 L178 66 L172 58Z',lx:191,ly:57,grape:'Müller-Thurgau, Weißburgunder, Silvaner',soil:'Muschelkalk, Buntsandstein, Zechstein',type:'Weißwein',desc:'Nördlichstes Anbaugebiet. Terrassen-Weinbau. Historische Klosterweingüter.',klass:'Qualitätswein, Prädikatswein'},
-      {id:'Sachsen',fill:'#97C459',d:'M210 46 L228 44 L236 50 L236 62 L226 66 L212 64 L208 56Z',lx:221,ly:56,grape:'Müller-Thurgau, Riesling, Grauburgunder',soil:'Granit, Gneis, Porphyr, Löss',type:'Weißwein',desc:'Kleinstes Gebiet an der Elbe. Dresden, Meißen. Steilhang-Weinbau.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Ahr',fill:'#8dc63f',d:'M97 136 L102 134 L106 136 L107 141 L103 144 L98 142Z',lx:102,ly:139,grape:'Spätburgunder, Frühburgunder',soil:'Schiefer, Grauwacke, Basalt',type:'Rotwein',desc:'Nördlichstes Rotweingebiet Deutschlands. Steile Schieferlagen am Ahrtal.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Mittelrhein',fill:'#e3001b',d:'M110 124 L114 122 L117 124 L117 132 L115 140 L112 146 L109 148 L108 142 L108 134 L109 126Z',lx:113,ly:135,grape:'Riesling',soil:'Schiefer, Quarzit',type:'Weißwein',desc:'Dramatische Steillagen am Rhein. UNESCO-Welterbe. Mineralischer Riesling.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Mosel',fill:'#9b86bd',d:'M68 142 L75 136 L82 130 L88 126 L95 124 L100 126 L104 130 L106 136 L102 140 L96 144 L90 150 L84 158 L78 166 L73 172 L68 176 L64 172 L63 164 L65 154Z',lx:82,ly:152,grape:'Riesling, Elbling',soil:'Devonschiefer, Grau- & Rotschiefer',type:'Weißwein',desc:'Steiles Flusstal mit weltberühmten Rieslingen. Elegante Leichtigkeit bei niedrigem Alkohol.',klass:'Qualitätswein, Kabinett, Spätlese, Auslese, BA, TBA, Eiswein'},
+      {id:'Nahe',fill:'#1a7033',d:'M106 148 L114 146 L120 148 L122 155 L120 162 L114 164 L107 162 L104 155Z',lx:113,ly:156,grape:'Riesling, Müller-Thurgau',soil:'Porphyr, Schiefer, Kalk, Sandstein',type:'Weißwein',desc:'Vielfältige Böden zwischen Mosel und Rheinhessen. Mineralische Rieslinge mit Frucht.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Rheingau',fill:'#d4a96a',d:'M118 148 L128 146 L134 148 L135 154 L130 158 L120 158 L117 154Z',lx:126,ly:153,grape:'Riesling, Spätburgunder',soil:'Quarzit, Phyllith, Taunus-Schiefer',type:'Weißwein',desc:'Klassisches Rieslinggebiet. Südexponierte Hänge am Rhein. Heimat des Spätlese-Begriffs.',klass:'Erstes Gewächs, Qualitätswein, Kabinett bis TBA'},
+      {id:'Hess. Bergstraße',fill:'#005b8e',d:'M142 160 L147 158 L150 162 L150 172 L146 176 L142 172 L140 166Z',lx:145,ly:167,grape:'Riesling, Grauburgunder',soil:'Granit, Sandstein, Löss',type:'Weißwein',desc:'Kleinstes Anbaugebiet. Frühlingsblüte. Milder Klimaeinfluss.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Rheinhessen',fill:'#e680a0',d:'M118 158 L134 156 L140 160 L142 168 L140 178 L130 184 L118 184 L112 178 L110 168 L114 160Z',lx:126,ly:171,grape:'Riesling, Silvaner, Müller-Thurgau',soil:'Löss, Mergel, Kalk, Ton',type:'Weißwein',desc:'Größtes deutsches Anbaugebiet. Neue Winzergeneration mit modernen Weinen.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Pfalz',fill:'#6ecff6',d:'M112 186 L124 184 L132 186 L134 196 L134 210 L130 220 L120 222 L112 218 L108 208 L108 196Z',lx:121,ly:203,grape:'Riesling, Spätburgunder, Dornfelder',soil:'Sandstein, Kalk, Ton, Löss',type:'Weißwein & Rotwein',desc:'Zweitgrößtes Gebiet. Mediterranes Klima. Vielfalt von trocken bis edelsüß.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
+      {id:'Baden',fill:'#f7941d',d:'M110 224 L118 222 L124 226 L126 238 L128 252 L126 264 L122 274 L116 280 L110 282 L106 276 L104 262 L104 248 L106 234Z',lx:115,ly:252,grape:'Spätburgunder, Grauburgunder, Riesling',soil:'Löss, Kalk, Muschelkalk, Granit',type:'Rotwein & Weißwein',desc:'Wärmstes Anbaugebiet. Kaiserstuhl, Markgräflerland, Ortenau. Bodensee.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Württemberg',fill:'#8dc63f',d:'M136 210 L150 206 L164 206 L172 212 L174 224 L170 236 L160 242 L148 244 L136 240 L130 230 L130 218Z',lx:152,ly:225,grape:'Trollinger, Lemberger, Riesling',soil:'Muschelkalk, Mergel, Keupermergel',type:'Rotwein',desc:'Weinland mit Tradition. Neckartal. Schwäbische Weinbauern und Genossenschaften.',klass:'Großes Gewächs (VDP), Qualitätswein, Prädikatswein'},
+      {id:'Franken',fill:'#fff200',d:'M154 156 L172 152 L188 150 L204 152 L212 160 L212 172 L206 180 L192 184 L176 186 L162 184 L152 176 L150 164Z',lx:182,ly:168,grape:'Silvaner, Müller-Thurgau, Bacchus',soil:'Muschelkalk, Keuper, Buntsandstein',type:'Weißwein',desc:'Trockene Frankenweine im Bocksbeutel. Würzburg als Zentrum. Kontinentales Klima.',klass:'Großes Gewächs (VDP), Erstes Gewächs, Qualitätswein, Prädikatswein'},
+      {id:'Saale-Unstrut',fill:'#7b4f2e',d:'M178 118 L190 114 L198 116 L200 124 L194 130 L182 130 L176 124Z M172 130 L177 128 L180 132 L178 137 L172 136Z',lx:188,ly:122,grape:'Müller-Thurgau, Weißburgunder, Silvaner',soil:'Muschelkalk, Buntsandstein, Zechstein',type:'Weißwein',desc:'Nördlichstes Anbaugebiet. Terrassen-Weinbau. Historische Klosterweingüter.',klass:'Qualitätswein, Prädikatswein'},
+      {id:'Sachsen',fill:'#92278f',d:'M228 126 L236 124 L242 128 L242 136 L236 140 L226 138 L222 132Z M220 138 L224 136 L227 140 L224 144 L219 142Z',lx:233,ly:132,grape:'Müller-Thurgau, Riesling, Grauburgunder',soil:'Granit, Gneis, Porphyr, Löss',type:'Weißwein',desc:'Kleinstes Gebiet an der Elbe. Dresden, Meißen. Steilhang-Weinbau.',klass:'Qualitätswein, Prädikatswein'},
     ]
   },
   Italien:{
-    viewBox:'60 28 185 315',
+    viewBox:'55 25 200 330',
     regions:[
-      {id:'Piemont',fill:'#AFA9EC',d:'M78 60 L118 55 L130 63 L132 80 L128 94 L114 98 L96 96 L78 88 L72 74Z',lx:103,ly:78,grape:'Nebbiolo, Barbera, Dolcetto',soil:'Mergel, Kalk, Sand, Ton',type:'Rotwein'},
-      {id:'Lombardei',fill:'#B5D4F4',d:'M118 55 L150 50 L170 56 L174 70 L170 82 L154 88 L136 86 L128 80 L130 63Z',lx:150,ly:70,grape:'Nebbiolo, Chardonnay, Pinot Nero',soil:'Kalk, Moräne, Sandstein',type:'Rotwein & Weißwein'},
-      {id:'Südtirol',fill:'#9FE1CB',d:'M134 36 L164 32 L180 38 L182 50 L170 56 L148 50 L132 46Z',lx:157,ly:44,grape:'Vernatsch, Lagrein, Gewürztraminer',soil:'Porphyr, Gneis, Kalk',type:'Rotwein & Weißwein'},
-      {id:'Venetien',fill:'#F4C0D1',d:'M148 52 L182 48 L212 54 L218 66 L212 78 L196 84 L178 84 L160 82 L150 74 L148 62Z',lx:183,ly:67,grape:'Garganega, Glera, Corvina',soil:'Kalk, Basalt, Lehm, Ton',type:'Weißwein & Rotwein'},
-      {id:'Friaul',fill:'#FAC775',d:'M196 54 L220 50 L234 58 L234 70 L220 76 L204 76 L196 68Z',lx:213,ly:65,grape:'Friulano, Pinot Grigio, Refosco',soil:'Flysch, Kalk, Tonschiefer',type:'Weißwein'},
-      {id:'Emilia-Romagna',fill:'#F0997B',d:'M94 96 L130 90 L154 88 L170 94 L174 106 L170 118 L152 124 L130 126 L108 122 L94 114Z',lx:135,ly:108,grape:'Sangiovese, Lambrusco, Albana',soil:'Ton, Lehm, Sand, Kalk',type:'Rotwein & Weißwein'},
-      {id:'Toskana',fill:'#CECBF6',d:'M98 122 L130 126 L154 124 L164 132 L166 148 L162 164 L154 178 L138 184 L120 182 L106 172 L98 156 L94 140Z',lx:130,ly:153,grape:'Sangiovese, Vernaccia, Trebbiano',soil:'Galeo, Alberese, Mergel, Tuff',type:'Rotwein'},
-      {id:'Umbrien',fill:'#C0DD97',d:'M138 184 L160 178 L170 184 L174 198 L170 212 L156 218 L140 216 L130 206 L130 192Z',lx:152,ly:199,grape:'Sagrantino, Sangiovese, Grechetto',soil:'Ton, Kalk, Sandstein',type:'Rotwein'},
-      {id:'Marken',fill:'#EAF3DE',d:'M158 134 L176 128 L188 132 L190 148 L186 164 L174 170 L162 166 L156 152 L156 138Z',lx:172,ly:150,grape:'Verdicchio, Montepulciano',soil:'Ton, Sandstein, Kalk',type:'Weißwein & Rotwein'},
-      {id:'Kampanien',fill:'#F7C1C1',d:'M136 226 L162 220 L180 224 L186 238 L182 252 L168 260 L150 262 L136 254 L128 242Z',lx:156,ly:241,grape:'Aglianico, Fiano, Greco',soil:'Tuff, Kalk, Lehm, Vulkanasche',type:'Rotwein & Weißwein'},
-      {id:'Apulien',fill:'#F5C4B3',d:'M162 252 L190 244 L210 246 L220 258 L222 274 L214 290 L196 298 L178 296 L162 286 L154 272 L154 258Z',lx:187,ly:271,grape:'Primitivo, Negroamaro, Verdeca',soil:'Kalk, Terra Rossa, Ton',type:'Rotwein'},
-      {id:'Sizilien',fill:'#FAC775',d:'M90 304 L128 298 L158 300 L174 308 L176 320 L164 330 L140 334 L114 330 L96 320Z',lx:133,ly:316,grape:'Nero d\'Avola, Grillo, Catarratto',soil:'Kalk, Ton, Sandstein, Vulkanasche',type:'Rotwein & Weißwein'},
-      {id:'Sardinien',fill:'#9FE1CB',d:'M68 228 L96 222 L108 230 L110 252 L104 270 L88 276 L70 272 L60 260 L60 240Z',lx:84,ly:249,grape:'Cannonau, Vermentino, Carignano',soil:'Granit, Kalk, Basalt',type:'Rotwein & Weißwein'},
+      {id:'Valle d\'Aosta',fill:'#f7e463',d:'M70 52 L84 48 L92 52 L92 62 L84 66 L72 64Z',lx:81,ly:57,grape:'Petite Arvine, Cornalin, Nebbiolo',soil:'Granit, Gneis, Moräne',type:'Rotwein & Weißwein',desc:'Kleinstes Weingebiet Italiens. Hochalpine Lage im Aostatal.',klass:'DOC Valle d\'Aosta'},
+      {id:'Piemont',fill:'#e07b39',d:'M72 64 L106 58 L118 64 L122 76 L118 90 L108 100 L92 102 L76 98 L68 86 L68 74Z',lx:95,ly:82,grape:'Nebbiolo, Barbera, Dolcetto, Moscato',soil:'Mergel, Kalk, Sand, Ton',type:'Rotwein',desc:'Heimat von Barolo und Barbaresco. Nebbiolo ist die Königsrebe. Truffle country.',klass:'Barolo DOCG, Barbaresco DOCG, Asti DOCG, Gavi DOCG'},
+      {id:'Ligurien',fill:'#9bc4e2',d:'M90 102 L110 98 L124 102 L128 110 L122 116 L106 114 L92 112Z',lx:110,ly:107,grape:'Vermentino, Rossese, Pigato',soil:'Schiefer, Sandstein, Kalk',type:'Weißwein & Rotwein',desc:'Schmaler Küstenstreifen an der Riviera. Terrassenanbau.',klass:'DOC Cinque Terre, DOC Rossese di Dolceacqua'},
+      {id:'Lombardei',fill:'#f4a261',d:'M118 56 L152 52 L170 58 L174 70 L170 84 L154 90 L136 90 L124 84 L120 72Z',lx:148,ly:72,grape:'Nebbiolo, Chardonnay, Pinot Nero',soil:'Kalk, Moräne, Sandstein',type:'Rotwein & Weißwein',desc:'Franciacorta, Valtellina, Lugana. Vielfältige Klimazonen vom Alpenfuß bis zu den Seen.',klass:'Franciacorta DOCG, Valtellina Superiore DOCG'},
+      {id:'Trentino-Südtirol',fill:'#2a9d8f',d:'M152 38 L180 34 L196 40 L198 54 L188 62 L170 66 L154 62 L148 52Z',lx:174,ly:50,grape:'Vernatsch, Lagrein, Gewürztraminer, Pinot Grigio',soil:'Porphyr, Gneis, Kalk, Dolomit',type:'Rotwein & Weißwein',desc:'Zwei Welten: deutschsprachiges Südtirol mit Gewürztraminer, trentinisches Tal mit Teroldego.',klass:'Alto Adige DOC, Trento DOC, Teroldego Rotaliano DOC'},
+      {id:'Venetien',fill:'#e9c46a',d:'M156 64 L196 58 L216 64 L218 76 L212 88 L196 94 L176 96 L158 94 L150 84 L152 70Z',lx:185,ly:78,grape:'Garganega, Glera (Prosecco), Corvina',soil:'Kalk, Basalt, Lehm, Ton, Vulkan',type:'Weißwein & Rotwein',desc:'Prosecco, Soave, Valpolicella, Amarone. Größtes DOC-Volumen Italiens.',klass:'Prosecco DOC/DOCG, Soave DOC, Amarone DOCG, Valpolicella DOC'},
+      {id:'Friaul',fill:'#457b9d',d:'M198 56 L224 52 L238 58 L238 70 L228 78 L212 82 L198 78 L194 66Z',lx:216,ly:67,grape:'Friulano, Pinot Grigio, Refosco, Ribolla Gialla',soil:'Flysch, Kalk, Tonschiefer, Eisenerde',type:'Weißwein',desc:'Terrassenweine im Collio. Weltklasse-Weißweine, natürliche Orangeweine.',klass:'Collio DOC, Friuli Colli Orientali DOC, Ramandolo DOCG'},
+      {id:'Emilia-Romagna',fill:'#e76f51',d:'M100 102 L132 96 L158 96 L174 102 L178 116 L172 128 L154 132 L130 134 L106 130 L96 118Z',lx:138,ly:115,grape:'Sangiovese, Lambrusco, Albana, Trebbiano',soil:'Ton, Lehm, Sand, Kalk',type:'Rotwein & Weißwein',desc:'Lambrusco und Parmigiano-Land. Albana war erster Weißwein mit DOCG.',klass:'Albana di Romagna DOCG, Lambrusco DOC'},
+      {id:'Toskana',fill:'#9b2335',d:'M100 132 L134 132 L158 134 L170 144 L172 162 L168 180 L158 194 L140 200 L120 198 L104 186 L96 170 L96 152Z',lx:134,ly:165,grape:'Sangiovese, Vernaccia, Trebbiano, Cabernet Sauvignon',soil:'Galestro, Alberese, Tuff, Mergel',type:'Rotwein',desc:'Chianti, Brunello, Bolgheri. Herzstück der italienischen Weinwelt.',klass:'Brunello di Montalcino DOCG, Chianti Classico DOCG, Bolgheri DOC, Vernaccia DOCG'},
+      {id:'Marken',fill:'#a8dadc',d:'M162 128 L182 122 L196 124 L200 138 L196 154 L184 162 L170 164 L162 156 L160 140Z',lx:180,ly:144,grape:'Verdicchio, Montepulciano, Sangiovese',soil:'Ton, Sandstein, Kalk',type:'Weißwein & Rotwein',desc:'Verdicchio dei Castelli di Jesi. Adriaküste mit guten Weißweinen.',klass:'Verdicchio dei Castelli di Jesi DOC, Conero DOCG'},
+      {id:'Umbrien',fill:'#6a994e',d:'M134 196 L160 190 L172 196 L176 210 L170 222 L154 228 L138 226 L128 214 L130 200Z',lx:153,ly:210,grape:'Sagrantino, Sangiovese, Grechetto, Trebbiano',soil:'Ton, Kalk, Sandstein',type:'Rotwein',desc:'Sagrantino di Montefalco — tanninreichster Wein Italiens. Grünes Herz Italiens.',klass:'Sagrantino di Montefalco DOCG, Orvieto DOC, Torgiano DOCG'},
+      {id:'Lazio',fill:'#f1faee',d:'M124 200 L152 196 L168 200 L170 216 L164 234 L148 242 L130 240 L118 228 L118 212Z',lx:144,ly:220,grape:'Malvasia, Trebbiano, Cesanese, Sangiovese',soil:'Vulkantuff, Vulkanasche, Pouzzolan',type:'Weißwein',desc:'Frascati und Est! Est!! Est!!!. Vulkanböden rund um Rom.',klass:'Frascati DOC, Est! Est!! Est!!! DOC, Cesanese DOCG'},
+      {id:'Abruzzen',fill:'#e9c46a',d:'M170 188 L192 182 L206 184 L212 196 L210 212 L200 220 L184 222 L170 218 L164 206 L166 194Z',lx:188,ly:203,grape:'Montepulciano, Trebbiano, Pecorino',soil:'Ton, Sandstein, Kalk',type:'Rotwein',desc:'Montepulciano d\'Abruzzo — vollmundig, zugänglich, preiswert. Adriaküste.',klass:'Montepulciano d\'Abruzzo DOC, Trebbiano d\'Abruzzo DOC'},
+      {id:'Molise',fill:'#c77dff',d:'M184 220 L204 216 L212 220 L212 232 L202 238 L186 236 L180 228Z',lx:196,ly:228,grape:'Montepulciano, Tintilia, Trebbiano',soil:'Ton, Kalk',type:'Rotwein',desc:'Kleines, wenig bekanntes Gebiet. Tintilia ist die autochthone Spezialität.',klass:'Biferno DOC, Molise DOC'},
+      {id:'Kampanien',fill:'#e63946',d:'M142 240 L166 234 L186 236 L194 248 L192 264 L178 274 L160 276 L144 268 L136 254Z',lx:165,ly:257,grape:'Aglianico, Fiano, Greco, Falanghina',soil:'Vulkantuff, Kalk, Lehm, Asche',type:'Rotwein & Weißwein',desc:'Taurasi, Fiano di Avellino, Greco di Tufo. Vulkanböden des Vesuvs.',klass:'Taurasi DOCG, Fiano di Avellino DOCG, Greco di Tufo DOCG'},
+      {id:'Basilicata',fill:'#fb8500',d:'M182 262 L206 258 L220 264 L222 278 L214 288 L196 292 L180 286 L176 274Z',lx:199,ly:275,grape:'Aglianico, Sangiovese, Primitivo',soil:'Vulkanerde, Ton, Sandstein',type:'Rotwein',desc:'Aglianico del Vulture vom Erloschenen Vulkan Monte Vulture.',klass:'Aglianico del Vulture DOC, Aglianico del Vulture Superiore DOCG'},
+      {id:'Apulien',fill:'#f4a261',d:'M196 228 L220 222 L238 228 L244 242 L244 260 L238 276 L224 288 L208 294 L194 288 L186 274 L186 256 L192 240Z',lx:218,ly:258,grape:'Primitivo, Negroamaro, Verdeca, Sangiovese',soil:'Kalk, Terra Rossa, Ton, Roterde',type:'Rotwein',desc:'Italiens Weinscheune. Primitivo di Manduria, Salice Salentino. Viel Volumen.',klass:'Primitivo di Manduria DOCG, Castel del Monte DOCG'},
+      {id:'Kalabrien',fill:'#2ec4b6',d:'M184 290 L206 286 L220 290 L226 304 L220 316 L206 322 L190 318 L180 306 L180 296Z',lx:203,ly:304,grape:'Gaglioppo, Greco Nero, Magliocco',soil:'Granit, Sandstein, Ton, Schiefer',type:'Rotwein',desc:'Cirò — ältester Wein der Welt. Stiefelspitze mit rauem Charme.',klass:'Cirò DOC, Greco di Bianco DOC'},
+      {id:'Sizilien',fill:'#ffb703',d:'M102 316 L140 308 L168 310 L188 318 L190 332 L178 342 L156 346 L130 344 L108 338 L96 328Z',lx:144,ly:328,grape:'Nero d\'Avola, Grillo, Catarratto, Nerello Mascalese',soil:'Kalk, Ton, Sandstein, Vulkanasche',type:'Rotwein & Weißwein',desc:'Nero d\'Avola, Marsala, Etna-Weine vom Vulkan. Sonnenverwöhnte Insel.',klass:'Etna DOC, Marsala DOC, Cerasuolo di Vittoria DOCG'},
+      {id:'Sardinien',fill:'#57cc99',d:'M68 234 L96 228 L108 236 L110 256 L106 274 L90 282 L70 278 L60 266 L60 246Z',lx:84,ly:256,grape:'Cannonau, Vermentino, Carignano, Monica',soil:'Granit, Kalk, Basalt, Sandstein',type:'Rotwein & Weißwein',desc:'Cannonau (Grenache) ist die Hauptrebe. Vermentino di Gallura. Longevity island.',klass:'Cannonau di Sardegna DOC, Vermentino di Gallura DOCG'},
     ]
   }
 };
@@ -976,7 +1009,7 @@ let d3Loaded=false;let topoLoaded=false;let worldData=null;let currentDrillCount
 function renderMapView(el){
   el.innerHTML=`
     <div style="position:relative">
-      <div id="map-svg-container" style="width:100%;height:280px;background:#dae8f0;overflow:hidden;position:relative;touch-action:none">
+      <div id="map-svg-container" style="width:100%;height:280px;background:#120B10;overflow:hidden;position:relative;touch-action:none">
         <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8a95;flex-direction:column;gap:8px"><i class="ti ti-map-2" style="font-size:28px;opacity:.4"></i>Weltkarte lädt…</div>
       </div>
       <div id="map-back-btn" style="position:absolute;top:10px;left:10px;display:none">
@@ -993,38 +1026,189 @@ function renderMapView(el){
   loadD3AndDraw();
 }
 
+// GeoJSON regions with real coordinates
+const GEO_REGIONS={
+  Deutschland:[
+    {id:'Ahr',fill:'#c0392b',coords:[[[6.5,50.4],[7.1,50.4],[7.1,50.6],[6.8,50.65],[6.5,50.55]]]},
+    {id:'Mittelrhein',fill:'#2980b9',coords:[[[7.1,50.0],[7.7,50.0],[7.8,50.3],[7.6,50.6],[7.2,50.6],[7.0,50.4],[7.0,50.1]]]},
+    {id:'Mosel',fill:'#9b86bd',coords:[[[6.1,49.5],[7.0,49.4],[7.3,49.7],[7.2,50.0],[7.0,50.1],[6.8,50.0],[6.5,49.9],[6.2,49.8],[6.0,49.65]]]},
+    {id:'Nahe',fill:'#1a7033',coords:[[[7.3,49.7],[7.9,49.7],[8.0,49.95],[7.8,50.05],[7.4,50.0],[7.2,49.85]]]},
+    {id:'Rheingau',fill:'#d4a96a',coords:[[[7.8,49.95],[8.4,49.95],[8.5,50.1],[8.3,50.2],[7.9,50.15],[7.75,50.05]]]},
+    {id:'Hess. Bergstraße',fill:'#005b8e',coords:[[[8.5,49.4],[8.7,49.4],[8.75,49.6],[8.75,49.85],[8.55,49.9],[8.45,49.75],[8.4,49.55]]]},
+    {id:'Rheinhessen',fill:'#e680a0',coords:[[[7.9,49.5],[8.5,49.5],[8.55,49.7],[8.5,49.95],[8.05,50.0],[7.9,50.0],[7.7,49.85],[7.75,49.6]]]},
+    {id:'Pfalz',fill:'#6ecff6',coords:[[[7.7,49.0],[8.3,49.0],[8.5,49.2],[8.5,49.5],[8.3,49.55],[7.9,49.5],[7.7,49.35]]]},
+    {id:'Baden',fill:'#f7941d',coords:[[[7.5,47.55],[7.9,47.55],[8.1,47.8],[8.3,48.1],[8.4,48.5],[8.5,48.9],[8.4,49.0],[8.0,49.05],[7.8,48.8],[7.7,48.5],[7.6,48.2],[7.55,47.9]]]},
+    {id:'Württemberg',fill:'#8dc63f',coords:[[[8.9,48.4],[9.9,48.4],[10.2,48.7],[10.1,49.15],[9.7,49.3],[9.1,49.3],[8.8,49.1],[8.75,48.7]]]},
+    {id:'Franken',fill:'#fff200',coords:[[[9.5,49.4],[10.1,49.3],[11.0,49.5],[11.2,49.7],[11.0,50.05],[10.3,50.2],[9.8,50.1],[9.4,49.85],[9.3,49.6]]]},
+    {id:'Saale-Unstrut',fill:'#e91e8c',coords:[[[11.5,51.1],[12.3,51.1],[12.4,51.4],[12.0,51.55],[11.6,51.5],[11.4,51.3]]]},
+    {id:'Sachsen',fill:'#92278f',coords:[[[13.3,51.0],[13.9,51.0],[13.95,51.2],[13.7,51.35],[13.3,51.3],[13.2,51.15]]]},
+  ],
+  Italien:[
+    {id:'Valle d\'Aosta',fill:'#f7e463',coords:[[[6.8,45.6],[7.8,45.6],[7.9,45.8],[7.5,46.0],[6.9,45.9]]]},
+    {id:'Piemont',fill:'#e07b39',coords:[[[6.6,44.1],[8.8,44.1],[9.0,44.5],[8.8,45.2],[8.2,45.6],[7.5,45.65],[6.8,45.5],[6.5,44.8],[6.6,44.4]]]},
+    {id:'Ligurien',fill:'#9bc4e2',coords:[[[6.6,43.8],[10.0,43.8],[10.2,44.15],[9.5,44.4],[8.0,44.3],[6.8,44.2]]]},
+    {id:'Lombardei',fill:'#f4a261',coords:[[[8.5,44.8],[11.2,44.8],[11.3,45.1],[11.0,45.8],[10.5,46.5],[9.5,46.5],[8.8,46.2],[8.4,45.9],[8.3,45.3]]]},
+    {id:'Trentino-Südtirol',fill:'#2a9d8f',coords:[[[10.4,45.7],[12.5,45.7],[12.6,46.2],[12.0,47.1],[11.0,47.0],[10.4,46.8],[10.3,46.2]]]},
+    {id:'Venetien',fill:'#e9c46a',coords:[[[10.8,45.0],[12.8,45.0],[12.9,45.5],[12.5,46.0],[11.5,46.5],[10.9,46.2],[10.6,45.7],[10.7,45.2]]]},
+    {id:'Friaul',fill:'#457b9d',coords:[[[12.5,45.5],[13.9,45.5],[14.0,46.0],[13.5,46.6],[12.8,46.7],[12.4,46.3],[12.3,45.8]]]},
+    {id:'Emilia-Romagna',fill:'#e76f51',coords:[[[9.2,43.8],[12.8,43.8],[13.0,44.2],[12.5,44.8],[11.5,44.9],[10.5,44.8],[9.5,44.5],[9.0,44.2]]]},
+    {id:'Toskana',fill:'#9b2335',coords:[[[9.8,42.3],[12.3,42.3],[12.4,43.0],[12.0,43.8],[11.2,44.2],[10.3,44.1],[9.6,43.5],[9.5,42.8]]]},
+    {id:'Umbrien',fill:'#6a994e',coords:[[[11.9,42.4],[13.2,42.4],[13.3,43.0],[12.8,43.5],[12.0,43.5],[11.8,43.0]]]},
+    {id:'Marken',fill:'#a8dadc',coords:[[[12.3,42.8],[13.9,42.8],[14.0,43.5],[13.5,43.9],[12.5,43.8],[12.2,43.3]]]},
+    {id:'Lazio',fill:'#e0e0e0',coords:[[[11.4,41.2],[13.8,41.2],[14.0,42.0],[13.5,42.5],[12.5,42.5],[11.5,42.2],[11.2,41.7]]]},
+    {id:'Abruzzen',fill:'#e9c46a',coords:[[[13.2,41.7],[14.8,41.7],[14.9,42.2],[14.3,42.7],[13.5,42.7],[13.0,42.2]]]},
+    {id:'Molise',fill:'#c77dff',coords:[[[14.0,41.3],[15.2,41.3],[15.3,41.8],[14.8,42.0],[14.0,41.9],[13.8,41.6]]]},
+    {id:'Kampanien',fill:'#e63946',coords:[[[14.0,40.2],[16.0,40.2],[16.1,41.0],[15.5,41.3],[14.5,41.2],[13.8,40.8],[13.7,40.4]]]},
+    {id:'Basilicata',fill:'#fb8500',coords:[[[15.3,40.0],[16.8,40.0],[16.9,40.5],[16.3,40.9],[15.5,40.8],[15.0,40.5]]]},
+    {id:'Apulien',fill:'#f4a261',coords:[[[15.0,39.8],[18.4,39.8],[18.5,40.3],[17.5,41.3],[16.5,41.8],[15.8,41.8],[15.0,41.2],[14.8,40.5]]]},
+    {id:'Kalabrien',fill:'#2ec4b6',coords:[[[15.6,37.9],[16.8,37.9],[17.0,38.5],[16.6,39.4],[16.0,39.9],[15.5,39.8],[15.3,39.2],[15.6,38.5]]]},
+    {id:'Sizilien',fill:'#ffb703',coords:[[[12.4,36.6],[15.7,36.6],[15.8,37.8],[14.5,38.3],[12.5,38.2],[11.9,37.6],[12.0,36.9]]]},
+    {id:'Sardinien',fill:'#57cc99',coords:[[[8.1,38.8],[9.8,38.8],[9.9,40.1],[9.5,41.3],[8.5,41.3],[8.0,40.5],[7.9,39.5],[8.0,39.0]]]},
+  ]
+};
+
 function showStaticRegionMap(countryName){
   const container=document.getElementById('map-svg-container');if(!container)return;
-  const data=SVG_REGIONS[countryName];if(!data)return;
   const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
-  const countryWines=getCountryWines();
-  const myWineRegions=new Set((countryWines[countryName]||[]).map(w=>w.region).filter(Boolean));
+  container.style.height='400px';
+  const cw=getCountryWines();
+  const myR=new Set((cw[countryName]||[]).map(w=>w.region).filter(Boolean));
+  const hasW=id=>[...myR].some(mr=>mr.toLowerCase().includes(id.toLowerCase())||id.toLowerCase().includes(mr.toLowerCase()));
 
-  // Country outline paths
-  const outlines={
-    Deutschland:'M82 34 L100 28 L120 26 L148 30 L168 28 L192 32 L212 40 L236 44 L240 58 L236 72 L226 78 L218 86 L210 94 L212 114 L210 132 L208 148 L196 158 L180 162 L168 168 L164 180 L158 196 L150 212 L148 228 L146 244 L140 258 L130 268 L118 262 L106 248 L100 232 L100 214 L102 196 L104 180 L112 172 L108 160 L100 150 L94 138 L88 126 L80 116 L72 104 L76 90 L80 76 L78 62 L78 48Z',
-    Italien:'M94 38 L116 34 L134 36 L150 34 L168 32 L186 38 L198 46 L210 54 L218 64 L216 78 L208 88 L196 96 L180 100 L168 108 L166 122 L162 136 L156 150 L156 168 L160 182 L164 196 L170 210 L172 226 L170 242 L164 258 L168 272 L176 284 L192 296 L204 308 L192 320 L178 328 L164 332 L148 332 L132 328 L118 318 L108 306 L98 318 L88 328 L78 322 L68 310 L66 296 L72 282 L80 270 L88 256 L98 244 L104 230 L108 214 L106 198 L104 182 L100 168 L100 152 L98 136 L96 120 L92 106 L86 92 L82 76 L84 60 L90 46Z',
-  };
+  // Pinterest 2026 palette: Wasabi #E9F056, Orange Topaze #F75C54, Cool Blue #D7EFFF, Cassis #351E28, Vert Sauge #AEB8A0 + warm sand #C4A882 + peach #F7A07A
+  const PL={W:'#E9F056',O:'#F75C54',C:'#D7EFFF',K:'#351E28',V:'#AEB8A0',S:'#C4A882',P:'#F7A07A'};
+  // Text color per fill
+  const TC={[PL.W]:'#2a2a10',[PL.O]:'#fff',[PL.C]:'#1a2a3a',[PL.K]:'#fff',[PL.V]:'#1a2a1a',[PL.S]:'#2a1a08',[PL.P]:'#3a2010'};
 
-  container.innerHTML=`<svg viewBox="${data.viewBox}" width="100%" height="100%" style="display:block">
-    <rect width="9999" height="9999" x="-999" y="-999" fill="#dae8f0"/>
-    ${outlines[countryName]?`<path d="${outlines[countryName]}" fill="#e8e0d4" stroke="#c0b8a8" stroke-width="0.8" stroke-linejoin="round" opacity="0.5"/>`:''}
-    ${data.regions.map(r=>{
-      const hasWine=[...myWineRegions].some(mr=>mr.toLowerCase().includes(r.id.toLowerCase())||r.id.toLowerCase().includes(mr.toLowerCase()));
-      return`<path id="svgr-${r.id.replace(/[^a-zA-Z0-9]/g,'_')}" d="${r.d}" fill="${r.fill}" stroke="white" stroke-width="0.8" stroke-linejoin="round" style="cursor:pointer;opacity:${hasWine?1:0.6}" onclick="selectSvgRegion('${countryName}','${r.id.replace(/'/g,"\\'")}','${r.fill}')"/>
-      <text x="${r.lx}" y="${r.ly}" text-anchor="middle" dominant-baseline="middle" style="pointer-events:none;font-size:5px;font-weight:600;fill:#1a1209;font-family:sans-serif">${r.id}</text>`;
-    }).join('')}
-  </svg>`;
+  function svg(vb,W,H,outline,regions,cities,extras){
+    const esc=s=>s.replace(/'/g,"\\'");
+    // Adaptive font size based on region area
+    const fs=r=>{
+      const nums=(r.d.match(/[\d.]+/g)||[]).map(Number);
+      const xs=nums.filter((_,i)=>i%2===0),ys=nums.filter((_,i)=>i%2===1);
+      if(!xs.length)return 0;
+      const w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys);
+      const a=w*h;
+      return a>2500?5.5:a>1000?4.8:a>400?4.2:a>150?3.8:0;
+    };
+    return`<svg viewBox="${vb}" width="${W}" height="${H}" style="display:block">
+    <defs>${regions.map(r=>`<clipPath id="cp${r.id.replace(/[^a-zA-Z0-9]/g,'_')}"><path d="${r.d}"/></clipPath>`).join('')}</defs>
+    <rect width="${vb.split(' ')[2]}" height="${vb.split(' ')[3]}" fill="#120B10"/>
+    ${outline}
+    ${regions.map(r=>{const f=fs(r);return`<path id="svgr-${r.id.replace(/[^a-zA-Z0-9]/g,'_')}" d="${r.d}" fill="${r.f}" stroke="#dde8ee" stroke-width="0.7" opacity="${hasW(r.id)?1:0.72}" style="cursor:pointer" onclick="selectSvgRegion('${countryName}','${esc(r.id)}','${r.f}')"/>${f>0?`<text clip-path="url(#cp${r.id.replace(/[^a-zA-Z0-9]/g,'_')})" x="${r.lx}" y="${r.ly}" text-anchor="middle" dominant-baseline="middle" font-size="${f}" font-weight="700" fill="${TC[r.f]||'#fff'}" font-family="sans-serif" pointer-events="none">${r.lb||r.id}</text>`:''}`}).join('')}
+    ${(extras||[]).map(r=>`<path d="${r.d}" fill="${r.f}" stroke="#dde8ee" stroke-width="0.7" opacity="0.72" style="cursor:pointer" onclick="selectSvgRegion('${countryName}','${esc(r.id)}','${r.f}')"/>`).join('')}
+    ${cities.map(c=>`<circle cx="${c.x}" cy="${c.y}" r="2" fill="#F5F2EC"/><text x="${c.x+3.5}" y="${c.y+1}" font-size="4.8" font-family="sans-serif" fill="#F5F2EC" font-weight="500">${c.n}</text>`).join('')}
+    </svg>`;
+  }
+
+  if(countryName==='Deutschland'){
+    const W=container.getBoundingClientRect().width||360;
+    const outline=`<path fill="#2A1824" stroke="#3A2030" stroke-width="1.2" stroke-linejoin="round" d="M 8.2 205.3 L 11.4 161.3 L 21.2 151.4 L 37.5 136.5 L 37.5 116.4 L 70.1 80.9 L 86.4 65.5 L 102.7 29.0 L 115.8 13.3 L 135.3 0.0 L 161.4 13.3 L 216.8 29.0 L 262.5 44.7 L 269.0 65.5 L 278.8 91.1 L 288.6 126.5 L 290.2 176.1 L 300.0 205.3 L 291.8 212.6 L 282.1 229.4 L 249.5 241.3 L 239.7 253.2 L 216.8 239.0 L 203.8 239.0 L 210.3 262.7 L 220.1 276.8 L 234.8 318.6 L 225.0 362.0 L 207.1 359.7 L 164.7 368.8 L 154.9 373.3 L 141.8 378.7 L 120.7 366.5 L 88.0 355.2 L 70.1 359.7 L 57.1 366.5 L 55.4 357.5 L 57.1 346.1 L 57.1 323.2 L 76.6 302.4 L 65.2 276.8 L 16.3 276.8 L 8.2 260.3 L 1.6 243.7 L 0.0 229.4 L 11.4 205.3 Z"/>`;
+    const regions=[
+      {id:'Mosel',f:PL.S,d:'M 8.2 279.1 L 39.1 282.4 L 48.9 269.7 L 45.7 254.2 L 39.1 250.8 L 31.0 254.2 L 21.2 258.9 L 9.8 265.0 L 3.3 272.1 Z',lx:27,ly:265},
+      {id:'Ahr',f:PL.O,d:'M 21.2 236.6 L 42.4 236.6 L 42.4 223.6 L 31.0 222.2 L 21.2 227.0 Z',lx:32,ly:230},
+      {id:'Mittelrhein',f:PL.C,d:'M 40.8 255.6 L 62.0 255.6 L 65.2 239.0 L 58.7 223.6 L 42.4 223.6 L 35.9 234.2 L 37.5 248.5 Z',lx:49,ly:241,lb:'M-Rhein'},
+      {id:'Nahe',f:PL.V,d:'M 45.7 269.7 L 68.5 269.7 L 71.7 257.0 L 65.2 250.8 L 50.5 254.2 L 44.0 261.7 Z',lx:58,ly:261},
+      {id:'Rheingau',f:PL.W,d:'M 65.2 257.0 L 83.8 257.0 L 87.1 249.4 L 80.5 243.7 L 68.5 246.1 L 62.9 250.8 Z',lx:75,ly:251},
+      {id:'Rheinhessen',f:PL.C,d:'M 66.2 279.1 L 86.4 279.1 L 88.0 268.3 L 86.4 257.0 L 72.7 254.2 L 66.8 254.2 L 60.3 261.7 L 62.0 273.0 Z',lx:74,ly:266},
+      {id:'Hess. Bergstraße',f:PL.K,d:'M 86.4 282.4 L 93.6 282.4 L 95.5 272.1 L 95.5 258.9 L 88.4 257.0 L 84.8 265.0 L 83.8 274.4 Z',lx:90,ly:271,lb:'H.B.'},
+      {id:'Pfalz',f:PL.O,d:'M 59.7 302.4 L 80.5 302.4 L 87.1 291.8 L 87.1 277.7 L 79.9 275.9 L 66.8 277.7 L 59.7 285.2 Z',lx:74,ly:288},
+      {id:'Baden',f:PL.V,d:'M 53.2 367.9 L 68.5 367.9 L 75.0 356.1 L 81.5 342.5 L 84.8 322.3 L 88.0 303.8 L 83.8 300.1 L 70.8 297.8 L 64.2 308.5 L 61.0 322.3 L 57.7 337.0 L 55.4 351.6 Z',lx:70,ly:332},
+      {id:'Württemberg',f:PL.K,d:'M 98.8 328.7 L 132.7 328.7 L 142.5 314.9 L 139.2 291.8 L 126.2 285.2 L 106.6 285.2 L 96.8 295.5 L 95.5 314.9 Z',lx:117,ly:308},
+      {id:'Franken',f:PL.W,d:'M 118.4 282.4 L 139.2 287.1 L 168.6 277.7 L 175.1 266.4 L 168.6 249.4 L 145.8 242.8 L 129.5 247.5 L 116.4 258.9 L 111.8 273.0 Z',lx:141,ly:265},
+      {id:'Saale-Unstrut',f:PL.O,d:'M 183.6 201.4 L 211.0 201.4 L 214.2 186.8 L 201.2 178.5 L 186.8 182.0 L 181.6 191.7 Z',lx:196,ly:191,lb:'Saale-U.'},
+      {id:'Sachsen',f:PL.V,d:'M 242.3 206.3 L 263.2 206.3 L 265.1 194.6 L 256.6 188.3 L 242.3 191.7 L 239.0 199.5 Z',lx:251,ly:199},
+    ];
+    const extras=[
+      {id:'Saale-Unstrut',f:PL.O,d:'M 176 197 L 185 194 L 187 200 L 183 205 L 176 203 Z'},
+      {id:'Sachsen',f:PL.V,d:'M 237 204 L 243 201 L 245 207 L 241 211 L 236 208 Z'},
+    ];
+    const cities=[
+      {n:'Berlin',x:246,y:131},{n:'Hamburg',x:135,y:78},{n:'München',x:187,y:340},
+      {n:'Köln',x:36,y:208},{n:'Frankfurt',x:92,y:248},{n:'Stuttgart',x:109,y:310},
+      {n:'Würzburg',x:133,y:263},{n:'Mainz',x:66,y:252},{n:'Trier',x:11,y:263},
+      {n:'Dresden',x:257,y:203},{n:'Halle',x:200,y:182},{n:'Freiburg',x:65,y:347},
+      {n:'Nürnberg',x:171,y:279},{n:'Karlsruhe',x:88,y:300},
+    ];
+    container.innerHTML=svg('0 0 300 380',W,400,outline,regions,cities,extras);
+    return;
+  }
+
+  if(countryName==='Italien'){
+    const W=container.getBoundingClientRect().width||360;
+    const outlines=`
+      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 0.0 132.2 L 10.0 145.1 L 22.5 149.3 L 35.0 145.1 L 50.0 127.9 L 62.5 119.3 L 75.0 127.9 L 85.0 145.1 L 97.5 162.1 L 102.5 174.8 L 110.0 187.4 L 115.0 200.0 L 112.5 212.5 L 115.0 229.1 L 122.5 249.7 L 127.5 266.1 L 135.0 262.0 L 147.5 253.8 L 155.0 270.2 L 160.0 282.4 L 177.5 286.4 L 185.0 302.6 L 210.0 302.6 L 225.0 381.9 L 235.0 385.8 L 247.5 374.1 L 260.0 362.3 L 265.0 342.5 L 260.0 322.6 L 247.5 310.6 L 250.0 302.6 L 260.0 290.5 L 280.0 282.4 L 297.5 278.3 L 297.5 290.5 L 247.5 220.8 L 222.5 220.8 L 205.0 200.0 L 192.5 179.0 L 182.5 157.9 L 175.0 136.5 L 147.5 136.5 L 135.0 115.0 L 122.5 97.7 L 97.5 102.0 L 72.5 115.0 L 65.0 127.9 L 57.5 132.2 L 47.5 53.7 L 35.0 49.3 L 10.0 53.7 L 0.0 67.0 Z"/>
+      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 145.0 436.2 L 155.0 436.2 L 170.0 420.8 L 185.0 420.8 L 197.5 409.2 L 217.5 397.5 L 225.0 385.8 L 227.5 374.1 L 217.5 370.1 L 197.5 370.1 L 172.5 378.0 L 155.0 381.9 L 147.5 381.9 L 132.5 397.5 L 135.0 420.8 Z"/>
+      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 37.5 350.4 L 45.0 358.3 L 55.0 354.4 L 65.0 342.5 L 72.5 330.6 L 80.0 310.6 L 82.5 282.4 L 77.5 262.0 L 72.5 249.7 L 65.0 241.5 L 55.0 245.6 L 47.5 253.8 L 40.0 266.1 L 35.0 282.4 L 32.5 302.6 L 35.0 330.6 Z"/>`;
+    const regions=[
+      {id:"Valle d'Aosta",f:PL.W,d:'M 0.0 67.0 L 32.5 67.0 L 32.5 49.3 L 15.0 49.3 L 0.0 53.7 Z',lx:16,ly:58,lb:"V.d'Aosta"},
+      {id:'Piemont',f:PL.P,d:'M 0.0 132.2 L 57.5 132.2 L 57.5 102.0 L 37.5 67.0 L 32.5 67.0 L 0.0 71.4 Z',lx:30,ly:97},
+      {id:'Ligurien',f:PL.C,d:'M 0.0 145.1 L 72.5 145.1 L 72.5 132.2 L 60.0 127.9 L 35.0 132.2 L 5.0 136.5 Z',lx:38,ly:138},
+      {id:'Lombardei',f:PL.P,d:'M 57.5 132.2 L 107.5 132.2 L 107.5 102.0 L 110.0 58.2 L 97.5 27.0 L 72.5 27.0 L 55.0 40.4 L 37.5 67.0 L 57.5 102.0 Z',lx:75,ly:82},
+      {id:'Trentino-Südtirol',f:PL.V,d:'M 107.5 132.2 L 147.5 132.2 L 147.5 62.6 L 135.0 0.0 L 110.0 4.5 L 95.0 13.5 L 92.5 40.4 L 107.5 102.0 Z',lx:118,ly:57,lb:'Trentino-S.'},
+      {id:'Venetien',f:PL.W,d:'M 107.5 132.2 L 147.5 132.2 L 147.5 62.6 L 122.5 27.0 L 107.5 40.4 Z',lx:123,ly:94},
+      {id:'Friaul',f:PL.C,d:'M 147.5 132.2 L 185.0 132.2 L 185.0 49.3 L 172.5 22.5 L 155.0 18.0 L 145.0 36.0 L 147.5 62.6 Z',lx:161,ly:76},
+      {id:'Emilia-Romagna',f:PL.O,d:'M 72.5 145.1 L 185.0 145.1 L 172.5 136.5 L 147.5 127.9 L 122.5 136.5 L 97.5 140.8 L 72.5 136.5 Z',lx:125,ly:139,lb:'Emilia-R.'},
+      {id:'Toskana',f:PL.K,d:'M 72.5 145.1 L 185.0 145.1 L 172.5 200.0 L 135.0 212.5 L 120.0 220.8 L 97.5 195.8 L 75.0 170.6 Z',lx:118,ly:175},
+      {id:'Umbrien',f:PL.V,d:'M 135.0 212.5 L 172.5 212.5 L 180.0 179.0 L 172.5 157.9 L 172.5 145.1 L 185.0 145.1 L 172.5 200.0 Z',lx:162,ly:185},
+      {id:'Marken',f:PL.C,d:'M 185.0 145.1 L 185.0 179.0 L 172.5 200.0 L 172.5 157.9 L 172.5 145.1 Z',lx:178,ly:165},
+      {id:'Lazio',f:PL.P,d:'M 120.0 253.8 L 180.0 253.8 L 185.0 220.8 L 172.5 200.0 L 172.5 212.5 L 135.0 212.5 L 122.5 220.8 L 115.0 233.3 Z',lx:150,ly:225},
+      {id:'Abruzzen',f:PL.W,d:'M 160.0 204.2 L 205.0 204.2 L 210.0 237.4 L 185.0 253.8 L 160.0 237.4 Z',lx:184,ly:228},
+      {id:'Molise',f:PL.K,d:'M 180.0 253.8 L 215.0 253.8 L 222.5 229.1 L 205.0 220.8 L 185.0 220.8 L 180.0 237.4 Z',lx:198,ly:240},
+      {id:'Kampanien',f:PL.O,d:'M 180.0 294.5 L 235.0 294.5 L 240.0 262.0 L 222.5 249.7 L 197.5 253.8 L 185.0 220.8 L 180.0 253.8 Z',lx:203,ly:262},
+      {id:'Basilicata',f:PL.V,d:'M 217.5 302.6 L 255.0 302.6 L 257.5 282.4 L 242.5 266.1 L 222.5 270.2 L 210.0 282.4 Z',lx:234,ly:285},
+      {id:'Apulien',f:PL.P,d:'M 210.0 310.6 L 295.0 310.6 L 297.5 290.5 L 272.5 249.7 L 247.5 229.1 L 230.0 229.1 L 210.0 253.8 L 205.0 282.4 Z',lx:252,ly:272},
+      {id:'Kalabrien',f:PL.C,d:'M 225.0 385.8 L 250.0 385.8 L 260.0 362.3 L 250.0 326.6 L 235.0 306.6 L 222.5 310.6 L 217.5 334.6 L 225.0 362.3 Z',lx:236,ly:348},
+      {id:'Sizilien',f:PL.W,d:'M 145.0 436.2 L 227.5 436.2 L 230.0 389.7 L 197.5 370.1 L 147.5 374.1 L 132.5 397.5 L 135.0 424.6 Z',lx:180,ly:406},
+      {id:'Sardinien',f:PL.V,d:'M 37.5 350.4 L 80.0 350.4 L 82.5 298.5 L 72.5 249.7 L 47.5 249.7 L 35.0 282.4 L 32.5 322.6 Z',lx:55,ly:304},
+    ];
+    const cities=[
+      {n:'Turin',x:27,y:90},{n:'Mailand',x:65,y:73},{n:'Venedig',x:141,y:73},
+      {n:'Genua',x:58,y:119},{n:'Bologna',x:118,y:115},{n:'Florenz',x:116,y:146},
+      {n:'Rom',x:147,y:225},{n:'Neapel',x:191,y:268},{n:'Palermo',x:169,y:378},
+      {n:'Bari',x:257,y:257},{n:'Cagliari',x:55,y:334},
+    ];
+    container.innerHTML=svg('0 0 300 440',W,440,outlines,regions,cities);
+    return;
+  }
+
+  // Andere Länder — D3
+  if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
+  const W=container.getBoundingClientRect().width||360;const H=380;
+  const geoRegions=GEO_REGIONS[countryName];if(!geoRegions)return;
+  const regionFeatures=geoRegions.map(r=>({type:'Feature',properties:{id:r.id,fill:r.fill},geometry:{type:'Polygon',coordinates:r.coords}}));
+  const countries=topojson.feature(worldData,worldData.objects.countries);
+  const isoMap={};
+  const countryFeature=countries.features.find(f=>f.id===isoMap[countryName]);
+  container.innerHTML='';
+  const svg2=d3.select(container).append('svg').attr('width',W).attr('height',H).style('display','block');
+  const proj=d3.geoMercator().fitSize([W,H],countryFeature||{type:'FeatureCollection',features:regionFeatures});
+  const path2=d3.geoPath().projection(proj);
+  svg2.append('rect').attr('width',W).attr('height',H).attr('fill','#dde8ee');
+  if(countryFeature)svg2.append('path').datum(countryFeature).attr('d',path2).attr('fill','#f0ece4').attr('stroke','#c0b8b0').attr('stroke-width',1);
+  regionFeatures.forEach(f=>{
+    const r=f.properties;
+    svg2.append('path').datum(f).attr('d',path2).attr('id','svgr-'+r.id.replace(/[^a-zA-Z0-9]/g,'_')).attr('fill',r.fill).attr('stroke','#dde8ee').attr('stroke-width',0.7).attr('opacity',0.8).style('cursor','pointer').on('click',()=>selectSvgRegion(countryName,r.id,r.fill));
+    const c=path2.centroid(f);
+    if(c&&!isNaN(c[0]))svg2.append('text').attr('x',c[0]).attr('y',c[1]).attr('text-anchor','middle').attr('dominant-baseline','middle').style('font-size','6px').style('font-weight','700').style('fill','white').style('pointer-events','none').style('font-family','sans-serif').text(r.id);
+  });
 }
 
+
 function selectSvgRegion(countryName,regionId,fill){
-  document.querySelectorAll('[id^="svgr-"]').forEach(p=>{p.style.stroke='white';p.style.strokeWidth='0.8';});
-  const pid=regionId.replace(/[^a-zA-Z0-9]/g,'_');
-  const el=document.getElementById('svgr-'+pid);
-  if(el){el.style.stroke='#1a1209';el.style.strokeWidth='2';}
+  // Deselect all region paths
+  const container=document.getElementById('map-svg-container');
+  if(container)container.querySelectorAll('path').forEach(p=>{
+    if(p.getAttribute('id')&&p.getAttribute('id').startsWith('svgr-')){
+      p.style.stroke='white';p.style.strokeWidth='0.8';
+    }
+  });
+  const pid='svgr-'+regionId.replace(/[^a-zA-Z0-9]/g,'_');
+  const el=document.getElementById(pid);
+  if(el){el.style.stroke='#1a1209';el.style.strokeWidth='2.5';}
   const info=getRegionInfo(countryName,regionId);
-  const countryWines=getCountryWines();
-  const myWines=(countryWines[countryName]||[]).filter(w=>w.region&&(w.region.toLowerCase().includes(regionId.toLowerCase())||regionId.toLowerCase().includes(w.region.toLowerCase())));
+  const cw=getCountryWines();
+  const myWines=(cw[countryName]||[]).filter(w=>w.region&&(w.region.toLowerCase().includes(regionId.toLowerCase())||regionId.toLowerCase().includes(w.region.toLowerCase())));
   const detailEl=document.getElementById('map-region-detail');
   detailEl.style.display='block';
   const fillEsc=fill.replace(/'/g,"\\'");
@@ -1057,7 +1241,6 @@ function selectSvgRegion(countryName,regionId,fill){
     </div>`).join('')}`
     :`<div style="font-size:10px;color:var(--ink3);font-style:italic">Noch kein Wein eingetragen.</div>`}`;
 }
-
 function editRegionInfo(countryName,regionId,fill){
   const info=getRegionInfo(countryName,regionId);
   const esc=fill.replace(/'/g,"\\'");
@@ -1137,7 +1320,7 @@ function drawWorldMap(){
     g.selectAll('circle.wine-marker').attr('r',3/k).attr('stroke-width',1/k);
   });
   _mapZoom=zoom;svg.call(zoom);
-  svg.append('rect').attr('width',W).attr('height',H).attr('fill','#dae8f0');
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill','#120B10');
   const g=svg.append('g');_mapG=g;
   const countries=topojson.feature(worldData,worldData.objects.countries);
   g.selectAll('path.country').data(countries.features).join('path').attr('class','country').attr('d',path)
@@ -1216,7 +1399,7 @@ function renderCountryList(countryWines){
   const countries=Object.keys(countryWines).sort();
   el.innerHTML=countries.map(c=>{
     const ws=countryWines[c];const flag=COUNTRY_FLAGS[c]||'🍷';
-    const hasRegionMap=!!REGION_GEODATA[c];
+    const hasRegionMap=!!(SVG_REGIONS[c]||GEO_REGIONS[c]);
     const regionGroups={};
     ws.forEach(w=>{const r=w.region||'—';if(!regionGroups[r])regionGroups[r]={};const wg=w.weingut||w.name;if(!regionGroups[r][wg])regionGroups[r][wg]=[];regionGroups[r][wg].push(w);});
     return`<div class="map-country-card" data-country="${c}">
