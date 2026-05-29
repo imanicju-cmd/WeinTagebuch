@@ -38,12 +38,13 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:var(--font-body);color:var(--ink)}
-#app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;width:100%;max-width:480px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+html,body{width:100%;overflow-x:hidden}
 .screen{display:none;flex-direction:column;height:100%;overflow:hidden}
 .screen.active{display:flex}
 
 /* TOPBAR */
-.topbar{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;padding-top:max(14px,env(safe-area-inset-top))}
+.topbar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;padding-top:max(12px,env(safe-area-inset-top))}
 .topbar-title{font-size:14px;font-weight:500;flex:1;color:var(--ink);letter-spacing:.2px}
 .topbar-logo{font-size:22px;font-weight:800;flex:1;color:var(--ink);letter-spacing:-1.5px;text-transform:lowercase;font-family:var(--font-body)}
 .topbar-logo span{color:var(--wine)}
@@ -319,7 +320,10 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <div class="topbar">
     <button class="btn-icon btn btn-ghost" onclick="goList()" aria-label="Zurück"><i class="ti ti-arrow-left"></i></button>
     <div class="topbar-title" id="detail-topbar"></div>
-    <button class="btn btn-ghost btn-icon" onclick="deleteWine()" style="color:#a32d2d;border-color:rgba(163,45,45,0.3)"><i class="ti ti-trash"></i></button>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-icon" onclick="editCurrentWine()"><i class="ti ti-pencil"></i></button>
+      <button class="btn btn-ghost btn-icon" onclick="deleteWine()" style="color:#F75C54"><i class="ti ti-trash"></i></button>
+    </div>
   </div>
   <div class="scroll-body" id="detail-scroll">
     <div id="detail-content"></div>
@@ -414,21 +418,18 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
     <!-- ERLEBNIS -->
     <div class="form-section">
       <div class="form-section-title">Erlebnis</div>
-      <div class="form-group"><label class="form-label">Datum</label><input class="form-input" id="f-date" type="date" style="width:180px"></div>
       <div class="form-row">
-        <div><label class="form-label">Ort / Restaurant</label><input class="form-input" id="f-ort" placeholder="z.B. Bar-rique, zuhause…"></div>
-        <div><label class="form-label">Mit wem</label><input class="form-input" id="f-with" placeholder="z.B. Jannis…"></div>
-      </div>
-      <div class="form-row">
-        <div><label class="form-label">Anlass</label><input class="form-input" id="f-occasion" placeholder="z.B. Geburtstag…"></div>
+        <div><label class="form-label">Datum</label><input class="form-input" id="f-date" type="date"></div>
         <div><label class="form-label">Preis (€)</label><input class="form-input" id="f-price" placeholder="28" type="number"></div>
       </div>
+      <div class="form-group"><label class="form-label">Wo & mit wem</label><input class="form-input" id="f-ort" placeholder="z.B. Barrique mit Jannis…"></div>
       <div class="form-group"><label class="form-label">Link zum Wein</label><input class="form-input" id="f-link" type="url" placeholder="https://…" style="font-size:12px"></div>
     </div>
     <!-- NOTIZEN -->
     <div class="form-section">
       <div class="form-section-title">Notizen & Bewertung</div>
-      <div class="form-group"><label class="form-label">Notizen</label><textarea class="form-input form-textarea" id="f-notes" placeholder="Aromen, Struktur, Abgang, persönlicher Eindruck…"></textarea></div>
+      <div class="form-group"><label class="form-label">Aromen</label><textarea class="form-input form-textarea" id="f-aroma" placeholder="z.B. Kirsche, Veilchen, Zedernholz, leichter Pfeffer…" style="min-height:64px"></textarea></div>
+      <div class="form-group"><label class="form-label">Notizen</label><textarea class="form-input form-textarea" id="f-notes" placeholder="Struktur, Abgang, persönlicher Eindruck…"></textarea></div>
       <div class="form-group"><label class="form-label">Bewertung</label><div class="star-row" id="add-stars"></div></div>
     </div>
     <div style="height:32px"></div>
@@ -846,6 +847,7 @@ async function goDetail(id){
       </div>
       <div class="detail-stars">${'★'.repeat(w.rating)}${'☆'.repeat(5-w.rating)}</div>
       <div class="divider"></div>
+      ${w.aroma?`<div class="section-label">Aromen</div><div class="section-text">${w.aroma}</div>`:''}
       ${w.notes?`<div class="section-label">Notizen</div><div class="section-text">${w.notes}</div>`:''}
       ${ripeText()}
       ${(w.date||w.ort||w.withwho||w.occasion)?`
@@ -865,6 +867,31 @@ async function goDetail(id){
   showScreen('detail');
 }
 
+async function editCurrentWine(){
+  const w=wines.find(x=>x.id===currentId);if(!w)return;
+  editRating=w.rating||3;
+  aiData=null;
+  const photo=await dbGet('photos',currentId);
+  currentPhotoB64=photo?.data||null;
+  resetForm();
+  // Populate all fields
+  const set=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+  set('f-weingut',w.weingut);set('f-name',w.weinname);set('f-vintage',w.vintage);
+  set('f-grape',w.grape);set('f-alc',w.alc);set('f-country',w.country);
+  set('f-region',w.region);set('f-lage',w.lage);set('f-klass',w.klass);
+  set('f-soil',w.soil);set('f-aroma',w.aroma);set('f-notes',w.notes);
+  set('f-price',w.price||'');set('f-ort',w.ort);set('f-from',w.drinkFrom);
+  set('f-to',w.drinkTo);set('f-link',w.link);set('f-date',w.date);
+  if(w.type){const sel=document.getElementById('f-type');if(sel)[...sel.options].forEach(o=>{if(o.value===w.type)sel.value=w.type;});}
+  if(w.format){const sel=document.getElementById('f-format');if(sel)[...sel.options].forEach(o=>{if(o.value===w.format)sel.value=w.format;});}
+  if(photo){const prev=document.getElementById('photo-preview');if(prev){prev.src=photo.data;prev.style.display='block';}}
+  renderAddStars();
+  // Replace saveWine to update existing record
+  const origId=currentId;
+  document.getElementById('screen-add').dataset.editId=origId;
+  showScreen('add');
+}
+
 async function deleteWine(){
   if(!confirm('Wein löschen?'))return;
   await dbDelete('wines',currentId);await dbDelete('photos',currentId);
@@ -874,7 +901,7 @@ async function deleteWine(){
 
 // ── Form ────────────────────────────────────────────────
 function resetForm(){
-  ['f-weingut','f-name','f-vintage','f-grape','f-alc','f-country','f-region','f-lage','f-klass','f-soil','f-notes','f-price','f-ort','f-with','f-occasion','f-from','f-to','f-url','f-link'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});;
+  ['f-weingut','f-name','f-vintage','f-grape','f-alc','f-country','f-region','f-lage','f-klass','f-soil','f-aroma','f-notes','f-price','f-ort','f-from','f-to','f-url','f-link'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});;
   document.getElementById('f-type').value='Rotwein';
   document.getElementById('f-format').value='Flasche (0,75L)';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
@@ -937,14 +964,29 @@ function applyAi(){
 async function saveWine(){
   const weingut=document.getElementById('f-weingut').value.trim();
   const weinname=document.getElementById('f-name').value.trim();
-  if(!weingut){alert('Weingut ist Pflichtfeld');return;}
-  const name=weinname?`${weingut} ${weinname}`:weingut;
-  const id=Date.now();
-  const wine={id,name,weingut,weinname,vintage:document.getElementById('f-vintage').value.trim(),type:document.getElementById('f-type').value,grape:document.getElementById('f-grape').value.trim(),alc:document.getElementById('f-alc').value.trim(),country:document.getElementById('f-country').value.trim(),region:document.getElementById('f-region').value.trim(),lage:document.getElementById('f-lage').value.trim(),klass:document.getElementById('f-klass').value.trim(),soil:document.getElementById('f-soil').value.trim(),notes:document.getElementById('f-notes').value.trim(),rating:editRating,price:parseFloat(document.getElementById('f-price').value)||0,date:document.getElementById('f-date').value,ort:document.getElementById('f-ort').value.trim(),withwho:document.getElementById('f-with').value.trim(),occasion:document.getElementById('f-occasion').value.trim(),format:document.getElementById('f-format').value,drinkFrom:document.getElementById('f-from').value.trim(),drinkTo:document.getElementById('f-to').value.trim(),link:document.getElementById('f-link').value.trim()};
+  if(!weingut&&!weinname){
+    // Highlight both fields instead of alert
+    ['f-weingut','f-name'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.style.borderColor='#F75C54';setTimeout(()=>el.style.borderColor='',2000);}
+    });
+    showToast('Bitte Weingut oder Weinname eingeben');
+    return;
+  }
+  const name=weingut?(weinname?`${weingut} ${weinname}`:weingut):weinname;
+  const editId=parseInt(document.getElementById('screen-add').dataset.editId||'0');
+  const id=editId||Date.now();
+  document.getElementById('screen-add').dataset.editId='';
+  const wine={id,name,weingut,weinname,vintage:document.getElementById('f-vintage').value.trim(),type:document.getElementById('f-type').value,grape:document.getElementById('f-grape').value.trim(),alc:document.getElementById('f-alc').value.trim(),country:document.getElementById('f-country').value.trim(),region:document.getElementById('f-region').value.trim(),lage:document.getElementById('f-lage').value.trim(),klass:document.getElementById('f-klass').value.trim(),soil:document.getElementById('f-soil').value.trim(),aroma:document.getElementById('f-aroma').value.trim(),notes:document.getElementById('f-notes').value.trim(),rating:editRating,price:parseFloat(document.getElementById('f-price').value)||0,date:document.getElementById('f-date').value,ort:document.getElementById('f-ort').value.trim(),format:document.getElementById('f-format').value,drinkFrom:document.getElementById('f-from').value.trim(),drinkTo:document.getElementById('f-to').value.trim(),link:document.getElementById('f-link').value.trim()};
   await dbPut('wines',wine);
   if(currentPhotoB64)await dbPut('photos',{id,data:currentPhotoB64});
-  wines.unshift(wine);currentPhotoB64=null;
+  // Update or insert in wines array
+  const idx=wines.findIndex(w=>w.id===id);
+  if(idx>=0)wines[idx]=wine; else wines.unshift(wine);
+  currentPhotoB64=null;
+  renderAll();
   goList();
+  showToast('Wein gespeichert ✓');
 }
 
 // ── Map ─────────────────────────────────────────────────
@@ -1013,7 +1055,7 @@ let d3Loaded=false;let topoLoaded=false;let worldData=null;let currentDrillCount
 function renderMapView(el){
   el.innerHTML=`
     <div style="position:relative">
-      <div id="map-svg-container" style="width:100%;height:280px;background:#120B10;overflow:hidden;position:relative;touch-action:none">
+      <div id="map-svg-container" style="width:100%;background:#120B10;overflow:hidden;position:relative;touch-action:none">
         <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8a95;flex-direction:column;gap:8px"><i class="ti ti-map-2" style="font-size:28px;opacity:.4"></i>Weltkarte lädt…</div>
       </div>
       <div id="map-back-btn" style="position:absolute;top:10px;left:10px;display:none">
@@ -1074,7 +1116,8 @@ const GEO_REGIONS={
 function showStaticRegionMap(countryName){
   const container=document.getElementById('map-svg-container');if(!container)return;
   const loading=document.getElementById('map-loading');if(loading)loading.style.display='none';
-  container.style.height='400px';
+  container.style.height='auto';
+  container.style.minHeight='280px';
   const cw=getCountryWines();
   const myR=new Set((cw[countryName]||[]).map(w=>w.region).filter(Boolean));
   const hasW=id=>[...myR].some(mr=>mr.toLowerCase().includes(id.toLowerCase())||id.toLowerCase().includes(mr.toLowerCase()));
@@ -1095,7 +1138,7 @@ function showStaticRegionMap(countryName){
       const a=w*h;
       return a>2500?5.5:a>1000?4.8:a>400?4.2:a>150?3.8:0;
     };
-    return`<svg viewBox="${vb}" width="${W}" height="${H}" style="display:block">
+    return`<svg viewBox="${vb}" width="100%" style="display:block;max-width:100%">
     <defs>${regions.map(r=>`<clipPath id="cp${r.id.replace(/[^a-zA-Z0-9]/g,'_')}"><path d="${r.d}"/></clipPath>`).join('')}</defs>
     <rect width="${vb.split(' ')[2]}" height="${vb.split(' ')[3]}" fill="#120B10"/>
     ${outline}
@@ -1139,44 +1182,102 @@ function showStaticRegionMap(countryName){
   }
 
   if(countryName==='Italien'){
+    // D3 mit echtem GeoJSON für korrekte Regionsgrenzen
+    if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
     const W=container.getBoundingClientRect().width||360;
-    const outlines=`
-      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 0.0 132.2 L 10.0 145.1 L 22.5 149.3 L 35.0 145.1 L 50.0 127.9 L 62.5 119.3 L 75.0 127.9 L 85.0 145.1 L 97.5 162.1 L 102.5 174.8 L 110.0 187.4 L 115.0 200.0 L 112.5 212.5 L 115.0 229.1 L 122.5 249.7 L 127.5 266.1 L 135.0 262.0 L 147.5 253.8 L 155.0 270.2 L 160.0 282.4 L 177.5 286.4 L 185.0 302.6 L 210.0 302.6 L 225.0 381.9 L 235.0 385.8 L 247.5 374.1 L 260.0 362.3 L 265.0 342.5 L 260.0 322.6 L 247.5 310.6 L 250.0 302.6 L 260.0 290.5 L 280.0 282.4 L 297.5 278.3 L 297.5 290.5 L 247.5 220.8 L 222.5 220.8 L 205.0 200.0 L 192.5 179.0 L 182.5 157.9 L 175.0 136.5 L 147.5 136.5 L 135.0 115.0 L 122.5 97.7 L 97.5 102.0 L 72.5 115.0 L 65.0 127.9 L 57.5 132.2 L 47.5 53.7 L 35.0 49.3 L 10.0 53.7 L 0.0 67.0 Z"/>
-      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 145.0 436.2 L 155.0 436.2 L 170.0 420.8 L 185.0 420.8 L 197.5 409.2 L 217.5 397.5 L 225.0 385.8 L 227.5 374.1 L 217.5 370.1 L 197.5 370.1 L 172.5 378.0 L 155.0 381.9 L 147.5 381.9 L 132.5 397.5 L 135.0 420.8 Z"/>
-      <path fill="#2A1824" stroke="#3A2030" stroke-width="1" stroke-linejoin="round" d="M 37.5 350.4 L 45.0 358.3 L 55.0 354.4 L 65.0 342.5 L 72.5 330.6 L 80.0 310.6 L 82.5 282.4 L 77.5 262.0 L 72.5 249.7 L 65.0 241.5 L 55.0 245.6 L 47.5 253.8 L 40.0 266.1 L 35.0 282.4 L 32.5 302.6 L 35.0 330.6 Z"/>`;
-    const regions=[
-      {id:"Valle d'Aosta",f:PL.W,d:'M 0.0 67.0 L 32.5 67.0 L 32.5 49.3 L 15.0 49.3 L 0.0 53.7 Z',lx:16,ly:58,lb:"V.d'Aosta"},
-      {id:'Piemont',f:PL.P,d:'M 0.0 132.2 L 57.5 132.2 L 57.5 102.0 L 37.5 67.0 L 32.5 67.0 L 0.0 71.4 Z',lx:30,ly:97},
-      {id:'Ligurien',f:PL.C,d:'M 0.0 145.1 L 72.5 145.1 L 72.5 132.2 L 60.0 127.9 L 35.0 132.2 L 5.0 136.5 Z',lx:38,ly:138},
-      {id:'Lombardei',f:PL.P,d:'M 57.5 132.2 L 107.5 132.2 L 107.5 102.0 L 110.0 58.2 L 97.5 27.0 L 72.5 27.0 L 55.0 40.4 L 37.5 67.0 L 57.5 102.0 Z',lx:75,ly:82},
-      {id:'Trentino-Südtirol',f:PL.V,d:'M 107.5 132.2 L 147.5 132.2 L 147.5 62.6 L 135.0 0.0 L 110.0 4.5 L 95.0 13.5 L 92.5 40.4 L 107.5 102.0 Z',lx:118,ly:57,lb:'Trentino-S.'},
-      {id:'Venetien',f:PL.W,d:'M 107.5 132.2 L 147.5 132.2 L 147.5 62.6 L 122.5 27.0 L 107.5 40.4 Z',lx:123,ly:94},
-      {id:'Friaul',f:PL.C,d:'M 147.5 132.2 L 185.0 132.2 L 185.0 49.3 L 172.5 22.5 L 155.0 18.0 L 145.0 36.0 L 147.5 62.6 Z',lx:161,ly:76},
-      {id:'Emilia-Romagna',f:PL.O,d:'M 72.5 145.1 L 185.0 145.1 L 172.5 136.5 L 147.5 127.9 L 122.5 136.5 L 97.5 140.8 L 72.5 136.5 Z',lx:125,ly:139,lb:'Emilia-R.'},
-      {id:'Toskana',f:PL.K,d:'M 72.5 145.1 L 185.0 145.1 L 172.5 200.0 L 135.0 212.5 L 120.0 220.8 L 97.5 195.8 L 75.0 170.6 Z',lx:118,ly:175},
-      {id:'Umbrien',f:PL.V,d:'M 135.0 212.5 L 172.5 212.5 L 180.0 179.0 L 172.5 157.9 L 172.5 145.1 L 185.0 145.1 L 172.5 200.0 Z',lx:162,ly:185},
-      {id:'Marken',f:PL.C,d:'M 185.0 145.1 L 185.0 179.0 L 172.5 200.0 L 172.5 157.9 L 172.5 145.1 Z',lx:178,ly:165},
-      {id:'Lazio',f:PL.P,d:'M 120.0 253.8 L 180.0 253.8 L 185.0 220.8 L 172.5 200.0 L 172.5 212.5 L 135.0 212.5 L 122.5 220.8 L 115.0 233.3 Z',lx:150,ly:225},
-      {id:'Abruzzen',f:PL.W,d:'M 160.0 204.2 L 205.0 204.2 L 210.0 237.4 L 185.0 253.8 L 160.0 237.4 Z',lx:184,ly:228},
-      {id:'Molise',f:PL.K,d:'M 180.0 253.8 L 215.0 253.8 L 222.5 229.1 L 205.0 220.8 L 185.0 220.8 L 180.0 237.4 Z',lx:198,ly:240},
-      {id:'Kampanien',f:PL.O,d:'M 180.0 294.5 L 235.0 294.5 L 240.0 262.0 L 222.5 249.7 L 197.5 253.8 L 185.0 220.8 L 180.0 253.8 Z',lx:203,ly:262},
-      {id:'Basilicata',f:PL.V,d:'M 217.5 302.6 L 255.0 302.6 L 257.5 282.4 L 242.5 266.1 L 222.5 270.2 L 210.0 282.4 Z',lx:234,ly:285},
-      {id:'Apulien',f:PL.P,d:'M 210.0 310.6 L 295.0 310.6 L 297.5 290.5 L 272.5 249.7 L 247.5 229.1 L 230.0 229.1 L 210.0 253.8 L 205.0 282.4 Z',lx:252,ly:272},
-      {id:'Kalabrien',f:PL.C,d:'M 225.0 385.8 L 250.0 385.8 L 260.0 362.3 L 250.0 326.6 L 235.0 306.6 L 222.5 310.6 L 217.5 334.6 L 225.0 362.3 Z',lx:236,ly:348},
-      {id:'Sizilien',f:PL.W,d:'M 145.0 436.2 L 227.5 436.2 L 230.0 389.7 L 197.5 370.1 L 147.5 374.1 L 132.5 397.5 L 135.0 424.6 Z',lx:180,ly:406},
-      {id:'Sardinien',f:PL.V,d:'M 37.5 350.4 L 80.0 350.4 L 82.5 298.5 L 72.5 249.7 L 47.5 249.7 L 35.0 282.4 L 32.5 322.6 Z',lx:55,ly:304},
-    ];
-    const cities=[
-      {n:'Turin',x:27,y:90},{n:'Mailand',x:65,y:73},{n:'Venedig',x:141,y:73},
-      {n:'Genua',x:58,y:119},{n:'Bologna',x:118,y:115},{n:'Florenz',x:116,y:146},
-      {n:'Rom',x:147,y:225},{n:'Neapel',x:191,y:268},{n:'Palermo',x:169,y:378},
-      {n:'Bari',x:257,y:257},{n:'Cagliari',x:55,y:334},
-    ];
-    container.innerHTML=svg('0 0 300 440',W,440,outlines,regions,cities);
+    const H=Math.round(W*1.35);
+    container.style.height=H+'px';
+    container.innerHTML='';
+
+    // Farben und Metadaten pro Region
+    const IT_META={
+      'Piemonte':{f:'#F7A07A',id:'Piemont',grape:'Nebbiolo, Barbera, Dolcetto'},
+      "Valle d'Aosta":{f:"#E9F056",id:"Valle d'Aosta",grape:"Petite Arvine, Cornalin"},
+      'Liguria':{f:'#D7EFFF',id:'Ligurien',grape:'Vermentino, Rossese'},
+      'Lombardia':{f:'#F7A07A',id:'Lombardei',grape:'Nebbiolo, Chardonnay, Pinot Nero'},
+      'Trentino-Alto Adige':{f:'#AEB8A0',id:'Trentino-Südtirol',grape:'Vernatsch, Lagrein, Gewürztraminer'},
+      'Veneto':{f:'#E9F056',id:'Venetien',grape:'Garganega, Glera, Corvina'},
+      'Friuli-Venezia Giulia':{f:'#D7EFFF',id:'Friaul',grape:'Friulano, Pinot Grigio, Refosco'},
+      'Emilia-Romagna':{f:'#F75C54',id:'Emilia-Romagna',grape:'Sangiovese, Lambrusco, Albana'},
+      'Toscana':{f:'#351E28',id:'Toskana',grape:'Sangiovese, Vernaccia, Cabernet'},
+      'Umbria':{f:'#AEB8A0',id:'Umbrien',grape:'Sagrantino, Sangiovese, Grechetto'},
+      'Marche':{f:'#D7EFFF',id:'Marken',grape:'Verdicchio, Montepulciano'},
+      'Lazio':{f:'#F7A07A',id:'Lazio',grape:'Malvasia, Trebbiano, Cesanese'},
+      'Abruzzo':{f:'#E9F056',id:'Abruzzen',grape:'Montepulciano, Trebbiano'},
+      'Molise':{f:'#351E28',id:'Molise',grape:'Montepulciano, Tintilia'},
+      'Campania':{f:'#F75C54',id:'Kampanien',grape:'Aglianico, Fiano, Greco'},
+      'Basilicata':{f:'#AEB8A0',id:'Basilicata',grape:'Aglianico, Sangiovese'},
+      'Puglia':{f:'#F7A07A',id:'Apulien',grape:'Primitivo, Negroamaro, Verdeca'},
+      'Calabria':{f:'#D7EFFF',id:'Kalabrien',grape:'Gaglioppo, Greco Nero'},
+      "Sicilia":{f:"#E9F056",id:"Sizilien",grape:"Nero d'Avola, Grillo, Nerello Mascalese"},
+      'Sardegna':{f:'#AEB8A0',id:'Sardinien',grape:'Cannonau, Vermentino, Carignano'},
+    };
+
+    const svg=d3.select(container).append('svg')
+      .attr('width',W).attr('height',H).style('display','block');
+    svg.append('rect').attr('width',W).attr('height',H).attr('fill','#120B10');
+
+    const countryWines=getCountryWines();
+    const myR=new Set((countryWines['Italien']||[]).map(w=>w.region).filter(Boolean));
+    const hasW=id=>[...myR].some(mr=>mr.toLowerCase().includes(id.toLowerCase())||id.toLowerCase().includes(mr.toLowerCase()));
+
+    fetch('https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson')
+      .then(r=>r.json())
+      .then(geo=>{
+        const proj=d3.geoMercator().fitSize([W,H],geo);
+        const path=d3.geoPath().projection(proj);
+
+        geo.features.forEach(f=>{
+          const name=f.properties.reg_name||f.properties.name||'';
+          const meta=IT_META[name]||{f:'#444',id:name,grape:''};
+          const hw=hasW(meta.id);
+
+          svg.append('path').datum(f).attr('d',path)
+            .attr('fill',meta.f).attr('stroke','#120B10').attr('stroke-width',0.8)
+            .attr('opacity',hw?1:0.7).style('cursor','pointer')
+            .on('click',()=>selectSvgRegion('Italien',meta.id,meta.f));
+
+          const c=path.centroid(f);
+          if(c&&!isNaN(c[0])){
+            const label=meta.id.length>12?meta.id.replace('-Südtirol','-S.').replace('Emilia-Romagna','Emilia-R.'):meta.id;
+            svg.append('text').attr('x',c[0]).attr('y',c[1])
+              .attr('text-anchor','middle').attr('dominant-baseline','middle')
+              .style('font-size','5.5px').style('font-weight','700')
+              .style('fill',meta.f==='#351E28'||meta.f==='#120B10'?'#E9F056':'#1C1018')
+              .style('pointer-events','none').style('font-family','sans-serif')
+              .text(label);
+          }
+        });
+
+        // Städte
+        const cities=[
+          {n:'Turin',lon:7.68,lat:45.07},{n:'Mailand',lon:9.19,lat:45.46},
+          {n:'Venedig',lon:12.33,lat:45.44},{n:'Genua',lon:8.93,lat:44.41},
+          {n:'Bologna',lon:11.34,lat:44.49},{n:'Florenz',lon:11.25,lat:43.77},
+          {n:'Rom',lon:12.49,lat:41.90},{n:'Neapel',lon:14.25,lat:40.84},
+          {n:'Palermo',lon:13.36,lat:38.11},{n:'Bari',lon:16.87,lat:41.12},
+          {n:'Cagliari',lon:9.11,lat:39.22},
+        ];
+        cities.forEach(city=>{
+          const [cx,cy]=proj([city.lon,city.lat]);
+          svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',2).attr('fill','#F5F2EC');
+          svg.append('text').attr('x',cx+3.5).attr('y',cy+1)
+            .style('font-size','5px').style('fill','#F5F2EC')
+            .style('font-family','sans-serif').style('pointer-events','none')
+            .text(city.n);
+        });
+      })
+      .catch(()=>{
+        // Fallback: zeige Fehlermeldung
+        svg.append('text').attr('x',W/2).attr('y',H/2)
+          .attr('text-anchor','middle').style('font-size','12px')
+          .style('fill','#6A6458').style('font-family','sans-serif')
+          .text('Karte lädt...');
+      });
     return;
   }
 
-  // Andere Länder — D3
+    // Andere Länder — D3
   if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
   const W=container.getBoundingClientRect().width||360;const H=380;
   const geoRegions=GEO_REGIONS[countryName];if(!geoRegions)return;
@@ -1481,13 +1582,50 @@ function renderExportView(el){
 
 // Swipe back on detail screen
 (function(){
-  let sx=0,sy=0;
-  document.addEventListener('touchstart',e=>{if(document.getElementById('screen-detail').classList.contains('active')||document.getElementById('screen-add').classList.contains('active')){sx=e.touches[0].clientX;sy=e.touches[0].clientY;}},{passive:true});
+  // Robust swipe-back for all screens
+  let _sx=0,_sy=0,_sActive=false;
+
+  function _getActiveBack(){
+    if(document.getElementById('screen-detail').classList.contains('active')) return goList;
+    if(document.getElementById('screen-add').classList.contains('active')) return cancelAdd;
+    // Check filtered wine list with back button visible
+    const backBtn=document.querySelector('#tab-liste .btn-ghost');
+    if(backBtn&&document.getElementById('tab-liste').style.display!=='none') return backToHome;
+    return null;
+  }
+
+  document.addEventListener('touchstart',e=>{
+    const fn=_getActiveBack();
+    if(!fn)return;
+    _sx=e.touches[0].clientX;
+    _sy=e.touches[0].clientY;
+    _sActive=_sx<40; // only trigger if starting from left edge (0-40px)
+  },{passive:true});
+
+  document.addEventListener('touchmove',e=>{
+    if(!_sActive)return;
+    const dx=e.touches[0].clientX-_sx;
+    if(dx>10){
+      // Show subtle swipe indicator
+      const app=document.getElementById('app');
+      app.style.transform=`translateX(${Math.min(dx*0.3,40)}px)`;
+      app.style.transition='none';
+    }
+  },{passive:true});
+
   document.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-sx,dy=Math.abs(e.changedTouches[0].clientY-sy);
-    if(dx>60&&dy<50){
-      if(document.getElementById('screen-detail').classList.contains('active'))goList();
-      else if(document.getElementById('screen-add').classList.contains('active'))cancelAdd();
+    const app=document.getElementById('app');
+    app.style.transform='';
+    app.style.transition='transform .2s ease';
+    setTimeout(()=>app.style.transition='',200);
+
+    if(!_sActive){_sActive=false;return;}
+    const dx=e.changedTouches[0].clientX-_sx;
+    const dy=Math.abs(e.changedTouches[0].clientY-_sy);
+    _sActive=false;
+    if(dx>50&&dy<80){
+      const fn=_getActiveBack();
+      if(fn)fn();
     }
   },{passive:true});
 })();
@@ -1755,19 +1893,6 @@ function acSelect(field,value){
   const input=document.getElementById('f-'+field);if(input)input.value=value;
   const dd=document.getElementById('ac-'+field);if(dd)dd.classList.remove('show');
 }
-
-// Swipe back gesture on detail screen
-(function(){
-  let startX=0,startY=0;
-  document.getElementById('screen-detail').addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;startY=e.touches[0].clientY;
-  },{passive:true});
-  document.getElementById('screen-detail').addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-startX;
-    const dy=Math.abs(e.changedTouches[0].clientY-startY);
-    if(dx>60&&dy<50)goList();
-  },{passive:true});
-})();
 
 init();
 
