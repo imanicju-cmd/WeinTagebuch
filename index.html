@@ -1550,6 +1550,193 @@ function showStaticRegionMap(countryName){
     return;
   }
 
+  
+  // ── Generische D3-Karte für alle Weinländer ─────────────────────
+  const COUNTRY_GEO={
+    'Frankreich':{
+      url:'https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions.geojson',
+      nameProp:'nom',
+      meta:{
+        'Île-de-France':{f:'#2A1824',id:'',grape:''},
+        'Nouvelle-Aquitaine':{f:'#351E28',id:'Bordeaux',grape:'Cab. Sauvignon, Merlot, Cab. Franc'},
+        'Bourgogne-Franche-Comté':{f:'#E9F056',id:'Burgund',grape:'Pinot Noir, Chardonnay'},
+        'Grand Est':{f:'#D7EFFF',id:'Elsass/Champagne',grape:'Riesling, Gewürztraminer, Pinot Noir'},
+        'Auvergne-Rhône-Alpes':{f:'#F75C54',id:'Rhône',grape:'Syrah, Grenache, Viognier'},
+        "Provence-Alpes-Côte d'Azur":{f:'#F7A07A',id:'Provence',grape:'Grenache, Mourvèdre, Rosé'},
+        'Occitanie':{f:'#AEB8A0',id:'Languedoc-Roussillon',grape:'Grenache, Syrah, Carignan'},
+        'Pays de la Loire':{f:'#C4A882',id:'Loire',grape:'Chenin Blanc, Cab. Franc, Muscadet'},
+        'Centre-Val de Loire':{f:'#C4A882',id:'Loire',grape:'Sauvignon Blanc, Cab. Franc'},
+        'Bretagne':{f:'#2A1824',id:'',grape:''},
+        'Normandie':{f:'#2A1824',id:'',grape:''},
+        'Hauts-de-France':{f:'#2A1824',id:'',grape:''},
+        'Corse':{f:'#AEB8A0',id:'Korsika',grape:'Nielluccio, Vermentino'},
+      }
+    },
+    'Spanien':{
+      url:'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/spain-communities.geojson',
+      nameProp:'name',
+      meta:{
+        'La Rioja':{f:'#F75C54',id:'Rioja',grape:'Tempranillo, Garnacha'},
+        'Castilla-Leon':{f:'#E9F056',id:'Ribera del Duero',grape:'Tempranillo, Albariño'},
+        'Cataluña':{f:'#F7A07A',id:'Priorat/Penedès',grape:'Grenache, Carignan, Cava'},
+        'Galicia':{f:'#D7EFFF',id:'Rías Baixas',grape:'Albariño'},
+        'Aragon':{f:'#AEB8A0',id:'Cariñena',grape:'Garnacha, Tempranillo'},
+        'Castilla-La Mancha':{f:'#C4A882',id:'La Mancha/Priorat',grape:'Airén, Tempranillo'},
+        'Extremadura':{f:'#AEB8A0',id:'Ribera del Guadiana',grape:'Tempranillo'},
+        'Andalucia':{f:'#351E28',id:'Jerez/Sherry',grape:'Palomino, Pedro Ximénez'},
+        'Valencia':{f:'#F7A07A',id:'Valencia/Alicante',grape:'Bobal, Monastrell'},
+        'Navarra':{f:'#D7EFFF',id:'Navarra',grape:'Garnacha, Tempranillo'},
+        'Pais Vasco':{f:'#AEB8A0',id:'Txakoli',grape:'Hondarrabi Zuri'},
+        'Murcia':{f:'#C4A882',id:'Jumilla',grape:'Monastrell'},
+        'Islas Baleares':{f:'#AEB8A0',id:'Balearen',grape:'Manto Negro'},
+        'Islas Canarias':{f:'#F75C54',id:'Kanarische Inseln',grape:'Listán Negro, Malvasía'},
+        'Asturias':{f:'#2A1824',id:'',grape:''},
+        'Cantabria':{f:'#2A1824',id:'',grape:''},
+        'Madrid':{f:'#2A1824',id:'Vinos de Madrid',grape:'Tempranillo, Malvar'},
+      }
+    },
+    'Österreich':{
+      url:'https://raw.githubusercontent.com/ginseng666/GeoJSON-TopoJSON-Austria/master/2021/simplified-99.5/laender_995_geo.json',
+      nameProp:'name',
+      meta:{
+        'Niederösterreich':{f:'#E9F056',id:'Wachau/Kamptal/Kremstal',grape:'Grüner Veltliner, Riesling'},
+        'Burgenland':{f:'#F75C54',id:'Burgenland',grape:'Blaufränkisch, Zweigelt'},
+        'Steiermark':{f:'#AEB8A0',id:'Steiermark',grape:'Sauvignon Blanc, Welschriesling'},
+        'Wien':{f:'#D7EFFF',id:'Wien',grape:'Grüner Veltliner, Riesling'},
+        'Oberösterreich':{f:'#2A1824',id:'',grape:''},
+        'Salzburg':{f:'#2A1824',id:'',grape:''},
+        'Tirol':{f:'#2A1824',id:'',grape:''},
+        'Vorarlberg':{f:'#2A1824',id:'',grape:''},
+        'Kärnten':{f:'#2A1824',id:'',grape:''},
+      }
+    },
+    'USA':{
+      url:'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json',
+      nameProp:'name',
+      meta:{
+        'California':{f:'#F75C54',id:'Napa Valley/Sonoma',grape:'Cab. Sauvignon, Pinot Noir, Chardonnay'},
+        'Oregon':{f:'#AEB8A0',id:'Willamette Valley',grape:'Pinot Noir, Pinot Gris'},
+        'Washington':{f:'#D7EFFF',id:'Columbia Valley',grape:'Cab. Sauvignon, Riesling'},
+        'New York':{f:'#E9F056',id:'Finger Lakes',grape:'Riesling, Cab. Franc'},
+        'Texas':{f:'#F7A07A',id:'Texas Hill Country',grape:'Tempranillo, Cab. Sauvignon'},
+        'Virginia':{f:'#C4A882',id:'Virginia',grape:'Cab. Franc, Viognier'},
+      }
+    },
+    'Australien':{
+      url:'https://raw.githubusercontent.com/tonywr71/GeoJson-Data/master/australian-states.min.geojson',
+      nameProp:'STATE_NAME',
+      meta:{
+        'South Australia':{f:'#F75C54',id:'Barossa Valley/Clare Valley',grape:'Shiraz, Cab. Sauvignon, Riesling'},
+        'Victoria':{f:'#E9F056',id:'Yarra Valley/Rutherglen',grape:'Pinot Noir, Shiraz, Chardonnay'},
+        'New South Wales':{f:'#F7A07A',id:'Hunter Valley',grape:'Semillon, Shiraz'},
+        'Western Australia':{f:'#AEB8A0',id:'Margaret River',grape:'Cab. Sauvignon, Chardonnay'},
+        'Tasmania':{f:'#D7EFFF',id:'Tasmanien',grape:'Pinot Noir, Chardonnay'},
+        'Queensland':{f:'#2A1824',id:'',grape:''},
+        'Northern Territory':{f:'#2A1824',id:'',grape:''},
+        'Australian Capital Territory':{f:'#2A1824',id:'',grape:''},
+      }
+    },
+    'Chile':{
+      url:'https://raw.githubusercontent.com/fcortes/Chile-GeoJSON/master/Regional.geojson',
+      nameProp:'Region',
+      meta:{
+        'Región de Coquimbo':{f:'#D7EFFF',id:'Elqui/Limarí',grape:'Syrah, Muscat'},
+        "Región de Valparaíso":{f:'#E9F056',id:'Aconcagua/Casablanca',grape:'Cab. Sauvignon, Sauvignon Blanc'},
+        "Región Metropolitana de Santiago":{f:'#F75C54',id:'Maipo Valley',grape:'Cab. Sauvignon, Carménère'},
+        "Región del Libertador Gral. Bernardo O'Higgins":{f:'#F7A07A',id:'Rapel Valley',grape:'Carménère, Merlot'},
+        "Región del Maule":{f:'#AEB8A0',id:'Maule Valley',grape:'Carménère, Cab. Sauvignon'},
+        "Región del Biobío":{f:'#C4A882',id:'Bio Bio',grape:'Pinot Noir, Riesling'},
+        "Región de La Araucanía":{f:'#AEB8A0',id:'Araucanía',grape:'Pinot Noir'},
+      }
+    },
+  };
+
+  const countryName_country=countryName;
+  if(COUNTRY_GEO[countryName_country]){
+    if(!d3Loaded){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
+    const cfg=COUNTRY_GEO[countryName_country];
+    const W=container.getBoundingClientRect().width||360;
+    const H=Math.round(W*1.2);
+    container.style.height=H+'px';
+    container.innerHTML='';
+
+    const svgC=d3.select(container).append('svg')
+      .attr('width',W).attr('height',H).style('display','block');
+    svgC.append('rect').attr('width',W).attr('height',H).attr('fill','#120B10');
+    const gC=svgC.append('g');
+    const zoomC=d3.zoom().scaleExtent([1,8]).on('zoom',e=>gC.attr('transform',e.transform));
+    svgC.call(zoomC).on('dblclick.zoom',null);
+
+    const countryWinesC=getCountryWines();
+    const myRC=new Set((countryWinesC[countryName_country]||[]).map(w=>w.region).filter(Boolean));
+    const hasWC=id=>[...myRC].some(mr=>mr.toLowerCase().includes((id||'').toLowerCase())||(id||'').toLowerCase().includes(mr.toLowerCase()));
+
+    fetch(cfg.url)
+      .then(r=>r.json())
+      .then(geo=>{
+        const proj=d3.geoMercator().fitSize([W-20,H-20],geo).translate([W/2,H/2]);
+        const path=d3.geoPath().projection(proj);
+
+        geo.features.forEach(f=>{
+          const regionName=f.properties[cfg.nameProp]||'';
+          const meta=cfg.meta[regionName]||{f:null,id:regionName,grape:''};
+          const isWein=!!meta.f;
+          const myW=meta.id?hasWC(meta.id):false;
+
+          gC.append('path').datum(f).attr('d',path)
+            .attr('fill',meta.f||'#2A1824')
+            .attr('stroke','#120B10').attr('stroke-width',0.6)
+            .attr('opacity',isWein?(myW?1:0.72):0.3)
+            .style('cursor',isWein?'pointer':'default')
+            .on('click',()=>{if(isWein)selectSvgRegion(countryName_country,meta.id||regionName,meta.f);});
+
+          if(isWein){
+            const cent=path.centroid(f);
+            if(cent&&!isNaN(cent[0])&&cent[0]>0&&cent[1]>0){
+              const lbl=(meta.id||regionName).replace('Napa Valley/Sonoma','Napa/Sonoma')
+                .replace('Barossa Valley/Clare Valley','Barossa').replace('Wachau/Kamptal/Kremstal','Wachau');
+              gC.append('text').attr('x',cent[0]).attr('y',cent[1])
+                .attr('text-anchor','middle').attr('dominant-baseline','middle')
+                .style('font-size','5px').style('font-weight','700')
+                .style('fill',meta.f==='#E9F056'||meta.f==='#D7EFFF'?'#1C1018':'#F5F2EC')
+                .style('pointer-events','none').style('font-family','sans-serif')
+                .text(lbl);
+              if(meta.grape){
+                gC.append('text').attr('x',cent[0]).attr('y',cent[1]+8)
+                  .attr('text-anchor','middle')
+                  .style('font-size','3.5px').style('fill','rgba(245,242,236,0.55)')
+                  .style('pointer-events','none').style('font-family','sans-serif')
+                  .text(meta.grape.split(',')[0]);
+              }
+            }
+          }
+        });
+      })
+      .catch(()=>{
+        // Fallback: Länderumriss aus TopoJSON
+        if(worldData){
+          const isoMap={'Frankreich':250,'Spanien':724,'Österreich':40,'USA':840,'Australien':36,'Chile':152,'Portugal':620,'Argentinien':32,'Neuseeland':554,'Südafrika':710,'Griechenland':300};
+          const iso=isoMap[countryName_country];
+          if(iso){
+            const countries=topojson.feature(worldData,worldData.objects.countries);
+            const feat=countries.features.find(f=>+f.id===iso);
+            if(feat){
+              const proj=d3.geoMercator().fitSize([W,H],feat);
+              const path=d3.geoPath().projection(proj);
+              gC.append('path').datum(feat).attr('d',path).attr('fill','#2A1824').attr('stroke','#3A2030').attr('stroke-width',1);
+            }
+          }
+        }
+        svgC.append('text').attr('x',W/2).attr('y',H/2-10)
+          .attr('text-anchor','middle').style('font-size','11px').style('fill','#6A6458').style('font-family','sans-serif')
+          .text('Regionsdaten nicht verfügbar');
+        svgC.append('text').attr('x',W/2).attr('y',H/2+10)
+          .attr('text-anchor','middle').style('font-size','9px').style('fill','#4A4038').style('font-family','sans-serif')
+          .text('Internetverbindung prüfen');
+      });
+    return;
+  }
+
     // Andere Länder — D3
   if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
   const W=container.getBoundingClientRect().width||360;const H=380;
