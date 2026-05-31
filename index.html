@@ -318,7 +318,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 <!-- DETAIL SCREEN -->
 <div id="screen-detail" class="screen">
   <div class="topbar">
-    <button class="btn-icon btn btn-ghost" onclick="goList()" aria-label="Zurück"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn-icon btn btn-ghost" onclick="navBack()" aria-label="Zurück"><i class="ti ti-arrow-left"></i></button>
     <div class="topbar-title" id="detail-topbar"></div>
     <div style="display:flex;gap:6px">
       <button class="btn btn-ghost btn-icon" onclick="editCurrentWine()"><i class="ti ti-pencil"></i></button>
@@ -810,6 +810,20 @@ function renderAll(){renderStats();renderTypeTiles();}
 
 
 // ── Navigation ──────────────────────────────────────────
+// Navigation history
+const navStack=[];
+function navPush(screen,data){navStack.push({screen,data});}
+function navBack(){
+  if(navStack.length>0){
+    const prev=navStack.pop();
+    if(prev.screen==='list'){switchMainTab('list');if(prev.data)applyListFilter(prev.data);}
+    else if(prev.screen==='home'){switchMainTab('home');}
+    else if(prev.screen==='map'){switchMainTab('map');}
+  } else {
+    goList();
+  }
+}
+
 function goList(){switchMainTab('home');renderAll();}
 function cancelAdd(){showScreen('list');switchMainTab('home');renderAll();}
 function goAdd(){editRating=3;aiData=null;currentPhotoB64=null;resetForm();renderAddStars();showScreen('add');}
@@ -817,6 +831,10 @@ function showScreen(s){document.querySelectorAll('.screen').forEach(x=>x.classLi
 
 // ── Detail ──────────────────────────────────────────────
 async function goDetail(id){
+  // Track where we came from
+  const activeTab=document.querySelector('.bnav-btn.active');
+  const tabId=activeTab?activeTab.dataset.tab:'home';
+  navPush(tabId==='list'?'list':tabId==='map'?'map':'home');
   currentId=id;
   const w=wines.find(x=>x.id===id);if(!w)return;
   const weingut=w.weingut||w.name;const weinname=w.weinname||'';
@@ -1149,39 +1167,112 @@ function showStaticRegionMap(countryName){
   }
 
   if(countryName==='Deutschland'){
+    if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
     const W=container.getBoundingClientRect().width||360;
-    const outline=`<path fill="#2A1824" stroke="#3A2030" stroke-width="1.2" stroke-linejoin="round" d="M 8.2 205.3 L 11.4 161.3 L 21.2 151.4 L 37.5 136.5 L 37.5 116.4 L 70.1 80.9 L 86.4 65.5 L 102.7 29.0 L 115.8 13.3 L 135.3 0.0 L 161.4 13.3 L 216.8 29.0 L 262.5 44.7 L 269.0 65.5 L 278.8 91.1 L 288.6 126.5 L 290.2 176.1 L 300.0 205.3 L 291.8 212.6 L 282.1 229.4 L 249.5 241.3 L 239.7 253.2 L 216.8 239.0 L 203.8 239.0 L 210.3 262.7 L 220.1 276.8 L 234.8 318.6 L 225.0 362.0 L 207.1 359.7 L 164.7 368.8 L 154.9 373.3 L 141.8 378.7 L 120.7 366.5 L 88.0 355.2 L 70.1 359.7 L 57.1 366.5 L 55.4 357.5 L 57.1 346.1 L 57.1 323.2 L 76.6 302.4 L 65.2 276.8 L 16.3 276.8 L 8.2 260.3 L 1.6 243.7 L 0.0 229.4 L 11.4 205.3 Z"/>`;
-    const regions=[
-      {id:'Mosel',f:PL.S,d:'M 8.2 279.1 L 39.1 282.4 L 48.9 269.7 L 45.7 254.2 L 39.1 250.8 L 31.0 254.2 L 21.2 258.9 L 9.8 265.0 L 3.3 272.1 Z',lx:27,ly:265},
-      {id:'Ahr',f:PL.O,d:'M 21.2 236.6 L 42.4 236.6 L 42.4 223.6 L 31.0 222.2 L 21.2 227.0 Z',lx:32,ly:230},
-      {id:'Mittelrhein',f:PL.C,d:'M 40.8 255.6 L 62.0 255.6 L 65.2 239.0 L 58.7 223.6 L 42.4 223.6 L 35.9 234.2 L 37.5 248.5 Z',lx:49,ly:241,lb:'M-Rhein'},
-      {id:'Nahe',f:PL.V,d:'M 45.7 269.7 L 68.5 269.7 L 71.7 257.0 L 65.2 250.8 L 50.5 254.2 L 44.0 261.7 Z',lx:58,ly:261},
-      {id:'Rheingau',f:PL.W,d:'M 65.2 257.0 L 83.8 257.0 L 87.1 249.4 L 80.5 243.7 L 68.5 246.1 L 62.9 250.8 Z',lx:75,ly:251},
-      {id:'Rheinhessen',f:PL.C,d:'M 66.2 279.1 L 86.4 279.1 L 88.0 268.3 L 86.4 257.0 L 72.7 254.2 L 66.8 254.2 L 60.3 261.7 L 62.0 273.0 Z',lx:74,ly:266},
-      {id:'Hess. Bergstraße',f:PL.K,d:'M 86.4 282.4 L 93.6 282.4 L 95.5 272.1 L 95.5 258.9 L 88.4 257.0 L 84.8 265.0 L 83.8 274.4 Z',lx:90,ly:271,lb:'H.B.'},
-      {id:'Pfalz',f:PL.O,d:'M 59.7 302.4 L 80.5 302.4 L 87.1 291.8 L 87.1 277.7 L 79.9 275.9 L 66.8 277.7 L 59.7 285.2 Z',lx:74,ly:288},
-      {id:'Baden',f:PL.V,d:'M 53.2 367.9 L 68.5 367.9 L 75.0 356.1 L 81.5 342.5 L 84.8 322.3 L 88.0 303.8 L 83.8 300.1 L 70.8 297.8 L 64.2 308.5 L 61.0 322.3 L 57.7 337.0 L 55.4 351.6 Z',lx:70,ly:332},
-      {id:'Württemberg',f:PL.K,d:'M 98.8 328.7 L 132.7 328.7 L 142.5 314.9 L 139.2 291.8 L 126.2 285.2 L 106.6 285.2 L 96.8 295.5 L 95.5 314.9 Z',lx:117,ly:308},
-      {id:'Franken',f:PL.W,d:'M 118.4 282.4 L 139.2 287.1 L 168.6 277.7 L 175.1 266.4 L 168.6 249.4 L 145.8 242.8 L 129.5 247.5 L 116.4 258.9 L 111.8 273.0 Z',lx:141,ly:265},
-      {id:'Saale-Unstrut',f:PL.O,d:'M 183.6 201.4 L 211.0 201.4 L 214.2 186.8 L 201.2 178.5 L 186.8 182.0 L 181.6 191.7 Z',lx:196,ly:191,lb:'Saale-U.'},
-      {id:'Sachsen',f:PL.V,d:'M 242.3 206.3 L 263.2 206.3 L 265.1 194.6 L 256.6 188.3 L 242.3 191.7 L 239.0 199.5 Z',lx:251,ly:199},
+    const H=Math.round(W*1.2);
+    container.style.height=H+'px';
+    container.innerHTML='';
+
+    const DE_META={
+      'Rheinland-Pfalz':{f:'#C4A882',id:'Mosel',label:'Mosel/RLP',grape:'Riesling, Elbling'},
+      'Bayern':{f:'#E9F056',id:'Franken',label:'Franken/Bay.',grape:'Silvaner, Müller-Thurgau'},
+      'Baden-Württemberg':{f:'#AEB8A0',id:'Baden-Württemberg',label:'Baden-Württ.',grape:'Spätburgunder, Riesling'},
+      'Hessen':{f:'#D7EFFF',id:'Rheingau/Hessen',label:'Rheingau',grape:'Riesling'},
+      'Sachsen-Anhalt':{f:'#F75C54',id:'Saale-Unstrut',label:'Saale-Unstrut',grape:'Müller-Thurgau, Silvaner'},
+      'Sachsen':{f:'#AEB8A0',id:'Sachsen',label:'Sachsen',grape:'Müller-Thurgau, Riesling'},
+      'Saarland':{f:'#C4A882',id:'Mosel',label:'Saarland',grape:'Riesling'},
+      'Nordrhein-Westfalen':{f:'#351E28',id:'Ahr/Mittelrhein',label:'NRW',grape:'Spätburgunder, Riesling'},
+      'Brandenburg':{f:'#2A1824',id:'',label:'Brandenburg',grape:''},
+      'Mecklenburg-Vorpommern':{f:'#2A1824',id:'',label:'',grape:''},
+      'Niedersachsen':{f:'#2A1824',id:'',label:'',grape:''},
+      'Schleswig-Holstein':{f:'#2A1824',id:'',label:'',grape:''},
+      'Hamburg':{f:'#2A1824',id:'',label:'',grape:''},
+      'Bremen':{f:'#2A1824',id:'',label:'',grape:''},
+      'Berlin':{f:'#2A1824',id:'',label:'',grape:''},
+      'Thüringen':{f:'#2A1824',id:'',label:'',grape:''},
+    };
+
+    // Individual wine regions as GeoJSON points (Anbaugebiete)
+    const WEINREGIONEN=[
+      {id:'Mosel',f:'#C4A882',lon:7.1,lat:50.0,grape:'Riesling, Elbling, Müller-Thurgau'},
+      {id:'Ahr',f:'#F75C54',lon:6.9,lat:50.5,grape:'Spätburgunder'},
+      {id:'Mittelrhein',f:'#D7EFFF',lon:7.6,lat:50.2,grape:'Riesling'},
+      {id:'Nahe',f:'#AEB8A0',lon:7.8,lat:49.8,grape:'Riesling, Müller-Thurgau'},
+      {id:'Rheingau',f:'#E9F056',lon:8.0,lat:50.0,grape:'Riesling, Spätburgunder'},
+      {id:'Rheinhessen',f:'#D7EFFF',lon:8.1,lat:49.7,grape:'Riesling, Silvaner'},
+      {id:'Hess. Bergstraße',f:'#351E28',lon:8.6,lat:49.6,grape:'Riesling, Grauburgunder'},
+      {id:'Pfalz',f:'#F75C54',lon:8.1,lat:49.3,grape:'Riesling, Spätburgunder, Dornfelder'},
+      {id:'Baden',f:'#AEB8A0',lon:8.0,lat:48.2,grape:'Spätburgunder, Grauburgunder'},
+      {id:'Württemberg',f:'#351E28',lon:9.4,lat:48.9,grape:'Trollinger, Lemberger, Riesling'},
+      {id:'Franken',f:'#E9F056',lon:10.1,lat:49.8,grape:'Silvaner, Müller-Thurgau'},
+      {id:'Saale-Unstrut',f:'#F75C54',lon:11.8,lat:51.2,grape:'Müller-Thurgau, Silvaner'},
+      {id:'Sachsen',f:'#AEB8A0',lon:13.5,lat:51.1,grape:'Müller-Thurgau, Riesling'},
     ];
-    const extras=[
-      {id:'Saale-Unstrut',f:PL.O,d:'M 176 197 L 185 194 L 187 200 L 183 205 L 176 203 Z'},
-      {id:'Sachsen',f:PL.V,d:'M 237 204 L 243 201 L 245 207 L 241 211 L 236 208 Z'},
-    ];
+
+    const countries=topojson.feature(worldData,worldData.objects.countries);
+    const deFeature=countries.features.find(f=>+f.id===276);
+    if(!deFeature)return;
+
+    const proj=d3.geoMercator().fitSize([W,H],deFeature);
+    const path=d3.geoPath().projection(proj);
+
+    const svg2=d3.select(container).append('svg')
+      .attr('width',W).attr('height',H).style('display','block');
+    svg2.append('rect').attr('width',W).attr('height',H).attr('fill','#120B10');
+    const gDE=svg2.append('g');
+    const zoomDE=d3.zoom().scaleExtent([1,8]).on('zoom',e=>gDE.attr('transform',e.transform));
+    svg2.call(zoomDE).on('dblclick.zoom',null);
+
+    // Deutschland Umriss
+    gDE.append('path').datum(deFeature).attr('d',path)
+      .attr('fill','#2A1824').attr('stroke','#3A2030').attr('stroke-width',1);
+
+    const countryWines=getCountryWines();
+    const myR=new Set((countryWines['Deutschland']||[]).map(w=>w.region).filter(Boolean));
+    const hasW=id=>[...myR].some(mr=>mr.toLowerCase().includes(id.toLowerCase())||id.toLowerCase().includes(mr.toLowerCase()));
+
+    // Weinregionen als Kreise mit Label
+    WEINREGIONEN.forEach(r=>{
+      const [cx,cy]=proj([r.lon,r.lat]);
+      const hw=hasW(r.id);
+      const radius=hw?10:7;
+
+      gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius)
+        .attr('fill',r.f).attr('stroke','#120B10').attr('stroke-width',0.8)
+        .attr('opacity',hw?1:0.75).style('cursor','pointer')
+        .on('click',()=>selectSvgRegion('Deutschland',r.id,r.f));
+
+      if(hw){
+        gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius+3)
+          .attr('fill','none').attr('stroke',r.f).attr('stroke-width',1.5).attr('opacity',0.4);
+      }
+
+      const shortLabel=r.id.replace('Hess. Bergstraße','H.Berg.').replace('Mittelrhein','M-Rhein').replace('Saale-Unstrut','Saale-U.');
+      gDE.append('text').attr('x',cx).attr('y',cy+radius+8)
+        .attr('text-anchor','middle').style('font-size','5px')
+        .style('font-weight','700').style('fill','#F5F2EC')
+        .style('font-family','sans-serif').style('pointer-events','none')
+        .text(shortLabel);
+    });
+
+    // Städte
     const cities=[
-      {n:'Berlin',x:246,y:131},{n:'Hamburg',x:135,y:78},{n:'München',x:187,y:340},
-      {n:'Köln',x:36,y:208},{n:'Frankfurt',x:92,y:248},{n:'Stuttgart',x:109,y:310},
-      {n:'Würzburg',x:133,y:263},{n:'Mainz',x:66,y:252},{n:'Trier',x:11,y:263},
-      {n:'Dresden',x:257,y:203},{n:'Halle',x:200,y:182},{n:'Freiburg',x:65,y:347},
-      {n:'Nürnberg',x:171,y:279},{n:'Karlsruhe',x:88,y:300},
+      {n:'Berlin',lon:13.4,lat:52.5},{n:'Hamburg',lon:10.0,lat:53.55},
+      {n:'München',lon:11.58,lat:48.14},{n:'Köln',lon:6.96,lat:50.94},
+      {n:'Frankfurt',lon:8.68,lat:50.11},{n:'Stuttgart',lon:9.19,lat:48.78},
     ];
-    container.innerHTML=svg('0 0 300 380',W,400,outline,regions,cities,extras);
+    cities.forEach(city=>{
+      const [cx,cy]=proj([city.lon,city.lat]);
+      gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',1.8).attr('fill','#F5F2EC').attr('opacity',0.6);
+      gDE.append('text').attr('x',cx+3).attr('y',cy+1)
+        .style('font-size','4.5px').style('fill','rgba(245,242,236,0.6)')
+        .style('font-family','sans-serif').style('pointer-events','none')
+        .text(city.n);
+    });
     return;
   }
 
-  if(countryName==='Italien'){
+    if(countryName==='Italien'){
     // D3 mit echtem GeoJSON für korrekte Regionsgrenzen
     if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
     const W=container.getBoundingClientRect().width||360;
