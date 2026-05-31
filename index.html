@@ -302,7 +302,16 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   </div>
 
   <!-- KARTE TAB -->
-  <div id="tab-karte" class="scroll-body" style="display:none"><div id="karte-content" class="map-wrap"></div></div>
+  <div id="tab-karte" class="scroll-body" style="display:none">
+    <div style="padding:12px 16px 8px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:0.5px solid var(--border)">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-input" id="map-search-input" placeholder="Land oder Anbaugebiet suchen…" oninput="filterMapSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+    </div>
+    <div id="map-search-results" style="display:none;padding:8px 0"></div>
+    <div id="karte-content" class="map-wrap"></div>
+  </div>
 
   <!-- EXPORT TAB -->
   <div id="tab-export" class="scroll-body" style="display:none"><div id="export-content"></div></div>
@@ -1070,6 +1079,163 @@ function saveRegionInfo(country,region,grape,soil,desc,klass){
 
 let d3Loaded=false;let topoLoaded=false;let worldData=null;let currentDrillCountry=null;
 
+// ── Karten-Suche ─────────────────────────────────────────────────
+const MAP_SEARCH_INDEX=[
+  // Länder
+  {type:'land',name:'Deutschland',flag:'🇩🇪',sub:''},
+  {type:'land',name:'Italien',flag:'🇮🇹',sub:''},
+  {type:'land',name:'Frankreich',flag:'🇫🇷',sub:''},
+  {type:'land',name:'Spanien',flag:'🇪🇸',sub:''},
+  {type:'land',name:'Österreich',flag:'🇦🇹',sub:''},
+  {type:'land',name:'Portugal',flag:'🇵🇹',sub:''},
+  {type:'land',name:'USA',flag:'🇺🇸',sub:''},
+  {type:'land',name:'Argentinien',flag:'🇦🇷',sub:''},
+  {type:'land',name:'Chile',flag:'🇨🇱',sub:''},
+  {type:'land',name:'Australien',flag:'🇦🇺',sub:''},
+  {type:'land',name:'Neuseeland',flag:'🇳🇿',sub:''},
+  {type:'land',name:'Südafrika',flag:'🇿🇦',sub:''},
+  {type:'land',name:'Griechenland',flag:'🇬🇷',sub:''},
+  // Deutsche Anbaugebiete
+  {type:'region',name:'Mosel',flag:'🇩🇪',land:'Deutschland',sub:'Riesling, Elbling'},
+  {type:'region',name:'Ahr',flag:'🇩🇪',land:'Deutschland',sub:'Spätburgunder'},
+  {type:'region',name:'Mittelrhein',flag:'🇩🇪',land:'Deutschland',sub:'Riesling'},
+  {type:'region',name:'Nahe',flag:'🇩🇪',land:'Deutschland',sub:'Riesling'},
+  {type:'region',name:'Rheingau',flag:'🇩🇪',land:'Deutschland',sub:'Riesling'},
+  {type:'region',name:'Rheinhessen',flag:'🇩🇪',land:'Deutschland',sub:'Silvaner, Riesling'},
+  {type:'region',name:'Hess. Bergstraße',flag:'🇩🇪',land:'Deutschland',sub:'Riesling'},
+  {type:'region',name:'Pfalz',flag:'🇩🇪',land:'Deutschland',sub:'Riesling, Dornfelder'},
+  {type:'region',name:'Baden',flag:'🇩🇪',land:'Deutschland',sub:'Spätburgunder, Grauburgunder'},
+  {type:'region',name:'Württemberg',flag:'🇩🇪',land:'Deutschland',sub:'Trollinger, Lemberger'},
+  {type:'region',name:'Franken',flag:'🇩🇪',land:'Deutschland',sub:'Silvaner, Müller-Thurgau'},
+  {type:'region',name:'Saale-Unstrut',flag:'🇩🇪',land:'Deutschland',sub:'Müller-Thurgau'},
+  {type:'region',name:'Sachsen',flag:'🇩🇪',land:'Deutschland',sub:'Müller-Thurgau, Riesling'},
+  // Italienische Regionen
+  {type:'region',name:'Piemont',flag:'🇮🇹',land:'Italien',sub:'Nebbiolo, Barbera, Dolcetto'},
+  {type:'region',name:'Toskana',flag:'🇮🇹',land:'Italien',sub:'Sangiovese, Vernaccia'},
+  {type:'region',name:'Venetien',flag:'🇮🇹',land:'Italien',sub:'Prosecco, Soave, Amarone'},
+  {type:'region',name:'Emilia-Romagna',flag:'🇮🇹',land:'Italien',sub:'Lambrusco, Sangiovese'},
+  {type:'region',name:'Sizilien',flag:'🇮🇹',land:'Italien',sub:'Nero d\'Avola, Grillo'},
+  {type:'region',name:'Sardinien',flag:'🇮🇹',land:'Italien',sub:'Cannonau, Vermentino'},
+  {type:'region',name:'Kampanien',flag:'🇮🇹',land:'Italien',sub:'Aglianico, Fiano, Greco'},
+  {type:'region',name:'Apulien',flag:'🇮🇹',land:'Italien',sub:'Primitivo, Negroamaro'},
+  {type:'region',name:'Friaul',flag:'🇮🇹',land:'Italien',sub:'Friulano, Pinot Grigio'},
+  {type:'region',name:'Ligurien',flag:'🇮🇹',land:'Italien',sub:'Vermentino, Rossese'},
+  {type:'region',name:'Umbrien',flag:'🇮🇹',land:'Italien',sub:'Sagrantino, Sangiovese'},
+  {type:'region',name:'Marken',flag:'🇮🇹',land:'Italien',sub:'Verdicchio, Montepulciano'},
+  {type:'region',name:'Lazio',flag:'🇮🇹',land:'Italien',sub:'Malvasia, Trebbiano'},
+  {type:'region',name:'Abruzzen',flag:'🇮🇹',land:'Italien',sub:'Montepulciano, Trebbiano'},
+  {type:'region',name:'Lombardei',flag:'🇮🇹',land:'Italien',sub:'Nebbiolo, Pinot Nero'},
+  {type:'region',name:'Trentino-Südtirol',flag:'🇮🇹',land:'Italien',sub:'Gewürztraminer, Lagrein'},
+  {type:'region',name:'Kalabrien',flag:'🇮🇹',land:'Italien',sub:'Gaglioppo, Greco Nero'},
+  {type:'region',name:'Basilicata',flag:'🇮🇹',land:'Italien',sub:'Aglianico'},
+  {type:'region',name:'Molise',flag:'🇮🇹',land:'Italien',sub:'Montepulciano, Tintilia'},
+  // Französische
+  {type:'region',name:'Bordeaux',flag:'🇫🇷',land:'Frankreich',sub:'Cabernet Sauvignon, Merlot'},
+  {type:'region',name:'Burgund',flag:'🇫🇷',land:'Frankreich',sub:'Pinot Noir, Chardonnay'},
+  {type:'region',name:'Champagne',flag:'🇫🇷',land:'Frankreich',sub:'Pinot Noir, Chardonnay'},
+  {type:'region',name:'Rhône',flag:'🇫🇷',land:'Frankreich',sub:'Syrah, Grenache, Viognier'},
+  {type:'region',name:'Elsass',flag:'🇫🇷',land:'Frankreich',sub:'Riesling, Gewürztraminer'},
+  {type:'region',name:'Loire',flag:'🇫🇷',land:'Frankreich',sub:'Chenin Blanc, Cabernet Franc'},
+  {type:'region',name:'Provence',flag:'🇫🇷',land:'Frankreich',sub:'Grenache, Rosé'},
+  // Spanische
+  {type:'region',name:'Rioja',flag:'🇪🇸',land:'Spanien',sub:'Tempranillo'},
+  {type:'region',name:'Priorat',flag:'🇪🇸',land:'Spanien',sub:'Grenache, Carignan'},
+  {type:'region',name:'Ribera del Duero',flag:'🇪🇸',land:'Spanien',sub:'Tempranillo'},
+  {type:'region',name:'Rías Baixas',flag:'🇪🇸',land:'Spanien',sub:'Albariño'},
+  {type:'region',name:'Jerez',flag:'🇪🇸',land:'Spanien',sub:'Palomino (Sherry)'},
+  // Österreich
+  {type:'region',name:'Wachau',flag:'🇦🇹',land:'Österreich',sub:'Grüner Veltliner, Riesling'},
+  {type:'region',name:'Burgenland',flag:'🇦🇹',land:'Österreich',sub:'Blaufränkisch, Zweigelt'},
+  {type:'region',name:'Steiermark',flag:'🇦🇹',land:'Österreich',sub:'Sauvignon Blanc, Welschriesling'},
+  // Portugal
+  {type:'region',name:'Douro',flag:'🇵🇹',land:'Portugal',sub:'Touriga Nacional, Port'},
+  {type:'region',name:'Alentejo',flag:'🇵🇹',land:'Portugal',sub:'Aragonês, Trincadeira'},
+  {type:'region',name:'Vinho Verde',flag:'🇵🇹',land:'Portugal',sub:'Alvarinho, Loureiro'},
+];
+
+function filterMapSearch(q){
+  const results=document.getElementById('map-search-results');
+  const mapContent=document.getElementById('karte-content');
+  q=q.trim().toLowerCase();
+  if(!q){
+    results.style.display='none';
+    mapContent.style.display='block';
+    return;
+  }
+  mapContent.style.display='none';
+  results.style.display='block';
+
+  // Also search through user's actual wines
+  const wineMatches=wines.filter(w=>(w.region||'').toLowerCase().includes(q)||(w.country||'').toLowerCase().includes(q)||(w.name||'').toLowerCase().includes(q));
+  const indexMatches=MAP_SEARCH_INDEX.filter(e=>e.name.toLowerCase().includes(q)||(e.sub||'').toLowerCase().includes(q)||(e.land||'').toLowerCase().includes(q));
+
+  // Deduplicate and sort: exact match first, then user's wines
+  const seen=new Set();
+  const combined=[];
+  indexMatches.forEach(e=>{if(!seen.has(e.name)){seen.add(e.name);combined.push(e);}});
+
+  let html='';
+  if(combined.length===0&&wineMatches.length===0){
+    html=`<div style="padding:24px;text-align:center;color:var(--ink3);font-size:13px">Keine Ergebnisse für „${q}"</div>`;
+  } else {
+    // Index results
+    combined.forEach(e=>{
+      const myWines=wines.filter(w=>e.type==='land'?(w.country||'')===(e.name):(w.region||'')===(e.name));
+      const count=myWines.length;
+      html+=`<div onclick="mapSearchSelect('${e.type}','${e.name.replace(/'/g,"\\'")}','${(e.land||'').replace(/'/g,"\\'")}',this)" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:0.5px solid var(--border);cursor:pointer;active:background:var(--bg2)">
+        <span style="font-size:22px">${e.flag}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.2px">${e.name}</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px">${e.type==='region'?(e.land+' · '):''}${e.sub}</div>
+        </div>
+        ${count>0?`<span style="font-size:11px;font-weight:700;color:var(--wine);background:var(--wine-pale);padding:3px 8px;border-radius:100px">${count} Wein${count>1?'e':''}</span>`:''}
+        <i class="ti ti-chevron-right" style="color:var(--ink3);font-size:14px"></i>
+      </div>`;
+    });
+
+    // User wine matches not in index
+    if(wineMatches.length>0&&combined.length===0){
+      wineMatches.slice(0,5).forEach(w=>{
+        html+=`<div onclick="goDetail(${w.id})" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:0.5px solid var(--border);cursor:pointer">
+          <div style="width:36px;height:44px;background:var(--bg2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-bottle" style="color:var(--ink3)"></i></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w.name}</div>
+            <div style="font-size:10px;color:var(--ink3)">${[w.region,w.country].filter(Boolean).join(' · ')}</div>
+          </div>
+        </div>`;
+      });
+    }
+  }
+  results.innerHTML=html;
+}
+
+function mapSearchSelect(type,name,land,el){
+  // Flash selection
+  el.style.background='var(--bg2)';
+  setTimeout(()=>el.style.background='',150);
+
+  // Clear search and show map
+  document.getElementById('map-search-input').value='';
+  document.getElementById('map-search-results').style.display='none';
+  document.getElementById('karte-content').style.display='block';
+
+  if(type==='land'){
+    // Show that country's map
+    const countryCard=document.querySelector(`.map-country-card[data-country="${name}"]`);
+    if(countryCard){
+      countryCard.scrollIntoView({behavior:'smooth',block:'start'});
+      const karteBtn=countryCard.querySelector('.btn');
+      if(karteBtn)karteBtn.click();
+    }
+  } else {
+    // Show region info directly
+    selectSvgRegion(land,name,'#E9F056');
+    // Also scroll to country
+    const countryCard=document.querySelector(`.map-country-card[data-country="${land}"]`);
+    if(countryCard)countryCard.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
 function renderMapView(el){
   el.innerHTML=`
     <div style="position:relative">
@@ -1169,52 +1335,29 @@ function showStaticRegionMap(countryName){
   if(countryName==='Deutschland'){
     if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
     const W=container.getBoundingClientRect().width||360;
-    const H=Math.round(W*1.2);
+    const H=Math.round(W*1.15);
     container.style.height=H+'px';
     container.innerHTML='';
 
-    const DE_META={
-      'Rheinland-Pfalz':{f:'#C4A882',id:'Mosel',label:'Mosel/RLP',grape:'Riesling, Elbling'},
-      'Bayern':{f:'#E9F056',id:'Franken',label:'Franken/Bay.',grape:'Silvaner, Müller-Thurgau'},
-      'Baden-Württemberg':{f:'#AEB8A0',id:'Baden-Württemberg',label:'Baden-Württ.',grape:'Spätburgunder, Riesling'},
-      'Hessen':{f:'#D7EFFF',id:'Rheingau/Hessen',label:'Rheingau',grape:'Riesling'},
-      'Sachsen-Anhalt':{f:'#F75C54',id:'Saale-Unstrut',label:'Saale-Unstrut',grape:'Müller-Thurgau, Silvaner'},
-      'Sachsen':{f:'#AEB8A0',id:'Sachsen',label:'Sachsen',grape:'Müller-Thurgau, Riesling'},
-      'Saarland':{f:'#C4A882',id:'Mosel',label:'Saarland',grape:'Riesling'},
-      'Nordrhein-Westfalen':{f:'#351E28',id:'Ahr/Mittelrhein',label:'NRW',grape:'Spätburgunder, Riesling'},
-      'Brandenburg':{f:'#2A1824',id:'',label:'Brandenburg',grape:''},
-      'Mecklenburg-Vorpommern':{f:'#2A1824',id:'',label:'',grape:''},
-      'Niedersachsen':{f:'#2A1824',id:'',label:'',grape:''},
-      'Schleswig-Holstein':{f:'#2A1824',id:'',label:'',grape:''},
-      'Hamburg':{f:'#2A1824',id:'',label:'',grape:''},
-      'Bremen':{f:'#2A1824',id:'',label:'',grape:''},
-      'Berlin':{f:'#2A1824',id:'',label:'',grape:''},
-      'Thüringen':{f:'#2A1824',id:'',label:'',grape:''},
+    // Bundesland → Weinregionen Mapping
+    const BL_META={
+      'Rheinland-Pfalz':{f:'#C4A882',regions:['Mosel','Nahe','Mittelrhein','Rheinhessen','Pfalz','Ahr'],grape:'Riesling, Elbling, Dornfelder'},
+      'Baden-Württemberg':{f:'#AEB8A0',regions:['Baden','Württemberg'],grape:'Spätburgunder, Riesling, Trollinger'},
+      'Bayern':{f:'#E9F056',regions:['Franken'],grape:'Silvaner, Müller-Thurgau'},
+      'Hessen':{f:'#D7EFFF',regions:['Rheingau','Hess. Bergstraße'],grape:'Riesling'},
+      'Sachsen-Anhalt':{f:'#F75C54',regions:['Saale-Unstrut'],grape:'Müller-Thurgau, Silvaner'},
+      'Sachsen':{f:'#F7A07A',regions:['Sachsen'],grape:'Müller-Thurgau, Riesling'},
+      'Nordrhein-Westfalen':{f:'#D7EFFF',regions:['Ahr','Mittelrhein'],grape:'Spätburgunder, Riesling'},
+      'Saarland':{f:'#C4A882',regions:['Mosel'],grape:'Riesling'},
+      'Brandenburg':{f:null,regions:[],grape:''},
+      'Mecklenburg-Vorpommern':{f:null,regions:[],grape:''},
+      'Niedersachsen':{f:null,regions:[],grape:''},
+      'Schleswig-Holstein':{f:null,regions:[],grape:''},
+      'Hamburg':{f:null,regions:[],grape:''},
+      'Bremen':{f:null,regions:[],grape:''},
+      'Berlin':{f:null,regions:[],grape:''},
+      'Thüringen':{f:null,regions:[],grape:''},
     };
-
-    // Individual wine regions as GeoJSON points (Anbaugebiete)
-    const WEINREGIONEN=[
-      {id:'Mosel',f:'#C4A882',lon:7.1,lat:50.0,grape:'Riesling, Elbling, Müller-Thurgau'},
-      {id:'Ahr',f:'#F75C54',lon:6.9,lat:50.5,grape:'Spätburgunder'},
-      {id:'Mittelrhein',f:'#D7EFFF',lon:7.6,lat:50.2,grape:'Riesling'},
-      {id:'Nahe',f:'#AEB8A0',lon:7.8,lat:49.8,grape:'Riesling, Müller-Thurgau'},
-      {id:'Rheingau',f:'#E9F056',lon:8.0,lat:50.0,grape:'Riesling, Spätburgunder'},
-      {id:'Rheinhessen',f:'#D7EFFF',lon:8.1,lat:49.7,grape:'Riesling, Silvaner'},
-      {id:'Hess. Bergstraße',f:'#351E28',lon:8.6,lat:49.6,grape:'Riesling, Grauburgunder'},
-      {id:'Pfalz',f:'#F75C54',lon:8.1,lat:49.3,grape:'Riesling, Spätburgunder, Dornfelder'},
-      {id:'Baden',f:'#AEB8A0',lon:8.0,lat:48.2,grape:'Spätburgunder, Grauburgunder'},
-      {id:'Württemberg',f:'#351E28',lon:9.4,lat:48.9,grape:'Trollinger, Lemberger, Riesling'},
-      {id:'Franken',f:'#E9F056',lon:10.1,lat:49.8,grape:'Silvaner, Müller-Thurgau'},
-      {id:'Saale-Unstrut',f:'#F75C54',lon:11.8,lat:51.2,grape:'Müller-Thurgau, Silvaner'},
-      {id:'Sachsen',f:'#AEB8A0',lon:13.5,lat:51.1,grape:'Müller-Thurgau, Riesling'},
-    ];
-
-    const countries=topojson.feature(worldData,worldData.objects.countries);
-    const deFeature=countries.features.find(f=>+f.id===276);
-    if(!deFeature)return;
-
-    const proj=d3.geoMercator().fitSize([W,H],deFeature);
-    const path=d3.geoPath().projection(proj);
 
     const svg2=d3.select(container).append('svg')
       .attr('width',W).attr('height',H).style('display','block');
@@ -1223,52 +1366,91 @@ function showStaticRegionMap(countryName){
     const zoomDE=d3.zoom().scaleExtent([1,8]).on('zoom',e=>gDE.attr('transform',e.transform));
     svg2.call(zoomDE).on('dblclick.zoom',null);
 
-    // Deutschland Umriss
-    gDE.append('path').datum(deFeature).attr('d',path)
-      .attr('fill','#2A1824').attr('stroke','#3A2030').attr('stroke-width',1);
-
     const countryWines=getCountryWines();
     const myR=new Set((countryWines['Deutschland']||[]).map(w=>w.region).filter(Boolean));
     const hasW=id=>[...myR].some(mr=>mr.toLowerCase().includes(id.toLowerCase())||id.toLowerCase().includes(mr.toLowerCase()));
 
-    // Weinregionen als Kreise mit Label
-    WEINREGIONEN.forEach(r=>{
-      const [cx,cy]=proj([r.lon,r.lat]);
-      const hw=hasW(r.id);
-      const radius=hw?10:7;
+    fetch('https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json')
+      .then(r=>r.json())
+      .then(geo=>{
+        const proj=d3.geoMercator().fitSize([W,H],geo);
+        const path=d3.geoPath().projection(proj);
 
-      gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius)
-        .attr('fill',r.f).attr('stroke','#120B10').attr('stroke-width',0.8)
-        .attr('opacity',hw?1:0.75).style('cursor','pointer')
-        .on('click',()=>selectSvgRegion('Deutschland',r.id,r.f));
+        geo.features.forEach(f=>{
+          const blName=f.properties.name;
+          const meta=BL_META[blName]||{f:null,regions:[],grape:''};
+          const isWeinland=!!meta.f;
+          const myWinesHere=meta.regions.some(r=>hasW(r));
 
-      if(hw){
-        gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius+3)
-          .attr('fill','none').attr('stroke',r.f).attr('stroke-width',1.5).attr('opacity',0.4);
-      }
+          gDE.append('path').datum(f).attr('d',path)
+            .attr('fill',meta.f||'#2A1824')
+            .attr('stroke','#120B10').attr('stroke-width',0.8)
+            .attr('opacity',isWeinland?(myWinesHere?1:0.72):0.35)
+            .style('cursor',isWeinland?'pointer':'default')
+            .on('click',()=>{
+              if(!isWeinland)return;
+              // Show all wine regions for this Bundesland
+              const regLabel=meta.regions.join(', ');
+              selectSvgRegion('Deutschland',regLabel,meta.f);
+            });
 
-      const shortLabel=r.id.replace('Hess. Bergstraße','H.Berg.').replace('Mittelrhein','M-Rhein').replace('Saale-Unstrut','Saale-U.');
-      gDE.append('text').attr('x',cx).attr('y',cy+radius+8)
-        .attr('text-anchor','middle').style('font-size','5px')
-        .style('font-weight','700').style('fill','#F5F2EC')
-        .style('font-family','sans-serif').style('pointer-events','none')
-        .text(shortLabel);
-    });
+          if(isWeinland){
+            const cent=path.centroid(f);
+            if(cent&&!isNaN(cent[0])){
+              const shortName=blName
+                .replace('Rheinland-Pfalz','Rh.-Pfalz')
+                .replace('Baden-Württemberg','BW')
+                .replace('Nordrhein-Westfalen','NRW')
+                .replace('Sachsen-Anhalt','Sa.-Anh.');
+              gDE.append('text').attr('x',cent[0]).attr('y',cent[1])
+                .attr('text-anchor','middle').attr('dominant-baseline','middle')
+                .style('font-size','5.5px').style('font-weight','700')
+                .style('fill',meta.f==='#E9F056'?'#1C1018':'#F5F2EC')
+                .style('pointer-events','none').style('font-family','sans-serif')
+                .text(shortName);
+              // Show wine regions below
+              gDE.append('text').attr('x',cent[0]).attr('y',cent[1]+9)
+                .attr('text-anchor','middle').attr('dominant-baseline','middle')
+                .style('font-size','4px').style('fill','rgba(245,242,236,0.6)')
+                .style('pointer-events','none').style('font-family','sans-serif')
+                .text(meta.regions.join(' · '));
+            }
+          }
+        });
 
-    // Städte
-    const cities=[
-      {n:'Berlin',lon:13.4,lat:52.5},{n:'Hamburg',lon:10.0,lat:53.55},
-      {n:'München',lon:11.58,lat:48.14},{n:'Köln',lon:6.96,lat:50.94},
-      {n:'Frankfurt',lon:8.68,lat:50.11},{n:'Stuttgart',lon:9.19,lat:48.78},
-    ];
-    cities.forEach(city=>{
-      const [cx,cy]=proj([city.lon,city.lat]);
-      gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',1.8).attr('fill','#F5F2EC').attr('opacity',0.6);
-      gDE.append('text').attr('x',cx+3).attr('y',cy+1)
-        .style('font-size','4.5px').style('fill','rgba(245,242,236,0.6)')
-        .style('font-family','sans-serif').style('pointer-events','none')
-        .text(city.n);
-    });
+        // Städte
+        const cities=[
+          {n:'Berlin',lon:13.4,lat:52.5},{n:'Hamburg',lon:10.0,lat:53.55},
+          {n:'München',lon:11.58,lat:48.14},{n:'Köln',lon:6.96,lat:50.94},
+          {n:'Frankfurt',lon:8.68,lat:50.11},{n:'Stuttgart',lon:9.19,lat:48.78},
+          {n:'Würzburg',lon:9.93,lat:49.79},{n:'Freiburg',lon:7.85,lat:47.99},
+          {n:'Trier',lon:6.64,lat:49.75},{n:'Mainz',lon:8.27,lat:49.99},
+          {n:'Dresden',lon:13.74,lat:51.05},{n:'Halle',lon:11.97,lat:51.48},
+        ];
+        cities.forEach(city=>{
+          const [cx,cy]=proj([city.lon,city.lat]);
+          gDE.append('circle').attr('cx',cx).attr('cy',cy).attr('r',2).attr('fill','#F5F2EC').attr('opacity',0.7);
+          gDE.append('text').attr('x',cx+3).attr('y',cy+1)
+            .style('font-size','4.5px').style('fill','rgba(245,242,236,0.6)')
+            .style('font-family','sans-serif').style('pointer-events','none')
+            .text(city.n);
+        });
+      })
+      .catch(()=>{
+        // Fallback mit TopoJSON Weltdaten
+        const countries=topojson.feature(worldData,worldData.objects.countries);
+        const deFeature=countries.features.find(f=>+f.id===276);
+        if(deFeature){
+          const proj=d3.geoMercator().fitSize([W,H],deFeature);
+          const path=d3.geoPath().projection(proj);
+          gDE.append('path').datum(deFeature).attr('d',path)
+            .attr('fill','#2A1824').attr('stroke','#3A2030').attr('stroke-width',1);
+          gDE.append('text').attr('x',W/2).attr('y',H/2)
+            .attr('text-anchor','middle').style('font-size','11px')
+            .style('fill','#6A6458').style('font-family','sans-serif')
+            .text('Regionen nicht ladbar');
+        }
+      });
     return;
   }
 
