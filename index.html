@@ -10,6 +10,7 @@
 <title>Weintagebuch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet"><style>
 :root {
   --bg: #1C1018;
@@ -67,7 +68,7 @@ html,body{width:100%;overflow-x:hidden}
 .bottom-nav{display:flex;background:#160E14;flex-shrink:0;padding:8px 8px;padding-bottom:max(16px,env(safe-area-inset-bottom));border-top:0.5px solid var(--border)}
 .bnav-btn{flex:1;padding:10px 4px 6px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:8px;font-weight:600;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-body);border-radius:8px;transition:all .15s}
 .bnav-btn.active{color:var(--wine);background:rgba(233,240,86,0.08)}
-.bnav-btn i{font-size:20px}
+.bnav-btn .icon{font-size:20px;display:block}
 
 /* HOME TABS */
 .home-tab-btn{flex:1;padding:14px 4px;border:none;background:none;cursor:pointer;font-size:10px;font-weight:600;color:var(--ink3);font-family:var(--font-body);border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -245,7 +246,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
         <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#d0c8bc;flex-shrink:0;transition:background .3s"></span>
         <span id="sync-btn" style="font-size:10px;color:var(--ink3);font-family:var(--font-body)">Drive</span>
       </div>
-      <button class="btn btn-wine" onclick="goAdd()"><i class="ti ti-plus"></i> Eintragen</button>
+      <button class="btn btn-wine" onclick="goAdd()">+ Eintragen</button>
     </div>
   </div>
 
@@ -283,7 +284,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <div id="panel-rebsorten" class="scroll-body" style="display:none">
     <div style="padding:12px 14px 6px;display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:10px;color:var(--ink3);font-weight:500" id="rebsorten-count"></div>
-      <button class="btn" style="font-size:10px;padding:5px 12px" onclick="showAddRebsorte()"><i class="ti ti-plus" style="font-size:12px"></i> Neue Rebsorte</button>
+      <button class="btn" style="font-size:10px;padding:5px 12px" onclick="showAddRebsorte()">+ Neue Rebsorte</button>
     </div>
     <div id="rebsorten-alpha-list" style="padding:0 14px 20px"></div>
   </div>
@@ -291,10 +292,10 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <!-- LISTE TAB (filtered results) -->
   <div id="tab-liste" class="scroll-body" style="display:none">
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0">
-      <button class="btn btn-ghost btn-icon" onclick="backToHome()" style="padding:6px"><i class="ti ti-arrow-left" style="font-size:16px"></i></button>
+      <button class="btn btn-ghost btn-icon" onclick="backToHome()" style="padding:6px">←</button>
       <div id="filter-label" style="font-size:14px;font-weight:700;color:var(--ink);flex:1;letter-spacing:-0.3px"></div>
       <div class="search-wrap" style="width:130px">
-        <i class="ti ti-search"></i>
+        
         <input class="search-input" id="sinput" placeholder="Suchen…" oninput="filterWines()" style="font-size:12px;padding:7px 10px 7px 30px">
       </div>
     </div>
@@ -305,7 +306,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <div id="tab-karte" class="scroll-body" style="display:none">
     <div style="padding:12px 16px 8px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:0.5px solid var(--border)">
       <div class="search-wrap">
-        <i class="ti ti-search"></i>
+        
         <input class="search-input" id="map-search-input" placeholder="Land oder Anbaugebiet suchen…" oninput="filterMapSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
       </div>
     </div>
@@ -317,21 +318,21 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
   <div id="tab-export" class="scroll-body" style="display:none"><div id="export-content"></div></div>
 
   <div class="bottom-nav">
-    <button class="bnav-btn active" id="bnav-home" onclick="switchMainTab('home')"><i class="ti ti-layout-grid"></i>Start</button>
-    <button class="bnav-btn" id="bnav-liste" onclick="switchMainTab('liste')"><i class="ti ti-list"></i>Alle</button>
-    <button class="bnav-btn" id="bnav-karte" onclick="switchMainTab('karte')"><i class="ti ti-map-2"></i>Karte</button>
-    <button class="bnav-btn" id="bnav-export" onclick="switchMainTab('export')"><i class="ti ti-download"></i>Export</button>
+    <button class="bnav-btn active" id="bnav-home" data-tab="home" onclick="switchMainTab('home')">⊞Start</button>
+    <button class="bnav-btn" id="bnav-liste" data-tab="liste" onclick="switchMainTab('liste')">≡Alle</button>
+    <button class="bnav-btn" id="bnav-karte" data-tab="karte" onclick="switchMainTab('karte')">🗺Karte</button>
+    <button class="bnav-btn" id="bnav-export" data-tab="export" onclick="switchMainTab('export')">↓Export</button>
   </div>
 </div>
 
 <!-- DETAIL SCREEN -->
 <div id="screen-detail" class="screen">
   <div class="topbar">
-    <button class="btn-icon btn btn-ghost" onclick="navBack()" aria-label="Zurück"><i class="ti ti-arrow-left"></i></button>
+    <button onclick="navBack()" aria-label="Zurück" style="background:none;border:none;cursor:pointer;font-size:28px;color:var(--ink);padding:8px 14px;line-height:1;font-weight:300">←</button>
     <div class="topbar-title" id="detail-topbar"></div>
     <div style="display:flex;gap:6px">
-      <button class="btn btn-ghost btn-icon" onclick="editCurrentWine()"><i class="ti ti-pencil"></i></button>
-      <button class="btn btn-ghost btn-icon" onclick="deleteWine()" style="color:#F75C54"><i class="ti ti-trash"></i></button>
+      <button class="btn btn-ghost" onclick="editCurrentWine()" style="font-size:18px;padding:4px 8px">✏️</button>
+      <button class="btn btn-ghost" onclick="deleteWine()" style="font-size:18px;padding:4px 8px;color:#F75C54">🗑</button>
     </div>
   </div>
   <div class="scroll-body" id="detail-scroll">
@@ -342,9 +343,9 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 <!-- ADD SCREEN -->
 <div id="screen-add" class="screen">
   <div class="topbar">
-    <button class="btn btn-ghost" onclick="cancelAdd()" style="gap:4px;padding:6px 10px"><i class="ti ti-arrow-left"></i> Abbrechen</button>
+    <button class="btn btn-ghost" onclick="cancelAdd()" style="gap:4px;padding:6px 10px">← Abbrechen</button>
     <div class="topbar-title">Neuer Eintrag</div>
-    <button class="btn btn-wine" onclick="saveWine()"><i class="ti ti-check"></i> Speichern</button>
+    <button class="btn btn-wine" onclick="saveWine()">✓ Speichern</button>
   </div>
   <div class="add-scroll">
     <!-- FOTO & URL -->
@@ -352,16 +353,16 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
       <div class="form-section-title">KI-Erkennung</div>
       <!-- Toggle buttons -->
       <div style="display:flex;gap:8px;margin-bottom:14px">
-        <button type="button" id="ki-tab-foto" class="btn" style="flex:1;justify-content:center;font-size:11px;background:var(--ink);color:var(--bg);border-color:var(--ink)" onclick="switchKiTab('foto')"><i class="ti ti-camera" style="font-size:13px"></i> Foto</button>
-        <button type="button" id="ki-tab-url" class="btn" style="flex:1;justify-content:center;font-size:11px" onclick="switchKiTab('url')"><i class="ti ti-link" style="font-size:13px"></i> Link</button>
+        <button type="button" id="ki-tab-foto" class="btn" style="flex:1;justify-content:center;font-size:11px;background:var(--ink);color:var(--bg);border-color:var(--ink)" onclick="switchKiTab('foto')">📷 Foto</button>
+        <button type="button" id="ki-tab-url" class="btn" style="flex:1;justify-content:center;font-size:11px" onclick="switchKiTab('url')">🔗 Link</button>
       </div>
 
       <!-- FOTO TAB -->
       <div id="ki-panel-foto">
         <label class="photo-zone" for="photo-input">
-          <i class="ti ti-camera photo-zone-icon"></i>
+          📷
           <div class="photo-zone-text">Foto aufnehmen oder hochladen</div>
-          <div class="photo-zone-badge"><i class="ti ti-sparkles" style="font-size:11px"></i> KI erkennt automatisch</div>
+          <div class="photo-zone-badge">✦ KI erkennt automatisch</div>
         </label>
         <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
         <img id="photo-preview" class="photo-preview" alt="Etikett Vorschau">
@@ -374,16 +375,16 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
             <label class="form-label">Link zur Weinseite</label>
             <input class="form-input" id="f-url" type="url" placeholder="z.B. https://www.hawesko.de/…" style="font-size:12px">
           </div>
-          <button type="button" class="btn btn-wine" style="font-size:11px;padding:8px 12px;flex-shrink:0" onclick="analyzeUrl()"><i class="ti ti-sparkles"></i> Analysieren</button>
+          <button type="button" class="btn btn-wine" style="font-size:11px;padding:8px 12px;flex-shrink:0" onclick="analyzeUrl()">✦ Analysieren</button>
         </div>
         <div style="font-size:10px;color:var(--ink3);margin-top:6px">Funktioniert gut mit: Hawesko, Jacques', Wine in Black, Gute-Weine.de, Weingut-Websites</div>
       </div>
 
-      <div class="ai-loading" id="ai-loading" style="margin-top:8px"><i class="ti ti-sparkles"></i><span>KI analysiert<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
+      <div class="ai-loading" id="ai-loading" style="margin-top:8px">✦<span>KI analysiert<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
       <div class="ai-result" id="ai-result">
         <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:10px;font-weight:500;color:var(--ink3);display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles" style="font-size:11px"></i> KI-Erkennung</div>
-          <button class="btn" style="font-size:10px;padding:4px 10px" onclick="applyAi()"><i class="ti ti-check"></i> Übernehmen</button>
+          <div style="font-size:10px;font-weight:500;color:var(--ink3);display:flex;align-items:center;gap:4px">✦ KI-Erkennung</div>
+          <button class="btn" style="font-size:10px;padding:4px 10px" onclick="applyAi()">✓ Übernehmen</button>
         </div>
         <div id="ai-grid" class="ai-grid"></div>
       </div>
@@ -500,11 +501,11 @@ function ripeDot(w){
 async function renderGrid(list){
   const grid=document.getElementById('wine-grid');
   if(!list||!list.length){
-    grid.innerHTML=`<div class="empty"><i class="ti ti-wine"></i><div class="empty-title">Noch keine Weine</div><div class="empty-sub">Tippe auf „Eintragen" um deinen ersten Wein hinzuzufügen</div></div>`;
+    grid.innerHTML=`<div class="empty">🍷<div class="empty-title">Noch keine Weine</div><div class="empty-sub">Tippe auf „Eintragen" um deinen ersten Wein hinzuzufügen</div></div>`;
     return;
   }
   const items=await Promise.all(list.map(async w=>{
-    let thumbHtml=`<div class="wine-row-thumb"><i class="ti ti-bottle wine-row-thumb-icon"></i></div>`;
+    let thumbHtml=`<div class="wine-row-thumb">🍷</div>`;
     const photo=await dbGet('photos',w.id);
     if(photo)thumbHtml=`<div class="wine-row-thumb"><img src="${photo.data}" alt="Etikett" loading="lazy"></div>`;
     const weingut=w.weingut||w.name;
@@ -519,7 +520,7 @@ async function renderGrid(list){
         <div class="wine-row-meta"><span>${meta}</span>${w.type?`<span class="${typeClass}">${w.type}</span>`:''}</div>
       </div>
       <div class="wine-row-right">
-        <i class="ti ti-chevron-right" style="font-size:14px;color:var(--ink3)"></i>
+        ›
       </div>
     </div>`;
   }));
@@ -821,16 +822,12 @@ function renderAll(){renderStats();renderTypeTiles();}
 // ── Navigation ──────────────────────────────────────────
 // Navigation history
 const navStack=[];
-function navPush(screen,data){navStack.push({screen,data});}
+function navPush(tab){navStack.push(tab);}
 function navBack(){
-  if(navStack.length>0){
-    const prev=navStack.pop();
-    if(prev.screen==='list'){switchMainTab('list');if(prev.data)applyListFilter(prev.data);}
-    else if(prev.screen==='home'){switchMainTab('home');}
-    else if(prev.screen==='map'){switchMainTab('map');}
-  } else {
-    goList();
-  }
+  // Always go back to the previous tab, or home as fallback
+  const prev=navStack.length>0?navStack.pop():'home';
+  showScreen('list'); // list screen contains all tabs
+  switchMainTab(prev);
 }
 
 function goList(){switchMainTab('home');renderAll();}
@@ -840,16 +837,16 @@ function showScreen(s){document.querySelectorAll('.screen').forEach(x=>x.classLi
 
 // ── Detail ──────────────────────────────────────────────
 async function goDetail(id){
-  // Track where we came from
-  const activeTab=document.querySelector('.bnav-btn.active');
-  const tabId=activeTab?activeTab.dataset.tab:'home';
-  navPush(tabId==='list'?'list':tabId==='map'?'map':'home');
+  // Save which tab we're coming from
+  const activeBtn=document.querySelector('.bnav-btn.active');
+  const currentTab=activeBtn?activeBtn.dataset.tab:'home';
+  navPush(currentTab);
   currentId=id;
   const w=wines.find(x=>x.id===id);if(!w)return;
   const weingut=w.weingut||w.name;const weinname=w.weinname||'';
   document.getElementById('detail-topbar').textContent=weingut;
   const photo=await dbGet('photos',id);
-  const heroHtml=photo?`<div class="detail-hero"><img src="${photo.data}" alt="Etikett"></div>`:`<div class="detail-hero"><i class="ti ti-bottle detail-hero-icon"></i></div>`;
+  const heroHtml=photo?`<div class="detail-hero"><img src="${photo.data}" alt="Etikett"></div>`:`<div class="detail-hero">🍷</div>`;
   const fullOrigin=[w.region,w.lage,w.klass].filter(Boolean).join(' › ');
   const ripeText=()=>{
     const f=parseInt(w.drinkFrom)||0,t=parseInt(w.drinkTo)||9999,n=2025;
@@ -870,7 +867,7 @@ async function goDetail(id){
         ${w.grape?`<span class="tag tag-g">${w.grape}</span>`:''}
         ${w.vintage?`<span class="tag tag-v">${w.vintage}</span>`:''}
         ${w.klass?`<span class="tag tag-k">${w.klass}</span>`:''}
-        ${w.soil?`<span class="tag tag-r"><i class="ti ti-shovel" style="font-size:9px;margin-right:2px"></i>${w.soil}</span>`:''}
+        ${w.soil?`<span class="tag tag-r">◈${w.soil}</span>`:''}
       </div>
       <div class="detail-stars">${'★'.repeat(w.rating)}${'☆'.repeat(5-w.rating)}</div>
       <div class="divider"></div>
@@ -880,16 +877,16 @@ async function goDetail(id){
       ${(w.date||w.ort||w.withwho||w.occasion)?`
         <div class="section-label">Erlebnis</div>
         <div class="experience-box">
-          ${w.date?`<div class="exp-row"><i class="ti ti-calendar"></i><span>${w.date.split('-').reverse().join('.')}</span></div>`:''}
-          ${w.ort?`<div class="exp-row"><i class="ti ti-map-pin"></i><span>${w.ort}</span></div>`:''}
-          ${w.withwho?`<div class="exp-row"><i class="ti ti-users"></i><span>${w.withwho}</span></div>`:''}
-          ${w.occasion?`<div class="exp-row"><i class="ti ti-confetti"></i><span>${w.occasion}</span></div>`:''}
+          ${w.date?`<div class="exp-row">📅<span>${w.date.split('-').reverse().join('.')}</span></div>`:''}
+          ${w.ort?`<div class="exp-row">📍<span>${w.ort}</span></div>`:''}
+          ${w.withwho?`<div class="exp-row">👥<span>${w.withwho}</span></div>`:''}
+          ${w.occasion?`<div class="exp-row">🎉<span>${w.occasion}</span></div>`:''}
         </div>`:''}
       <div class="detail-grid">
         ${w.price?`<div class="detail-stat"><div class="detail-stat-n">${w.price} €</div><div class="detail-stat-l">${w.format||'Preis'}</div></div>`:''}
         ${w.alc?`<div class="detail-stat"><div class="detail-stat-n">${w.alc}%</div><div class="detail-stat-l">Alkohol</div></div>`:''}
       </div>
-      ${w.link?`<div class="section-label">Link</div><a href="${w.link}" target="_blank" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--wine);text-decoration:none;padding:8px 0"><i class="ti ti-external-link" style="font-size:14px"></i>${w.link.replace(/^https?:\/\//,'').slice(0,50)}…</a>`:''}
+      ${w.link?`<div class="section-label">Link</div><a href="${w.link}" target="_blank" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--wine);text-decoration:none;padding:8px 0">↗${w.link.replace(/^https?:\/\//,'').slice(0,50)}…</a>`:''}
     </div>`;
   showScreen('detail');
 }
@@ -1189,7 +1186,7 @@ function filterMapSearch(q){
           <div style="font-size:10px;color:var(--ink3);margin-top:2px">${e.type==='region'?(e.land+' · '):''}${e.sub}</div>
         </div>
         ${count>0?`<span style="font-size:11px;font-weight:700;color:var(--wine);background:var(--wine-pale);padding:3px 8px;border-radius:100px">${count} Wein${count>1?'e':''}</span>`:''}
-        <i class="ti ti-chevron-right" style="color:var(--ink3);font-size:14px"></i>
+        ›
       </div>`;
     });
 
@@ -1197,7 +1194,7 @@ function filterMapSearch(q){
     if(wineMatches.length>0&&combined.length===0){
       wineMatches.slice(0,5).forEach(w=>{
         html+=`<div onclick="goDetail(${w.id})" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:0.5px solid var(--border);cursor:pointer">
-          <div style="width:36px;height:44px;background:var(--bg2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-bottle" style="color:var(--ink3)"></i></div>
+          <div style="width:36px;height:44px;background:var(--bg2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">🍷</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w.name}</div>
             <div style="font-size:10px;color:var(--ink3)">${[w.region,w.country].filter(Boolean).join(' · ')}</div>
@@ -1240,10 +1237,10 @@ function renderMapView(el){
   el.innerHTML=`
     <div style="position:relative">
       <div id="map-svg-container" style="width:100%;background:#120B10;overflow:hidden;position:relative;touch-action:none">
-        <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8a95;flex-direction:column;gap:8px"><i class="ti ti-map-2" style="font-size:28px;opacity:.4"></i>Weltkarte lädt…</div>
+        <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a8a95;flex-direction:column;gap:8px">Weltkarte lädt…</div>
       </div>
       <div id="map-back-btn" style="position:absolute;top:10px;left:10px;display:none">
-        <button class="btn btn-dark" style="font-size:10px;padding:6px 12px" onclick="mapBack()"><i class="ti ti-arrow-left"></i> Zurück</button>
+        <button class="btn btn-dark" style="font-size:10px;padding:6px 12px" onclick="mapBack()">← Zurück</button>
       </div>
       <div id="map-breadcrumb" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--ink);background:rgba(247,243,236,0.92);padding:4px 12px;border-radius:100px;display:none;white-space:nowrap"></div>
     </div>
@@ -1781,7 +1778,7 @@ function selectSvgRegion(countryName,regionId,fill){
   detailEl.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:13px;font-weight:700;color:var(--ink)">${regionId}</div>
-      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="editRegionInfo('${countryName}','${idEsc}','${fillEsc}')"><i class="ti ti-edit" style="font-size:11px"></i> Bearbeiten</button>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="editRegionInfo('${countryName}','${idEsc}','${fillEsc}')">✏ Bearbeiten</button>
     </div>
     ${info.desc?`<div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px;font-style:italic">${info.desc}</div>`:''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
@@ -1802,7 +1799,7 @@ function selectSvgRegion(countryName,regionId,fill){
     ${myWines.map(w=>`<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:10px;cursor:pointer" onclick="goDetail(${w.id})">
       <span style="background:var(--ink);color:var(--bg);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700">${w.vintage||'NV'}</span>
       <span style="font-weight:600;color:var(--ink);flex:1">${w.weingut||w.name}</span>
-      <i class="ti ti-chevron-right" style="font-size:11px;color:var(--ink3)"></i>
+      ›
     </div>`).join('')}`
     :`<div style="font-size:10px;color:var(--ink3);font-style:italic">Noch kein Wein eingetragen.</div>`}`;
 }
@@ -1813,7 +1810,7 @@ function editRegionInfo(countryName,regionId,fill){
   document.getElementById('map-region-detail').innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:12px;font-weight:700;color:var(--ink)">${regionId}</div>
-      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="selectSvgRegion('${countryName}','${idEsc}','${esc}')"><i class="ti ti-x" style="font-size:11px"></i></button>
+      <button class="btn" style="font-size:10px;padding:4px 9px" onclick="selectSvgRegion('${countryName}','${idEsc}','${esc}')">✕</button>
     </div>
     <div style="margin-bottom:7px">
       <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Beschreibung</label>
@@ -1831,7 +1828,7 @@ function editRegionInfo(countryName,regionId,fill){
       <label style="font-size:8px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px">Klassifikationen / Appellationen</label>
       <input id="edit-klass" class="finput" value="${(info.klass||'').replace(/"/g,'&quot;')}" style="font-size:12px;padding:7px 10px" placeholder="z.B. Großes Gewächs, Erstes Gewächs…">
     </div>
-    <button class="btn btn-wine" style="font-size:11px;width:100%;justify-content:center" onclick="saveRegionEdit('${countryName}','${idEsc}','${esc}')"><i class="ti ti-check"></i> Speichern</button>`;
+    <button class="btn btn-wine" style="font-size:11px;width:100%;justify-content:center" onclick="saveRegionEdit('${countryName}','${idEsc}','${esc}')">✓ Speichern</button>`;
 }
 
 function saveRegionEdit(countryName,regionId,fill){
@@ -1853,7 +1850,7 @@ function loadD3AndDraw(){
     if(worldData){drawWorldMap();return;}
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .then(r=>r.json()).then(data=>{worldData=data;drawWorldMap();})
-      .catch(()=>{const l=document.getElementById('map-loading');if(l)l.innerHTML='<i class="ti ti-wifi-off" style="font-size:20px;opacity:.4;display:block;margin-bottom:6px"></i><span style="font-size:11px">Karte nicht geladen</span>';});
+      .catch(()=>{const l=document.getElementById('map-loading');if(l)l.innerHTML='<span style="font-size:11px">Karte nicht geladen</span>';});
   }).catch(()=>{const l=document.getElementById('map-loading');if(l)l.textContent='Fehler beim Laden.';});
 }
 
@@ -1975,7 +1972,7 @@ function renderCountryList(countryWines){
           ${hasRegionMap?`<span style="font-size:8px;background:var(--wine-pale);color:var(--wine);border-radius:100px;padding:2px 7px;font-weight:700">KARTE</span>`:''}
           <span class="map-country-count">${ws.length} Weine</span>
         </div>
-        <i class="ti ti-chevron-down" style="font-size:14px;color:var(--ink3)"></i>
+        
       </div>
       <div class="map-country-wines">
         ${Object.entries(regionGroups).sort(([a],[b])=>a.localeCompare(b)).map(([r,weinguts])=>`
@@ -1984,24 +1981,24 @@ function renderCountryList(countryWines){
             ${Object.entries(weinguts).sort(([a],[b])=>a.localeCompare(b)).map(([wg,wlist])=>`
               <div class="map-weingut-block">
                 <div class="map-weingut-name" onclick="this.nextElementSibling.classList.toggle('open')">
-                  <i class="ti ti-building" style="font-size:11px;color:var(--ink3)"></i>
+                  
                   <span>${wg}</span>
                   <span style="color:var(--ink3);font-size:10px;margin-left:auto">${wlist.length}</span>
-                  <i class="ti ti-chevron-down" style="font-size:11px;color:var(--ink3)"></i>
+                  
                 </div>
                 <div class="map-weingut-wines">
                   ${Object.entries(wlist.reduce((acc,w)=>{const wn=w.weinname||w.name;if(!acc[wn])acc[wn]=[];acc[wn].push(w);return acc},{})).sort(([a],[b])=>a.localeCompare(b)).map(([wname,wnamelist])=>`
                     <div class="map-weinname-block">
                       <div class="map-weinname-row" onclick="this.nextElementSibling.classList.toggle('open')">
                         <span class="map-weinname-label">${wname}</span>
-                        <i class="ti ti-chevron-right" style="font-size:11px;color:var(--ink3)"></i>
+                        ›
                       </div>
                       <div class="map-vintage-list">
                         ${wnamelist.sort((a,b)=>(b.vintage||'0').localeCompare(a.vintage||'0')).map(w=>`
                           <div class="map-vintage-row" onclick="goDetail(${w.id})">
                             <span class="map-vintage-chip">${w.vintage||'NV'}</span>
                             <span style="font-size:11px;color:var(--ink3)">${w.type||''}</span>
-                            <i class="ti ti-chevron-right" style="font-size:12px;color:var(--ink3);margin-left:auto"></i>
+                            ›
                           </div>`).join('')}
                       </div>
                     </div>`).join('')}
@@ -2017,24 +2014,24 @@ function renderExportView(el){
   el.innerHTML=`<div class="export-section">
     <div class="export-title-row">Export & Backup</div>
     <div class="export-card">
-      <div class="export-icon" style="background:#EAF3DE;color:#3B6D11"><i class="ti ti-table"></i></div>
+      <div class="export-icon" style="background:#EAF3DE;color:#3B6D11"></div>
       <div class="export-info"><div class="export-name">Excel (.xlsx)</div><div class="export-desc">Alle Felder, filterbar</div></div>
-      <button class="btn btn-wine" onclick="exportXlsx()"><i class="ti ti-download"></i></button>
+      <button class="btn btn-wine" onclick="exportXlsx()">↓</button>
     </div>
     <div class="export-card">
-      <div class="export-icon" style="background:#FBEAF0;color:#993556"><i class="ti ti-file-type-pdf"></i></div>
+      <div class="export-icon" style="background:#FBEAF0;color:#993556"></div>
       <div class="export-info"><div class="export-name">PDF-Liste</div><div class="export-desc">Druckfreundlich</div></div>
-      <button class="btn" onclick="exportPdf()"><i class="ti ti-download"></i></button>
+      <button class="btn" onclick="exportPdf()">↓</button>
     </div>
     <div class="export-card">
-      <div class="export-icon" style="background:#E6F1FB;color:#185FA5"><i class="ti ti-file-code"></i></div>
+      <div class="export-icon" style="background:#E6F1FB;color:#185FA5"></div>
       <div class="export-info"><div class="export-name">JSON-Backup</div><div class="export-desc">Alle Daten sichern</div></div>
-      <button class="btn" onclick="exportJson()"><i class="ti ti-download"></i></button>
+      <button class="btn" onclick="exportJson()">↓</button>
     </div>
     <div class="export-card">
-      <div class="export-icon" style="background:#EEEDFE;color:#3C3489"><i class="ti ti-upload"></i></div>
+      <div class="export-icon" style="background:#EEEDFE;color:#3C3489">↑</div>
       <div class="export-info"><div class="export-name">JSON importieren</div><div class="export-desc">Backup wiederherstellen</div></div>
-      <label><input type="file" accept=".json" style="display:none" onchange="importJson(event)"><span class="btn" style="display:inline-flex"><i class="ti ti-folder-open"></i> Wählen</span></label>
+      <label><input type="file" accept=".json" style="display:none" onchange="importJson(event)"><span class="btn" style="display:inline-flex"> Wählen</span></label>
     </div>
     <div style="height:20px"></div>
   </div>`;
@@ -2046,7 +2043,7 @@ function renderExportView(el){
   let _sx=0,_sy=0,_sActive=false;
 
   function _getActiveBack(){
-    if(document.getElementById('screen-detail').classList.contains('active')) return goList;
+    if(document.getElementById('screen-detail').classList.contains('active')) return navBack;
     if(document.getElementById('screen-add').classList.contains('active')) return cancelAdd;
     // Check filtered wine list with back button visible
     const backBtn=document.querySelector('#tab-liste .btn-ghost');
@@ -2237,13 +2234,13 @@ function showRebsorteDetail(name){
   const el=document.getElementById('rebsorten-alpha-list');
   el.innerHTML=`
     <div style="padding:4px 0 14px">
-      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Alle Rebsorten</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()">← Alle Rebsorten</button>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
         <div>
           <div style="font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-0.5px">${r.name}</div>
           <div style="font-size:11px;color:var(--ink3);margin-top:2px">${r.farbe} · ${r.herkunft}</div>
         </div>
-        <button class="btn" style="font-size:10px;padding:5px 10px;flex-shrink:0" onclick="showEditRebsorte('${name.replace(/'/g,"\\'")}')"><i class="ti ti-edit" style="font-size:11px"></i> ${custom?'Bearbeiten':'Anpassen'}</button>
+        <button class="btn" style="font-size:10px;padding:5px 10px;flex-shrink:0" onclick="showEditRebsorte('${name.replace(/'/g,"\\'")}')">✏ ${custom?'Bearbeiten':'Anpassen'}</button>
       </div>
 
       <div style="background:var(--bg2);border-radius:var(--r2);padding:12px 14px;margin-bottom:10px">
@@ -2266,11 +2263,11 @@ function showRebsorteDetail(name){
             <div style="font-size:12px;font-weight:600;color:var(--ink)">${w.weingut||w.name}</div>
             <div style="font-size:10px;color:var(--ink3)">${w.region||''}</div>
           </div>
-          <i class="ti ti-chevron-right" style="font-size:12px;color:var(--ink3)"></i>
+          ›
         </div>`).join('')}`
       :`<div style="font-size:12px;color:var(--ink3);font-style:italic;text-align:center;padding:16px 0">Noch kein ${r.name} in deiner Sammlung.</div>`}
 
-      ${custom?`<button class="btn" style="font-size:10px;color:var(--wine);border-color:rgba(139,26,46,0.3);margin-top:14px" onclick="deleteRebsorte('${name.replace(/'/g,"\\'")}')"><i class="ti ti-trash" style="font-size:11px"></i> Löschen</button>`:''}
+      ${custom?`<button class="btn" style="font-size:10px;color:var(--wine);border-color:rgba(139,26,46,0.3);margin-top:14px" onclick="deleteRebsorte('${name.replace(/'/g,"\\'")}')">🗑 Löschen</button>`:''}
     </div>`;
 }
 
@@ -2280,7 +2277,7 @@ function showAddRebsorte(name=''){
   const el=document.getElementById('rebsorten-alpha-list');
   el.innerHTML=`
     <div style="padding:4px 0 20px">
-      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Zurück</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:5px 0;margin-bottom:12px" onclick="renderRebsortenList()">← Zurück</button>
       <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px">${r?'Rebsorte bearbeiten':'Neue Rebsorte'}</div>
       <div style="margin-bottom:9px"><label class="form-label">Name *</label><input class="form-input" id="rb-name" value="${r?.name||''}" placeholder="z.B. Agiorgitiko" style="font-size:13px" ${r?'readonly':''}></div>
       <div style="margin-bottom:9px"><label class="form-label">Farbe</label>
@@ -2291,7 +2288,7 @@ function showAddRebsorte(name=''){
       <div style="margin-bottom:9px"><label class="form-label">Herkunft</label><input class="form-input" id="rb-herkunft" value="${r?.herkunft||''}" placeholder="z.B. Griechenland" style="font-size:13px"></div>
       <div style="margin-bottom:9px"><label class="form-label">Charakterprofil</label><textarea class="form-input" id="rb-profil" style="font-size:12px;min-height:70px;resize:none">${r?.profil||''}</textarea></div>
       <div style="margin-bottom:14px"><label class="form-label">Typische Aromen (kommagetrennt)</label><input class="form-input" id="rb-aromen" value="${r?.aromen||''}" placeholder="z.B. Kirsche, Pfeffer, Rosen" style="font-size:13px"></div>
-      <button class="btn btn-wine" style="width:100%;justify-content:center;font-size:12px" onclick="saveRebsorte()"><i class="ti ti-check"></i> Speichern</button>
+      <button class="btn btn-wine" style="width:100%;justify-content:center;font-size:12px" onclick="saveRebsorte()">✓ Speichern</button>
     </div>`;
 }
 
