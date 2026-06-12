@@ -232,7 +232,7 @@ select.filter-chip{-webkit-appearance:none;appearance:none}
 
 /* MAP REGION DETAIL */
 .map-svg-container{background:#120B10}
-</style>>
+</style>
 </head>
 <body>
 <div id="app">
@@ -1734,26 +1734,149 @@ function showStaticRegionMap(countryName){
     return;
   }
 
-    // Andere Länder — D3
+    // Andere Länder — Länderumriss + Weinregionen als Punkte
   if(!d3Loaded||!topoLoaded||!worldData){setTimeout(()=>showStaticRegionMap(countryName),300);return;}
-  const W=container.getBoundingClientRect().width||360;const H=380;
-  const geoRegions=GEO_REGIONS[countryName];if(!geoRegions)return;
-  const regionFeatures=geoRegions.map(r=>({type:'Feature',properties:{id:r.id,fill:r.fill},geometry:{type:'Polygon',coordinates:r.coords}}));
-  const countries=topojson.feature(worldData,worldData.objects.countries);
-  const isoMap={};
-  const countryFeature=countries.features.find(f=>f.id===isoMap[countryName]);
+
+  // Weinregionen aller verbleibenden Länder
+  const POINT_REGIONS={
+    'Portugal':{iso:620,regions:[
+      {id:'Douro',f:'#F75C54',lon:-7.9,lat:41.2,grape:'Touriga Nacional, Tinta Roriz, Port'},
+      {id:'Vinho Verde',f:'#AEB8A0',lon:-8.5,lat:41.7,grape:'Alvarinho, Loureiro, Trajadura'},
+      {id:'Dão',f:'#E9F056',lon:-7.8,lat:40.5,grape:'Touriga Nacional, Encruzado'},
+      {id:'Bairrada',f:'#D7EFFF',lon:-8.5,lat:40.4,grape:'Baga, Maria Gomes'},
+      {id:'Alentejo',f:'#F7A07A',lon:-7.9,lat:38.5,grape:'Aragonês, Trincadeira, Alicante Bouschet'},
+      {id:'Lisboa',f:'#AEB8A0',lon:-9.1,lat:39.2,grape:'Arinto, Fernão Pires'},
+      {id:'Setúbal',f:'#C4A882',lon:-8.9,lat:38.5,grape:'Moscatel, Castelão'},
+      {id:'Algarve',f:'#351E28',lon:-8.1,lat:37.2,grape:'Negra Mole, Crato Branco'},
+      {id:'Madeira',f:'#F75C54',lon:-17.0,lat:32.7,grape:'Sercial, Verdelho, Bual, Malmsey'},
+    ]},
+    'Argentinien':{iso:32,regions:[
+      {id:'Mendoza',f:'#F75C54',lon:-68.8,lat:-33.0,grape:'Malbec, Cabernet Sauvignon, Torrontés'},
+      {id:'San Juan',f:'#E9F056',lon:-68.5,lat:-31.5,grape:'Syrah, Bonarda, Torrontés'},
+      {id:'La Rioja',f:'#F7A07A',lon:-67.5,lat:-29.4,grape:'Torrontés Riojano'},
+      {id:'Salta',f:'#D7EFFF',lon:-65.4,lat:-24.8,grape:'Torrontés, Malbec (Cafayate)'},
+      {id:'Neuquén/Patagonia',f:'#AEB8A0',lon:-68.1,lat:-38.9,grape:'Pinot Noir, Malbec, Sauvignon Blanc'},
+      {id:'Río Negro',f:'#C4A882',lon:-67.0,lat:-39.0,grape:'Pinot Noir, Merlot, Sauvignon Blanc'},
+      {id:'Córdoba',f:'#351E28',lon:-64.2,lat:-31.4,grape:'Torrontés, Malbec'},
+    ]},
+    'Neuseeland':{iso:554,regions:[
+      {id:'Marlborough',f:'#E9F056',lon:173.9,lat:-41.5,grape:'Sauvignon Blanc, Pinot Noir, Riesling'},
+      {id:'Central Otago',f:'#F75C54',lon:169.3,lat:-45.0,grape:'Pinot Noir, Pinot Gris, Riesling'},
+      {id:"Hawke's Bay",f:'#F7A07A',lon:176.8,lat:-39.6,grape:'Chardonnay, Merlot, Syrah'},
+      {id:'Martinborough',f:'#AEB8A0',lon:175.4,lat:-41.2,grape:'Pinot Noir, Riesling, Sauvignon Blanc'},
+      {id:'Waipara/Canterbury',f:'#D7EFFF',lon:172.7,lat:-43.4,grape:'Pinot Noir, Riesling, Chardonnay'},
+      {id:'Nelson',f:'#C4A882',lon:173.2,lat:-41.3,grape:'Sauvignon Blanc, Chardonnay, Pinot Noir'},
+      {id:'Gisborne',f:'#AEB8A0',lon:177.9,lat:-38.6,grape:'Chardonnay, Gewürztraminer'},
+    ]},
+    'Südafrika':{iso:710,regions:[
+      {id:'Stellenbosch',f:'#F75C54',lon:18.9,lat:-33.9,grape:'Cabernet Sauvignon, Pinotage, Chenin Blanc'},
+      {id:'Franschhoek',f:'#E9F056',lon:19.1,lat:-33.9,grape:'Cabernet Sauvignon, Semillon, Chardonnay'},
+      {id:'Paarl',f:'#F7A07A',lon:18.9,lat:-33.7,grape:'Cabernet Sauvignon, Chenin Blanc, Shiraz'},
+      {id:'Swartland',f:'#AEB8A0',lon:18.6,lat:-33.3,grape:'Shiraz, Chenin Blanc, Grenache'},
+      {id:'Walker Bay',f:'#D7EFFF',lon:19.4,lat:-34.4,grape:'Pinot Noir, Chardonnay'},
+      {id:'Robertson',f:'#C4A882',lon:19.9,lat:-33.8,grape:'Chardonnay, Cabernet Sauvignon, Shiraz'},
+      {id:'Constantia',f:'#351E28',lon:18.4,lat:-34.1,grape:'Sauvignon Blanc, Semillon'},
+      {id:'Elgin',f:'#AEB8A0',lon:19.0,lat:-34.2,grape:'Sauvignon Blanc, Pinot Noir, Riesling'},
+    ]},
+    'Griechenland':{iso:300,regions:[
+      {id:'Naoussa',f:'#F75C54',lon:22.1,lat:40.6,grape:'Xinomavro'},
+      {id:'Nemea',f:'#E9F056',lon:22.7,lat:37.8,grape:'Agiorgitiko'},
+      {id:'Santorini',f:'#D7EFFF',lon:25.4,lat:36.4,grape:'Assyrtiko, Nykteri'},
+      {id:'Mantinia',f:'#AEB8A0',lon:22.3,lat:37.6,grape:'Moschofilero'},
+      {id:'Cephalonia',f:'#F7A07A',lon:20.5,lat:38.2,grape:'Robola, Muscat'},
+      {id:'Patras',f:'#C4A882',lon:21.7,lat:38.3,grape:'Roditis, Muscat'},
+      {id:'Limnos',f:'#351E28',lon:25.2,lat:39.9,grape:'Muscat of Alexandria'},
+      {id:'Retsina/Attika',f:'#AEB8A0',lon:23.7,lat:38.0,grape:'Savatiano (Retsina)'},
+    ]},
+    'Ungarn':{iso:348,regions:[
+      {id:'Tokaj',f:'#F75C54',lon:21.4,lat:48.1,grape:'Furmint, Hárslevelű (Aszú)'},
+      {id:'Eger',f:'#E9F056',lon:20.4,lat:47.9,grape:'Egri Bikavér, Kékfrankos'},
+      {id:'Villány',f:'#F7A07A',lon:18.5,lat:45.9,grape:'Cabernet Sauvignon, Merlot, Zweigelt'},
+      {id:'Badacsony',f:'#D7EFFF',lon:17.5,lat:46.8,grape:'Olaszrizling, Kéknyelű'},
+    ]},
+    'Georgien':{iso:268,regions:[
+      {id:'Kakheti',f:'#F75C54',lon:45.5,lat:41.6,grape:'Rkatsiteli, Saperavi (Qvevri-Wein)'},
+      {id:'Kartli',f:'#E9F056',lon:44.1,lat:41.7,grape:'Chinuri, Goruli Mtsvane'},
+      {id:'Imereti',f:'#AEB8A0',lon:43.0,lat:42.2,grape:'Tsitska, Tsolikouri'},
+    ]},
+    'Libanon':{iso:422,regions:[
+      {id:'Bekaa-Tal',f:'#F75C54',lon:36.1,lat:33.8,grape:'Cabernet Sauvignon, Syrah, Cinsault'},
+    ]},
+    'Israel':{iso:376,regions:[
+      {id:'Galil',f:'#E9F056',lon:35.3,lat:33.0,grape:'Cabernet Sauvignon, Merlot, Syrah'},
+      {id:'Judäische Hügel',f:'#F7A07A',lon:35.0,lat:31.8,grape:'Cabernet Sauvignon, Chardonnay'},
+    ]},
+    'Kroatien':{iso:191,regions:[
+      {id:'Dalmatien',f:'#F75C54',lon:16.4,lat:43.5,grape:'Plavac Mali, Pošip'},
+      {id:'Istrien',f:'#E9F056',lon:13.9,lat:45.2,grape:'Malvazija, Teran'},
+      {id:'Slawonien',f:'#AEB8A0',lon:17.8,lat:45.3,grape:'Graševina, Riesling'},
+    ]},
+  };
+
+  const ptData=POINT_REGIONS[countryName];
+  const isoMapFallback={'Portugal':620,'Argentinien':32,'Neuseeland':554,'Südafrika':710,'Griechenland':300,'Ungarn':348,'Georgien':268,'Libanon':422,'Israel':376,'Kroatien':191};
+  const iso=ptData?ptData.iso:(isoMapFallback[countryName]||null);
+
+  const W=container.getBoundingClientRect().width||360;
+  const H=Math.round(W*1.1);
+  container.style.height=H+'px';
   container.innerHTML='';
-  const svg2=d3.select(container).append('svg').attr('width',W).attr('height',H).style('display','block');
-  const proj=d3.geoMercator().fitSize([W,H],countryFeature||{type:'FeatureCollection',features:regionFeatures});
-  const path2=d3.geoPath().projection(proj);
-  svg2.append('rect').attr('width',W).attr('height',H).attr('fill','#dde8ee');
-  if(countryFeature)svg2.append('path').datum(countryFeature).attr('d',path2).attr('fill','#f0ece4').attr('stroke','#c0b8b0').attr('stroke-width',1);
-  regionFeatures.forEach(f=>{
-    const r=f.properties;
-    svg2.append('path').datum(f).attr('d',path2).attr('id','svgr-'+r.id.replace(/[^a-zA-Z0-9]/g,'_')).attr('fill',r.fill).attr('stroke','#dde8ee').attr('stroke-width',0.7).attr('opacity',0.8).style('cursor','pointer').on('click',()=>selectSvgRegion(countryName,r.id,r.fill));
-    const c=path2.centroid(f);
-    if(c&&!isNaN(c[0]))svg2.append('text').attr('x',c[0]).attr('y',c[1]).attr('text-anchor','middle').attr('dominant-baseline','middle').style('font-size','6px').style('font-weight','700').style('fill','white').style('pointer-events','none').style('font-family','sans-serif').text(r.id);
-  });
+
+  const svgP=d3.select(container).append('svg').attr('width',W).attr('height',H).style('display','block');
+  svgP.append('rect').attr('width',W).attr('height',H).attr('fill','#120B10');
+  const gP=svgP.append('g');
+  const zoomP=d3.zoom().scaleExtent([1,8]).on('zoom',e=>gP.attr('transform',e.transform));
+  svgP.call(zoomP).on('dblclick.zoom',null);
+
+  const countryWinesP=getCountryWines();
+  const myRP=new Set((countryWinesP[countryName]||[]).map(w=>w.region).filter(Boolean));
+  const hasWP=id=>[...myRP].some(mr=>mr.toLowerCase().includes((id||'').toLowerCase())||(id||'').toLowerCase().includes(mr.toLowerCase()));
+
+  const countries=topojson.feature(worldData,worldData.objects.countries);
+  const countryFeat=iso?countries.features.find(f=>+f.id===iso):null;
+
+  if(countryFeat){
+    const proj=d3.geoMercator().fitSize([W-20,H-20],countryFeat).translate([W/2,H/2]);
+    const pathFn=d3.geoPath().projection(proj);
+
+    gP.append('path').datum(countryFeat).attr('d',pathFn)
+      .attr('fill','#2A1824').attr('stroke','#3A2030').attr('stroke-width',1);
+
+    if(ptData){
+      ptData.regions.forEach(r=>{
+        const hw=hasWP(r.id);
+        let [cx,cy]=proj([r.lon,r.lat]);
+        // Skip points outside visible area
+        if(cx<0||cy<0||cx>W||cy>H)return;
+        const radius=hw?12:8;
+
+        gP.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius)
+          .attr('fill',r.f).attr('stroke','#120B10').attr('stroke-width',0.8)
+          .attr('opacity',hw?1:0.75).style('cursor','pointer')
+          .on('click',()=>selectSvgRegion(countryName,r.id,r.f));
+
+        if(hw){
+          gP.append('circle').attr('cx',cx).attr('cy',cy).attr('r',radius+4)
+            .attr('fill','none').attr('stroke',r.f).attr('stroke-width',1.5).attr('opacity',0.4);
+        }
+
+        const shortId=r.id.replace('Neuquén/Patagonia','Patagonien').replace("Hawke's Bay",'Hawkes Bay');
+        gP.append('text').attr('x',cx).attr('y',cy+radius+9)
+          .attr('text-anchor','middle').style('font-size','5.5px').style('font-weight','700')
+          .style('fill','#F5F2EC').style('pointer-events','none').style('font-family','sans-serif')
+          .text(shortId);
+      });
+    } else {
+      // No point data — show message
+      svgP.append('text').attr('x',W/2).attr('y',H-30)
+        .attr('text-anchor','middle').style('font-size','10px').style('fill','#6A6458')
+        .style('font-family','sans-serif').text('Anbaugebiete folgen');
+    }
+  } else {
+    svgP.append('text').attr('x',W/2).attr('y',H/2)
+      .attr('text-anchor','middle').style('font-size','11px').style('fill','#6A6458')
+      .style('font-family','sans-serif').text('Karte nicht verfügbar');
+  }
 }
 
 
