@@ -484,11 +484,11 @@ textarea.form-input,textarea.finput{border-radius:20px!important}
 .bq-seg .btn,#bq-seg-karte,#bq-seg-merk,#bq-seg-lernen{border-radius:99px!important;border:1.5px solid #551E21!important;color:#551E21}
 #bq-seg-karte.on,#bq-seg-merk.on,#bq-seg-lernen.on{background:#551E21!important;color:#A9BAC2!important}
 .q-chip.on,.q-seg .btn.on{background:#551E21!important;color:#A9BAC2!important;border-color:#551E21!important}
-#bq-list .bq-row,#bq-content>.bq-row{background:#551E21;color:#F1ECE0;border:0;border-radius:24px;padding:16px 18px}
-#bq-list .bq-row:nth-child(odd),#bq-content>.bq-row:nth-child(even){background:#A9BAC2;color:#551E21}
-#bq-list .bq-name,#bq-content>.bq-row .bq-name{font:600 20px/1.2 'Poster2';text-transform:uppercase;color:inherit}
-#bq-list .bq-sub,#bq-content>.bq-row .bq-sub{color:inherit;opacity:.85}
-#bq-list .bq-price,#bq-content>.bq-row .bq-price{font:600 22px/1 'Poster2';color:inherit}
+#bq-content>.bq-row{background:#551E21;color:#F1ECE0;border:0;border-radius:24px;padding:16px 18px}
+#bq-content>.bq-row:nth-child(even){background:#A9BAC2;color:#551E21}
+#bq-content>.bq-row .bq-name{font:600 20px/1.2 'Poster2';text-transform:uppercase;color:inherit}
+#bq-content>.bq-row .bq-sub{color:inherit;opacity:.85}
+#bq-content>.bq-row .bq-price{font:600 22px/1 'Poster2';color:inherit}
 .bq-deck{background:#551E21!important;color:#F1ECE0!important;border:0!important;border-radius:26px!important;padding:18px 22px!important}
 .bq-deck b{font:600 22px/1.2 'Poster2'}.bq-deck span{color:#A9BAC2!important;text-transform:none}
 .bq-deck+.bq-deck{background:#A9BAC2!important;color:#551E21!important}.bq-deck+.bq-deck span{color:#551E21!important}
@@ -522,6 +522,29 @@ body.ohne-karte #tab-barrique .q-seg{grid-template-columns:1fr 1fr!important}
 .bq-neu textarea{width:100%;margin:10px 0;font-size:16px}.bq-neu>button{width:100%}
 .bq-leise{width:100%;margin-top:10px;border-color:transparent!important;text-decoration:underline}
 .detail-body #detail-foto{background:transparent!important;color:#A9BAC2!important;border:1.5px solid #A9BAC2!important;border-radius:99px!important;min-height:50px}
+
+/* Weinkarte: kompakt, einfarbig, nach Land und Region */
+#tab-barrique .bq-kats{flex-wrap:nowrap;gap:5px;margin:7px 0;overflow-x:auto}
+#tab-barrique .bq-kats .q-chip{flex:1 0 auto;min-height:34px!important;padding:3px 9px!important;font-size:13px!important}
+#bq-seg-karte,#bq-seg-merk,#bq-seg-lernen{min-height:36px!important;height:36px;font-size:12.5px!important;padding-top:0!important;padding-bottom:0!important}
+#tab-barrique #bq-search{min-height:40px!important;height:40px;font-size:16px;margin:0}
+.bq-filter{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.bq-filter select{min-width:0;width:100%;min-height:38px;border:1.5px solid rgba(85,30,33,.45);border-radius:99px;background:#F1ECE0;color:#551E21;font:600 13px 'Manrope',sans-serif;padding:0 10px}
+.bq-filter select.an{background:#551E21;color:#F1ECE0;border-color:#551E21}
+.bq-reset{background:none;border:0;color:#551E21;font:700 12.5px 'Manrope',sans-serif;text-decoration:underline;padding:8px 2px 2px;cursor:pointer}
+.bq-reset[hidden]{display:none}
+.bq-verwalten{margin:6px 0 0}
+.bq-verwalten>summary{font-size:12.5px;color:#551E21;text-decoration:underline;padding:6px 2px;cursor:pointer}
+.bq-hinweis{font-size:13.5px;background:#A9BAC2;color:#28100C;border-radius:10px;padding:8px 12px;margin-top:8px}
+.bq-zahl{font-size:12.5px;opacity:.75;margin:4px 0}
+.bq-kat{font:600 22px/1 'Poster2';text-transform:uppercase;color:#551E21;margin:16px 0 4px}
+.bq-land{font:600 13px/1 'Poster2';letter-spacing:.08em;text-transform:uppercase;background:#551E21;color:#F1ECE0;border-radius:6px;padding:7px 10px;margin:10px 0 2px}
+.bq-ort{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;background:#F1ECE0;color:#551E21;font:700 11.5px/1 'Manrope',sans-serif;letter-spacing:.09em;text-transform:uppercase;padding:9px 2px 5px;border-bottom:1.5px solid #551E21}
+.bq-ort span{opacity:.6;font-weight:600}
+#tab-barrique #bq-list .bq-row{display:flex;align-items:baseline;gap:10px;background:transparent!important;color:#28100C!important;border:0!important;border-bottom:1px solid rgba(85,30,33,.16)!important;border-radius:0!important;padding:5px 2px!important;margin:0!important}
+#tab-barrique #bq-list .bq-name{font:600 14.5px/1.25 'Poster2';text-transform:uppercase;color:#28100C}
+#tab-barrique #bq-list .bq-sub{font-size:11.5px;line-height:1.35;margin-top:1px;color:#28100C;opacity:.68}
+#tab-barrique #bq-list .bq-price{font:600 14.5px/1.25 'Poster2';color:#551E21;white-space:nowrap}
 </style>
 <style>
 #screen-aroma{background:#F1ECE0;position:relative}
@@ -3061,7 +3084,7 @@ function setzeKarte(list,quelle){
   const old=getKarte();
   if(old&&!confirm(`Karte ersetzen? Bisher ${old.wines.length}, neu ${list.length} Weine.`))return false;
   localStorage.setItem('wb_karte',JSON.stringify({loaded:Date.now(),file:quelle,wines:list}));
-  BQ.session=null;BQ.query='';BQ.color='';renderBarrique();showToast(`${list.length} Weine geladen ✓`);return true;
+  BQ.session=null;Object.assign(BQ,{query:'',color:'',region:'',rebe:'',preis:'',sort:''});renderBarrique();showToast(`${list.length} Weine geladen ✓`);return true;
 }
 // PDF-Karte: oft steht der Name in einer Zeile, darunter Rebsorte/Weingut mit dem Preis rechts
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
@@ -3083,14 +3106,22 @@ function ueberschrift(t){
   if(/^(schaumwein(e)?|sekt|champagner?|naturals(&freaky)?|(süß|süss)wein(e)?(&port)?|portwein|dessertwein(e)?|alkoholfrei)$/.test(k))return'';
   return null;
 }
+// Endet das Schaumwein-Kapitel? Nach einer Länderzeile muss der nächste Wein noch nach Sprudel klingen
+const SPRUDELT=/(^|[^\p{L}])(sekt|brut|nature|cr[ée]mant|champagner?|p[ée]t[ -]?nat|prosecco|lambrusco|spumante|cava|corpinnat|franciacorta|ancestral|moscato d.asti|extra dry)(?!\p{L})/iu;
 function parsePdfZeilen(zeilen){
-  const list=[];let gruppe='',ort='',offen=[];
+  const list=[];let gruppe='',ort='',land='',kat='',pruefe=false,offen=[];
   for(const raw of zeilen){
     const line=raw.trim();if(!line)continue;
     const glatt=line.replace(/\s+/g,' ');
     if(/^\d{1,3}$/.test(glatt)||/\bS\.\s*\d+$/.test(glatt)||/^(0,\d+\s*l?\s*)?(flasche|glas)?$/i.test(glatt))continue;
-    const g=ueberschrift(glatt);if(g!==null){gruppe=g;offen=[];ort=/^champagne$/i.test(glatt)?'Champagne':'';continue;}
-    if(istLand(glatt)){offen=[];ort='';continue;}
+    const g=ueberschrift(glatt);
+    if(g!==null){
+      gruppe=g;offen=[];ort=/^champagne$/i.test(glatt)?'Champagne':'';
+      const u=glatt.toLowerCase().replace(/^[\d.\s]+/,'').replace(/\s+/g,'');
+      if(/^(schaumwein|sekt)/.test(u))kat='schaum';else if(/^(süß|süss|dessert|port)/.test(u))kat='suess';else if(g)kat='';
+      continue;
+    }
+    if(istLand(glatt)){offen=[];ort='';land=/^usa$/i.test(glatt)?'USA':alsOrt(glatt);pruefe=kat==='schaum';continue;}
     let m=line.match(PDFPREIS);
     if(!m&&!JAHR.test(glatt)&&glatt.includes(','))m=line.match(/^(.*[^\d\s,.])\s+(\d{1,4}(?:,\d\d)?(?:\s*€)?)$/);
     if(!m){offen=[...offen,glatt].slice(-3);continue;}
@@ -3114,8 +3145,13 @@ function parsePdfZeilen(zeilen){
     }
     const j=name.match(JAHR);const n=j&&j[2]?j[2]:name;
     c=c||gruppe||(/ros[ée](?!\p{L})/iu.test(n)?'rosé':'');
-    list.push({v:j&&j[2]?j[1]:'',n,c,d:detail,p});
+    if(pruefe){if(!SPRUDELT.test(name+' '+detail))kat='';pruefe=false;}
+    const seg=detail.split(',');
+    list.push({v:j&&j[2]?j[1]:'',n,c,d:detail,p,l:land,r:ort||(seg.length>2?seg[seg.length-1].trim():''),k:kat});
   }
+  // Fehlt die Region, aber am Ende der Zeile steht eine, die anderswo auf der Karte vorkommt, dann gilt die
+  const bekannt=new Map(list.filter(x=>x.r).map(x=>[x.r.toLowerCase(),x.r]));
+  for(const x of list)if(!x.r){const ende=x.d.split(',').pop().trim().toLowerCase();if(bekannt.has(ende))x.r=bekannt.get(ende);}
   return list;
 }
 function pdfZeilen(items){
@@ -3200,20 +3236,98 @@ function renderBarrique(){
 }
 const karteButton=label=>`<label class="btn btn-wine bq-datei">${label}<input type="file" accept=".pdf,.txt,.md,.csv,.xlsx,.xls,application/pdf,text/plain,text/csv" style="display:none" onchange="loadKarte(event)"></label>
   <details class="bq-neu"><summary class="btn">Als Text einfügen</summary><textarea id="bq-text" class="form-input form-textarea" rows="6" placeholder="Ein Wein pro Zeile, Preis am Ende:&#10;2023 Riesling trocken, Weingut Muster 36"></textarea><button type="button" class="btn btn-wine" onclick="textKarte()">Übernehmen</button></details>`;
+// Kategorie, Land und Region eines Weins (Textlisten haben diese Angaben nicht, dort wird geschätzt)
+const katVon=x=>x.k!==undefined?x.k:/(^|[^\p{L}])(sekt|brut|cr[ée]mant|champagner|p[ée]t[ -]?nat|prosecco|lambrusco|spumante|cava|franciacorta)(?!\p{L})/iu.test(x.n)?'schaum':/(eiswein|beerenauslese|auslese(?!.*trocken)|tawny|colheita|vintage port|port blend|sauternes|grains nobles|süßwein)/i.test(x.n+' '+x.d)?'suess':'';
+const regionVon=x=>{if(x.r!==undefined)return x.r;const m=x.d.match(/\(([^()]+)\)\s*$/);if(m)return m[1];const s=x.d.split(',');return s.length>2?s[s.length-1].trim():'';};
+// Rebsorten samt anderer Namen, für den Filter
+const REBEN=[['Riesling','riesling|rheinriesling'],['Chardonnay','chardonnay|morillon'],['Pinot Noir / Spätburgunder','pinot noir|spatburgunder|blauburgunder|pinot nero'],['Weißburgunder / Pinot Blanc','weissburgunder|weißburgunder|pinot blanc|pinot bianco'],['Grauburgunder / Pinot Gris','grauburgunder|grauer burgunder|pinot gris|pinot grigio'],['Meunier','meunier|schwarzriesling'],['Sauvignon Blanc','sauvignon blanc'],['Chenin Blanc','chenin'],['Silvaner','silvaner|sylvaner'],['Grüner Veltliner','gruner veltliner'],['Scheurebe','scheurebe'],['Muskateller / Muscat','muskateller|muscat|moscato|moscatel'],['Gewürztraminer / Traminer','traminer|gewurztraminer|savagnin'],['Welschriesling','welschriesling|welsch'],['Sémillon','semillon'],['Viognier','viognier'],['Marsanne / Roussanne','marsanne|roussanne'],['Albariño','albarino|alvarinho'],['Viura / Macabeo','viura|macabeo'],['Xarel·lo','xarel.?lo'],['Cabernet Sauvignon','cabernet sauvignon'],['Cabernet Franc','cabernet franc'],['Merlot','merlot'],['Syrah / Shiraz','syrah|shiraz'],['Grenache / Garnacha','grenache|garnacha|garnatxa'],['Carignan','carignan|carinena'],['Mourvèdre / Monastrell','mourvedre|monastrell|mataro'],['Tempranillo','tempranillo|tinta de toro|tinta del pais|tinto fino'],['Sangiovese','sangiovese'],['Nebbiolo','nebbiolo'],['Barbera','barbera'],['Corvina','corvina'],['Gamay','gamay'],['Blaufränkisch / Lemberger','blaufrankisch|lemberger'],['Zweigelt','zweigelt'],['Sankt Laurent','st\\.? laurent|sankt laurent'],['Malbec','malbec'],['Petit Verdot','petit verdot'],['Zinfandel / Primitivo','zinfandel|primitivo'],['Mencía','mencia'],['Touriga Nacional','touriga nacional'],['Rieslaner','rieslaner'],['Gutedel / Chasselas','gutedel|chasselas'],['Aligoté','aligote'],['Melon de Bourgogne','melon de bourgogne'],['Glera','glera'],['Lambrusco','lambrusco'],['Lagrein','lagrein'],['Trebbiano','trebbiano'],['Ribolla Gialla','ribolla'],['Friulano','friulano'],['Arneis','arneis'],['Timorasso','timorasso'],['Vermentino','vermentino'],['Ansonica','ansonica'],['Vernaccia','vernaccia'],['Carricante','carricante'],['Godello','godello'],['Verdejo','verdejo'],['Listán','listan'],['Arinto','arinto'],['Verdelho','verdelho'],['Courbu','courbu'],['Hondarrabi Zuri','hondarrabi|hondarribi'],['Assyrtiko','assyrtiko'],['Cinsault','cinsault'],['Tannat','tannat'],['Tibouren','tibouren'],['Bonarda','bonarda'],['Tinta Negra','tinta negra'],['Alicante Bouschet','alicante bouschet'],['Port Blend','port blend']]
+  .map(([n,m])=>[n,new RegExp('(^|[^a-z])('+m.normalize('NFD').replace(/[\u0300-\u036f]/g,'')+')(?![a-z])')]);
+const ohneAkzent=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const rebenVon=x=>{const t=ohneAkzent(x.d+', '+x.n);return REBEN.filter(([,r])=>r.test(t)).map(([n])=>n);};
+const PREISE=[['0-40','bis 40 €'],['40-60','40 – 60 €'],['60-100','60 – 100 €'],['100-200','100 – 200 €'],['200-','über 200 €']];
+const imPreis=(p,f)=>{if(!f)return true;const[a,b]=f.split('-').map(Number);return(a===0||p>a)&&(!b||p<=b);};
+const SORT=[['','Sortiert: Region'],['auf','Preis aufsteigend'],['ab','Preis absteigend'],['alt','Jahrgang: alt zuerst'],['jung','Jahrgang: jung zuerst']];
+function sortiere(l,art){
+  const jahr=x=>parseInt(x.v)||null;
+  return[...l].sort((a,b)=>{
+    if(art==='auf')return a.p-b.p;if(art==='ab')return b.p-a.p;
+    const x=jahr(a),y=jahr(b);if(x===null||y===null)return(x===null)-(y===null);
+    return art==='alt'?x-y:y-x;
+  });
+}
+function resetKarte(){Object.assign(BQ,{query:'',color:'',region:'',rebe:'',preis:'',sort:''});renderBarrique();}
+const KATS=[['','Alle'],['schaum','Schaum'],['weiß','Weiß'],['rosé','Rosé'],['rot','Rot'],['orange','Orange'],['suess','Süß']];
+const inKat=(x,f)=>{if(!f)return true;const k=katVon(x);if(f==='schaum'||f==='suess')return k===f;const c=plain(x.c);return!k&&(c===plain(f)||c.startsWith(plain(f)+' ')||(f==='rosé'&&c.startsWith('rose'))||(f==='weiß'&&c.startsWith('weiss')));};
+const ortKey=x=>ohneAkzent(x.l||'')+'|'+ohneAkzent(regionVon(x));
+// Nach Kategorie, Land und Region bündeln, innerhalb davon die Reihenfolge der Karte
+function gruppiere(hits){
+  const baum=new Map();
+  const zweig=(m,key,neu)=>{if(!m.has(key))m.set(key,neu);return m.get(key);};
+  for(const x of hits){
+    const kat=zweig(baum,katVon(x),new Map());
+    const land=zweig(kat,ohneAkzent(x.l||''),{name:x.l||'',regionen:new Map()});
+    zweig(land.regionen,ohneAkzent(regionVon(x)),{name:regionVon(x),weine:[]}).weine.push(x);
+  }
+  return['schaum','','suess'].filter(k=>baum.has(k)).map(k=>({k,laender:[...baum.get(k).values()]}));
+}
+function zeile(x,region,mitFarbe){
+  const teile=x.d.split(',').map(s=>s.trim()).filter(Boolean);
+  if(region&&teile.length>1&&ohneAkzent(teile[teile.length-1])===ohneAkzent(region))teile.pop();
+  return`<div class="bq-row"><div style="flex:1;min-width:0"><div class="bq-name">${esc((x.v+' '+x.n).trim())}</div><div class="bq-sub">${esc([mitFarbe?x.c:'',teile.join(', ')].filter(Boolean).join(' · '))}</div></div><div class="bq-price">${euro(x.p)}</div></div>`;
+}
 function renderKarte(el){
   const k=getKarte();
   if(!k){el.innerHTML=`<div class="bq-empty">Füge hier deine eigene Weinkarte ein: als PDF, Excel- oder Textdatei, oder als kopierten Text.</div>${karteButton('Datei wählen')}<button type="button" class="btn bq-leise" onclick="setKarteAktiv(false)">Ich brauche keine Weinkarte</button>`;return;}
-  el.innerHTML=`<input class="search-input" id="bq-search" type="search" placeholder="🔍 Wein, Weingut, Rebsorte…" style="padding-left:14px;min-height:48px">
-    <div class="q-chips">${['','weiß','rot','rosé','orange'].map(c=>`<button class="q-chip${BQ.color===c?' on':''}" data-c="${c}">${c||'Alle'}</button>`).join('')}</div>
-    <div id="bq-list"></div>
-    <div class="bq-sub" style="margin-top:14px">Stand: geladen am ${new Date(k.loaded).toLocaleDateString('de-DE')}</div>${karteButton('Andere Karte laden')}<button type="button" class="btn bq-leise" onclick="entferneKarte()">Karte entfernen</button><button type="button" class="btn bq-leise" onclick="setKarteAktiv(false)">Weinkarte ausblenden</button>`;
+  const kats=KATS.filter(([f])=>!f||k.wines.some(x=>inKat(x,f)));
+  if(!kats.some(([f])=>f===BQ.color))BQ.color='';
+  const imFilter=k.wines.filter(x=>inKat(x,BQ.color));
+  // Auswahl „Land / Region“
+  const laender=new Map();
+  for(const x of imFilter){const l=x.l||'';if(!laender.has(l))laender.set(l,new Map());const r=regionVon(x);if(r&&!laender.get(l).has(ortKey(x)))laender.get(l).set(ortKey(x),r);}
+  const optionen=[...laender].map(([l,rs])=>{
+    const regs=[...rs].sort((a,b)=>a[1].localeCompare(b[1],'de')).map(([key,r])=>`<option value="${esc(key)}">${esc(r)}</option>`).join('');
+    return l?`<optgroup label="${esc(l)}"><option value="${esc(ohneAkzent(l)+'|*')}">${esc(l)}: alle</option>${regs}</optgroup>`:regs;
+  }).join('');
+  const zaehler=new Map();for(const x of imFilter)for(const r of rebenVon(x))zaehler.set(r,(zaehler.get(r)||0)+1);
+  const reben=[...zaehler].sort((a,b)=>a[0].localeCompare(b[0],'de'));
+  const alt=k.wines.some(x=>x.k===undefined)&&/\.pdf$/i.test(k.file||'');
+  el.innerHTML=`<input class="search-input" id="bq-search" type="search" placeholder="🔍 Wein, Weingut, Rebsorte…" style="padding-left:14px;min-height:44px">
+    <div class="q-chips bq-kats">${kats.map(([f,t])=>`<button class="q-chip${BQ.color===f?' on':''}" data-c="${f}">${t}</button>`).join('')}</div>
+    <div class="bq-filter">
+      <select id="bq-region" aria-label="Land oder Region"><option value="">Alle Regionen</option>${optionen}</select>
+      <select id="bq-rebe" aria-label="Rebsorte"><option value="">Alle Rebsorten</option>${reben.map(([r,n])=>`<option value="${esc(r)}">${esc(r)} (${n})</option>`).join('')}</select>
+      <select id="bq-preis" aria-label="Preis"><option value="">Alle Preise</option>${PREISE.map(([w,t])=>`<option value="${w}">${t}</option>`).join('')}</select>
+      <select id="bq-sort" aria-label="Sortierung">${SORT.map(([w,t])=>`<option value="${w}">${t}</option>`).join('')}</select>
+    </div>
+    <button type="button" id="bq-reset" class="bq-reset" onclick="resetKarte()" hidden>Filter zurücksetzen</button>
+    ${alt?'<div class="bq-hinweis">Lade deine PDF unter „Karte verwalten“ einmal neu, dann stimmen Regionen, Schaum und Süß.</div>':''}
+    <details class="bq-verwalten"><summary>Karte verwalten · geladen am ${new Date(k.loaded).toLocaleDateString('de-DE')}</summary>${karteButton('Andere Karte laden')}<button type="button" class="btn bq-leise" onclick="entferneKarte()">Karte entfernen</button><button type="button" class="btn bq-leise" onclick="setKarteAktiv(false)">Weinkarte ausblenden</button></details>
+    <div id="bq-list"></div>`;
   const input=document.getElementById('bq-search');input.value=BQ.query;
+  const wahlen=['region','rebe','preis','sort'].map(f=>{const s=document.getElementById('bq-'+f);s.value=BQ[f]||'';if(s.selectedIndex<0)s.value='';BQ[f]=s.value;return[f,s];});
   const show=()=>{
     const terms=plain(BQ.query).split(/\s+/).filter(Boolean);
-    const hits=k.wines.filter(x=>(!BQ.color||plain(x.c).startsWith(plain(BQ.color))&&!(BQ.color==='rot'&&plain(x.c).startsWith('rose')))&&terms.every(t=>plain(`${x.v} ${x.n} ${x.c} ${x.d}`).includes(t)));
-    document.getElementById('bq-list').innerHTML=`<div class="bq-sub">${hits.length} Weine · Flaschenpreise</div>`+hits.slice(0,80).map(karteRow).join('')+(hits.length>80?'<div class="bq-sub" style="padding:12px 0">Tippe in die Suche, um mehr einzugrenzen.</div>':'');
+    const hits=imFilter.filter(x=>{
+      if(BQ.region){const[l,r]=BQ.region.split('|');if(r==='*'?ohneAkzent(x.l||'')!==l:ortKey(x)!==BQ.region)return false;}
+      if(BQ.rebe&&!rebenVon(x).includes(BQ.rebe))return false;
+      if(!imPreis(x.p,BQ.preis))return false;
+      const text=plain(`${x.v} ${x.n} ${x.c} ${x.d} ${x.l||''} ${regionVon(x)}`);return terms.every(t=>text.includes(t));
+    });
+    const aktiv=!!(BQ.query||BQ.color||BQ.region||BQ.rebe||BQ.preis||BQ.sort);
+    document.getElementById('bq-reset').hidden=!aktiv;
+    wahlen.forEach(([f,s])=>s.classList.toggle('an',!!BQ[f]));
+    const kopf=`<div class="bq-zahl">${hits.length} Weine · Flaschenpreise</div>`;
+    const box=document.getElementById('bq-list');
+    if(!hits.length){box.innerHTML=kopf+'<div class="bq-empty">Kein Wein passt zu diesen Filtern.</div>';return;}
+    if(BQ.sort){box.innerHTML=kopf+`<section>${sortiere(hits,BQ.sort).map(x=>zeile(x,'',!BQ.color)).join('')}</section>`;return;}
+    const bloecke=gruppiere(hits);
+    box.innerHTML=kopf+bloecke.map(b=>
+      (bloecke.length>1||b.k?`<div class="bq-kat">${b.k==='schaum'?'Schaumwein':b.k==='suess'?'Süßwein':'Wein'}</div>`:'')+
+      b.laender.map(l=>(l.name?`<div class="bq-land">${esc(l.name)}</div>`:'')+[...l.regionen.values()].map(r=>
+        `<section>${r.name||!l.name?`<div class="bq-ort">${esc(r.name||'Ohne Region')}<span>${r.weine.length}</span></div>`:''}${r.weine.map(x=>zeile(x,r.name,!BQ.color||b.k)).join('')}</section>`).join('')).join('')).join('');
   };
   input.oninput=()=>{BQ.query=input.value;show();};
+  wahlen.forEach(([f,s])=>s.onchange=()=>{BQ[f]=s.value;show();});
   el.querySelectorAll('.q-chip').forEach(b=>b.onclick=()=>{BQ.color=b.dataset.c;renderKarte(el);});
   show();
 }
