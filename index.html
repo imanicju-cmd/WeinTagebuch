@@ -3063,9 +3063,93 @@ function setzeKarte(list,quelle){
   localStorage.setItem('wb_karte',JSON.stringify({loaded:Date.now(),file:quelle,wines:list}));
   BQ.session=null;BQ.query='';BQ.color='';renderBarrique();showToast(`${list.length} Weine geladen ✓`);return true;
 }
+// PDF-Karte: oft steht der Name in einer Zeile, darunter Rebsorte/Weingut mit dem Preis rechts
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+const JAHR=/^((?:19|20)\d\d(?:\/(?:19|20)\d\d)*|NV|MV)(?:\s+|$)(.*)$/i;
+const LAND=/^(deutschland|österreich|italien|frankreich|spanien|portugal|schweiz|ungarn|slowenien|kroatien|griechenland|libanon|georgien|england|usa|chile|argentinien|südafrika|australien|neuseeland|syrien)$/i;
+const istLand=t=>t.split(/\s*&\s*/).filter(Boolean).every(x=>LAND.test(x));
+const GROSS=t=>t.length<=45&&/\p{L}/u.test(t)&&!/[\d,]/.test(t)&&t===t.toUpperCase();
+const alsOrt=t=>t.toLowerCase().replace(/(^|[\s\-(])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()).replace(/ (Del|De|Du|Und) /g,m=>m.toLowerCase());
+// „weiß, Rebsorte, Weingut“: Farbe aus der Zeile nehmen, davor steht höchstens der Rest vom Namen
+const FARBZEILE=/^(.*?)(?:^|\s)(weiß|weiss|rot|ros[ée]|orange)\s*[,.]\s*(.*)$/i;
+const PDFPREIS=/^(.*?)\t\s*((?:(?:€\s*)?\d{1,4}(?:[.,](?:\d{1,2}|-{1,2}|–))?(?:\s*€)?[\t ]*)+)$/;
+function ueberschrift(t){
+  if(JAHR.test(t))return null;
+  const k=t.replace(/^[\d.\s]+/,'').replace(/\s+/g,'').toLowerCase();
+  if(/^wei(ß|ss)(wein(e)?)?$/.test(k))return'weiß';
+  if(/^ros[ée](wein(e)?)?$/.test(k))return'rosé';
+  if(/^rot(wein(e)?)?$/.test(k))return'rot';
+  if(/^(orange(wein(e)?)?)$/.test(k))return'orange';
+  if(/^(schaumwein(e)?|sekt|champagner?|naturals(&freaky)?|(süß|süss)wein(e)?(&port)?|portwein|dessertwein(e)?|alkoholfrei)$/.test(k))return'';
+  return null;
+}
+function parsePdfZeilen(zeilen){
+  const list=[];let gruppe='',ort='',offen=[];
+  for(const raw of zeilen){
+    const line=raw.trim();if(!line)continue;
+    const glatt=line.replace(/\s+/g,' ');
+    if(/^\d{1,3}$/.test(glatt)||/\bS\.\s*\d+$/.test(glatt)||/^(0,\d+\s*l?\s*)?(flasche|glas)?$/i.test(glatt))continue;
+    const g=ueberschrift(glatt);if(g!==null){gruppe=g;offen=[];ort=/^champagne$/i.test(glatt)?'Champagne':'';continue;}
+    if(istLand(glatt)){offen=[];ort='';continue;}
+    let m=line.match(PDFPREIS);
+    if(!m&&!JAHR.test(glatt)&&glatt.includes(','))m=line.match(/^(.*[^\d\s,.])\s+(\d{1,4}(?:,\d\d)?(?:\s*€)?)$/);
+    if(!m){offen=[...offen,glatt].slice(-3);continue;}
+    const text=m[1].replace(/\s+/g,' ').replace(/[\s.·…|–-]+$/,'').trim();
+    const preise=m[2].match(/\d{1,4}(?:[.,]\d{1,2})?/g);const p=zahl(preise[preise.length-1]);
+    let name=text,detail='';
+    if(!JAHR.test(text)&&offen.length){
+      let i=offen.length-1;while(i>=0&&!JAHR.test(offen[i]))i--;
+      if(i<0)i=offen.length-1;
+      if(JAHR.test(offen[i])&&i>0&&GROSS(offen[i-1]))ort=alsOrt(offen[i-1]);
+      name=offen[i];detail=[...offen.slice(i+1),text].filter(Boolean).join(' ');
+      if(/^((19|20)\d\d(\/(19|20)\d\d)*|NV|MV)$/i.test(name)&&i>0)name=offen[i-1]+' '+name;
+    }
+    offen=[];
+    if(detail&&/^((19|20)\d\d(\/(19|20)\d\d)*|NV|MV)$/i.test(name)){name+=' '+detail;detail='';}
+    if(!p||!/\p{L}/u.test(name))continue;
+    let c='';const f=detail.match(FARBZEILE);
+    if(f&&f[1]===f[1].toUpperCase()){
+      if(f[1])name+=' '+f[1];detail=f[3];c=farbe(f[2]);
+      if(ort&&detail.split(',').length<3&&!detail.toLowerCase().includes(ort.toLowerCase()))detail+=', '+ort;
+    }
+    const j=name.match(JAHR);const n=j&&j[2]?j[2]:name;
+    c=c||gruppe||(/ros[ée](?!\p{L})/iu.test(n)?'rosé':'');
+    list.push({v:j&&j[2]?j[1]:'',n,c,d:detail,p});
+  }
+  return list;
+}
+function pdfZeilen(items){
+  const teile=items.filter(i=>i.str.trim()).map(i=>({s:i.str,x:i.transform[4],y:i.transform[5],w:i.width,h:i.height||Math.abs(i.transform[3])||10})).sort((a,b)=>b.y-a.y||a.x-b.x);
+  const reihen=[];
+  for(const t of teile){const r=reihen[reihen.length-1];if(r&&Math.abs(r.y-t.y)<=Math.max(2,t.h*.45))r.t.push(t);else reihen.push({y:t.y,t:[t]});}
+  return reihen.map(r=>{let out='',ende=null;
+    for(const t of r.t.sort((a,b)=>a.x-b.x)){
+      if(ende!==null){const l=t.x-ende;if(l>t.h*1.4)out=out.trimEnd()+'\t';else if(l>t.h*.15&&!/\s$/.test(out))out+=' ';}
+      out+=t.s;ende=t.x+t.w;
+    }
+    return out;});
+}
+function ladePdfJs(){
+  if(window.pdfjsLib)return Promise.resolve();
+  return new Promise((ok,fehler)=>{const s=document.createElement('script');s.src=PDFJS+'pdf.min.js';s.onload=ok;s.onerror=()=>{s.remove();fehler(new Error('offline'));};document.head.appendChild(s);});
+}
+async function loadPdf(file){
+  try{await ladePdfJs();}catch(e){alert('PDF braucht Internet. Bitte kurz online gehen und noch einmal versuchen.');return;}
+  showToast('PDF wird gelesen…');
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';
+    const task=pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});
+    const pdf=await task.promise;const zeilen=[];
+    for(let i=1;i<=pdf.numPages;i++)zeilen.push(...pdfZeilen((await(await pdf.getPage(i)).getTextContent()).items));
+    task.destroy();
+    if(!zeilen.length){alert('In dieser PDF steckt kein Text, vermutlich ist sie eingescannt oder ein Foto. Bitte die Original-PDF nehmen.');return;}
+    const zwei=parsePdfZeilen(zeilen),eins=leseKarte(zeilen.map(z=>z.replace(/\t/g,' ')).join('\n'));
+    setzeKarte(eins.length>zwei.length*1.5?eins:zwei,file.name);
+  }catch(err){console.error(err);alert('Die PDF konnte nicht gelesen werden.');}
+}
 function loadKarte(e){
   const file=e.target.files[0];if(!file)return;e.target.value='';
-  if(/\.pdf$/i.test(file.name)){alert('PDF kann ich nicht lesen. Kopiere den Text aus der PDF und füge ihn bei „Als Text einfügen“ ein.');return;}
+  if(/\.pdf$/i.test(file.name)||file.type==='application/pdf'){loadPdf(file);return;}
   const excel=/\.xlsx?$/i.test(file.name);
   if(excel&&typeof XLSX==='undefined'){alert('Excel braucht einmal Internet. Bitte kurz warten und noch einmal versuchen.');return;}
   const r=new FileReader();
@@ -3114,11 +3198,11 @@ function renderBarrique(){
   ['karte','merk','lernen'].forEach(s=>document.getElementById('bq-seg-'+s).classList.toggle('on',s===BQ.seg));
   if(BQ.seg==='karte')renderKarte(el);else if(BQ.seg==='merk')renderMerk(el);else renderLernen(el);
 }
-const karteButton=label=>`<label class="btn btn-wine bq-datei">${label}<input type="file" accept=".txt,.md,.csv,.xlsx,.xls,.pdf,text/plain,text/csv" style="display:none" onchange="loadKarte(event)"></label>
+const karteButton=label=>`<label class="btn btn-wine bq-datei">${label}<input type="file" accept=".pdf,.txt,.md,.csv,.xlsx,.xls,application/pdf,text/plain,text/csv" style="display:none" onchange="loadKarte(event)"></label>
   <details class="bq-neu"><summary class="btn">Als Text einfügen</summary><textarea id="bq-text" class="form-input form-textarea" rows="6" placeholder="Ein Wein pro Zeile, Preis am Ende:&#10;2023 Riesling trocken, Weingut Muster 36"></textarea><button type="button" class="btn btn-wine" onclick="textKarte()">Übernehmen</button></details>`;
 function renderKarte(el){
   const k=getKarte();
-  if(!k){el.innerHTML=`<div class="bq-empty">Füge hier deine eigene Weinkarte ein: als Excel- oder Textdatei, oder als kopierten Text.</div>${karteButton('Datei wählen')}<button type="button" class="btn bq-leise" onclick="setKarteAktiv(false)">Ich brauche keine Weinkarte</button>`;return;}
+  if(!k){el.innerHTML=`<div class="bq-empty">Füge hier deine eigene Weinkarte ein: als PDF, Excel- oder Textdatei, oder als kopierten Text.</div>${karteButton('Datei wählen')}<button type="button" class="btn bq-leise" onclick="setKarteAktiv(false)">Ich brauche keine Weinkarte</button>`;return;}
   el.innerHTML=`<input class="search-input" id="bq-search" type="search" placeholder="🔍 Wein, Weingut, Rebsorte…" style="padding-left:14px;min-height:48px">
     <div class="q-chips">${['','weiß','rot','rosé','orange'].map(c=>`<button class="q-chip${BQ.color===c?' on':''}" data-c="${c}">${c||'Alle'}</button>`).join('')}</div>
     <div id="bq-list"></div>
